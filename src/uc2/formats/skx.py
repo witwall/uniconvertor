@@ -110,7 +110,7 @@ class SKX_Loader(AbstractLoader):
 			xml_reader.parse(input_source)
 			input.close
 		except:
-			pass		
+			pass
 		self.model = content_handler.model
 
 
@@ -132,7 +132,7 @@ class XMLDocReader(handler.ContentHandler):
 				code = compile(line, '<string>', 'exec')
 				exec code
 				obj.__dict__[item] = self.value
-				
+
 			if self.parent_stack:
 				parent = self.parent_stack[-1][0]
 				if self.parent_stack[-1][1]:
@@ -223,10 +223,11 @@ class SKX_Saver(AbstractSaver):
 				items.remove(item)
 		items = ['cid'] + items
 		for item in items:
-			item_str = props[item].__str__()
-			if isinstance(props[item], str):
-				item_str = "'%s'" % (escape_quote(item_str))
-			result.append((item, encode_quotes(item_str)))
+			if not item[:5] == 'cache':
+				item_str = props[item].__str__()
+				if isinstance(props[item], str):
+					item_str = "'%s'" % (escape_quote(item_str))
+				result.append((item, encode_quotes(item_str)))
 		return result
 
 	def _open_tag(self, tag, params, len):
