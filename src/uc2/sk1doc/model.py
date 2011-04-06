@@ -17,8 +17,6 @@
 
 from copy import deepcopy
 
-import cairo
-
 import uc2
 from uc2 import uc_conf
 from uc2 import _
@@ -315,10 +313,10 @@ class Rectangle(SelectableObject):
 		return [[
 				[self.start[0], self.start[1]],
 				[
-				[self.start[0] + self.width, self.start[1]],
-				[self.start[0] + self.width, self.start[1] + self.height],
-				[self.start[0], self.start[1] + self.height],
-				[self.start[0], self.start[1]]
+					[self.start[0] + self.width, self.start[1]],
+					[self.start[0] + self.width, self.start[1] + self.height],
+					[self.start[0], self.start[1] + self.height],
+					[self.start[0], self.start[1]]
 				],
 				[1]
 			]]
