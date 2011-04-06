@@ -41,9 +41,32 @@ cairo_DrawRectangle (PyObject *self, PyObject *args) {
 	return Py_None;
 }
 
+static PyObject *
+cairo_ConvertMatrixToTrafo (PyObject *self, PyObject *args) {
+
+	double m11, m12, m21, m22, dx, dy;
+	PycairoMatrix *py_matrix;
+	cairo_matrix_t *matrix;
+
+	if (!PyArg_ParseTuple(args, "O", &py_matrix)) {
+		return NULL;
+	}
+
+	matrix = &(py_matrix -> matrix);
+	m11 = matrix -> xx;
+	m12 = matrix -> xy;
+	m21 = matrix -> yx;
+	m22 = matrix -> yy;
+	dx = matrix -> x0;
+	dy = matrix -> y0;
+
+	return Py_BuildValue("[dddddd]", m11, m12, m21, m22, dx, dy);
+}
+
 static
 PyMethodDef cairo_methods[] = {
 	{"draw_rect", cairo_DrawRectangle, METH_VARARGS},
+	{"get_trafo", cairo_ConvertMatrixToTrafo, METH_VARARGS},
 	{NULL, NULL}
 };
 
