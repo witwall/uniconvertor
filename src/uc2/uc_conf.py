@@ -110,14 +110,15 @@ class UCData:
 	app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
 	if not os.path.lexists(app_config_dir):
 		os.makedirs(app_config_dir)
-	app_config = expanduser_unicode(os.path.join('~', '.config', 'uc2', 'preferences.cfg'))
+	app_config = expanduser_unicode(os.path.join('~', '.config',
+												'uc2', 'preferences.cfg'))
 
 
 class UCConfig(XmlConfigParser):
 
 	#============== GENERIC SECTION ===================
 	uc_version = ''
-	system_encoding = 'utf-8'	# default encoding for sK1 (GUI uses utf-8 only)
+	system_encoding = 'utf-8'	# default encoding (GUI uses utf-8 only)
 
 	#============== DOCUMENT SECTION ==================
 
