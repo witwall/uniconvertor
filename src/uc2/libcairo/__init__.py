@@ -16,9 +16,10 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import cairo
+#import _libcairo
 
-CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 10, 10))
-DIRECT_MATRIX = cairo.Matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
+CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 1000, 1000))
+DIRECT_MATRIX = cairo.Matrix()
 
 #Paths definition:
 #[path0, path1, ...]
@@ -33,7 +34,7 @@ DIRECT_MATRIX = cairo.Matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
 # line point - [x,y]
 # curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
 
-def create_cpath(paths, matrix):
+def create_cpath(paths, cmatrix=None):
 	CTX.set_matrix(DIRECT_MATRIX)
 	CTX.new_path()
 	for path in paths:
@@ -54,13 +55,14 @@ def create_cpath(paths, matrix):
 				CTX.curve_to(x1, y1, x2, y2, x3, y3)
 		if end:
 			CTX.close_path()
+	if not cmatrix is None:
+		CTX.transform(cmatrix)
 	return CTX.copy_path()
 
 def apply_cmatrix(cairo_path, cmatrix):
-	CTX.set_matrix(DIRECT_MATRIX)
+	CTX.set_matrix(cmatrix)
 	CTX.new_path()
 	CTX.append_path(cairo_path)
-	CTX.transform(cmatrix)
 	return CTX.copy_path()
 
 def get_cpath_bbox(cpath):
@@ -69,5 +71,51 @@ def get_cpath_bbox(cpath):
 	CTX.append_path(cpath)
 	return CTX.path_extents()
 
+def _get_trafo(cmatrix):
+	result = []
+	val = cmatrix.__str__()
+	val = val.replace('cairo.Matrix(', '')
+	val = val.replace(')', '')
+	items = val.split(', ')
+	for item in items:
+		result.append(float(item))
+	print result
+
 def get_trafo_from_matrix(cmatrix):
-	return []
+	return reverse_trafo(_get_trafo(cmatrix))
+
+def reverse_trafo(trafo):
+	m11, m12, m21, m22, dx, dy = trafo
+	if m11: m11 = 1.0 / m11
+	if m12: m12 = 1.0 / m12
+	if m21: m21 = 1.0 / m21
+	if m22: m22 = 1.0 / m22
+	dx = -dx
+	dy = -dy
+	return [m11, m12, m21, m22, dx, dy]
+
+def get_matrix_from_trafo(trafo):
+	m11, m12, m21, m22, dx, dy = reverse_trafo(trafo)
+	return cairo.Matrix(m11, m12, m21, m22, dx, dy)
+
+def reverse_matrix(cmatrix):
+	return get_matrix_from_trafo(_get_trafo(cmatrix))
+
+
+def _test():
+	_get_trafo(DIRECT_MATRIX)
+#	print get_trafo_from_matrix(DIRECT_MATRIX)
+#	paths = [
+#			[[0.0, 0.0], [
+#						[100.0, 50.0], [200.0, 40.0], [400.0, 10.0]
+#						], []]
+#			]
+#	cpath = create_cpath(paths)
+#	trafo = [2.0, 0.0, 0.0, 2.0, 0.0, 0.0]
+#	print reverse_trafo(trafo)
+#	print get_matrix_from_trafo(trafo)
+
+
+
+if __name__ == '__main__':
+	_test()

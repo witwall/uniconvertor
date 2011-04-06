@@ -325,20 +325,20 @@ class Rectangle(SelectableObject):
 
 	def update(self):
 		self.cache_paths = self._get_initial_paths()
-		m11, m12, m21, m22, dx, dy = self.trafo
-		self.cache_cmatrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
-		self.cache_cpath = libcairo.create_cpath(self.cache_paths)
+		self.cache_cmatrix = libcairo.get_matrix_from_trafo(self.trafo)
+		self.cache_cpath = libcairo.create_cpath(self.cache_paths,
+												self.cache_cmatrix)
 		self.update_bbox()
 
 	def update_bbox(self):
 		self.cache_bbox = libcairo.get_cpath_bbox(self.cache_cpath)
 
 	def apply_trafo(self, trafo):
-		m11, m12, m21, m22, dx, dy = trafo
-		matrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
+		matrix = libcairo.get_matrix_from_trafo(trafo)
 		self.cache_cmatrix = self.cache_cmatrix.multiply(matrix)
 		self.cache_cpath = libcairo.apply_cmatrix(self.cache_cpath, matrix)
 		self.trafo = libcairo.get_trafo_from_matrix(self.cache_cmatrix)
+		self.update_bbox()
 
 
 class Circle(SelectableObject):pass

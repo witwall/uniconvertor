@@ -166,7 +166,7 @@ if __name__ == "__main__":
 	cairo_module = Extension('uc2.libcairo._libcairo',
 			define_macros=[('MAJOR_VERSION', '1'),
 						('MINOR_VERSION', '0')],
-			sources=[cairo_src + '_cairo.c', ],
+			sources=[cairo_src + '_libcairo.c', ],
 			include_dirs=cairo_include_dirs,
 			libraries=['cairo'])
 
