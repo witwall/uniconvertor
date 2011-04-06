@@ -17,10 +17,48 @@
 
 from copy import deepcopy
 
+import cairo
+
 import uc2
 from uc2 import uc_conf
 from uc2 import _
 
+CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 10, 10))
+
+#Paths definition:
+#[path0, path1, ...]
+
+#Path definition:
+#[start_point, points, end_marker]
+#start_pont - [x,y]
+#end_ marker - is closed [1] if not []
+
+#Points definition:
+#[point0, point1,...]
+# line point - [x,y]
+# curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
+
+def create_cairo_path(paths):
+	CTX.new_path()
+	for path in paths:
+		start_point = path[0]
+		points = path[1]
+		end = path[2]
+		x, y = start_point
+		CTX.move_to(x, y)
+		for point in points:
+			if len(point) == 2:
+				x, y = point
+				CTX.line_to(x, y)
+			else:
+				p1, p2, p3, m = point
+				x1, y1 = p1
+				x2, y2 = p2
+				x3, y3 = p3
+				CTX.curve_to(x1, y1, x2, y2, x3, y3)
+		if end:
+			CTX.close_path()
+	return CTX.copy_path()
 
 # Document object enumeration
 DOCUMENT = 1
@@ -51,13 +89,15 @@ CLIP_GROUP = 103
 TEXT_BLOCK = 104
 TEXT_COLUMN = 105
 
+BITMAP_CLASS = 150
+PIXMAP = 151
+
 PRIMITIVE_CLASS = 200
 RECTANGLE = 201
 CIRCLE = 202
 POLYGON = 203
 CURVE = 204
 CHAR = 205
-PIXMAP = 206
 
 CID_TO_NAME = {
 	DOCUMENT: _('Document'),
@@ -116,7 +156,7 @@ class Document(DocumentObject):
 	"""
 	cid = DOCUMENT
 	metainfo = None
-	styles = []
+	styles = {}
 	profiles = []
 	doc_origin = 1
 
@@ -126,6 +166,12 @@ class Document(DocumentObject):
 		self.metainfo = None
 		self.config = config
 		self.doc_origin = self.config.doc_origin
+		self.styles = {}
+		self.styles["Default Style"] = [self.config.default_fill,
+									self.config.default_stroke,
+									self.config.default_text,
+									self.config.default_structural_style]
+
 
 
 class Pages(DocumentObject):
@@ -259,6 +305,10 @@ class ClipGroup(SelectableObject):pass
 class TextBlock(SelectableObject):pass
 class TextColumn(SelectableObject):pass
 
+#---------------Bitmap objects-----------------------
+
+class Pixmap(SelectableObject):pass
+
 #---------------Primitives---------------------------
 class Rectangle(SelectableObject):
 
@@ -267,6 +317,11 @@ class Rectangle(SelectableObject):
 	width = 10
 	height = 10
 	corners = []
+	style = []
+
+	cache_paths = None
+	cache_cairo_matrix = None
+	cache_cairo_path = None
 
 	def __init__(self, config=uc2.config, parent=None,
 				rect=[0.0, 0.0, 10, 10]):
@@ -278,7 +333,8 @@ class Rectangle(SelectableObject):
 		self.height = rect[3]
 		self.trafo = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
 		self.corners = [0.0, 0.0, 0.0, 0.0]
-		
+		self.style = [[], [], [], []]
+
 	def copy(self):
 		rect = Rectangle(self.config)
 		rect.start = [self.start[0], self.start[1]]
@@ -286,7 +342,26 @@ class Rectangle(SelectableObject):
 		rect.height = self.height
 		rect.trafo = [] + self.trafo
 		rect.corners = [] + self.corners
+		rect.style = deepcopy(self.style)
 		return rect
+
+	def _get_initial_paths(self):
+		return [[
+				[self.start[0], self.start[1]],
+				[
+				[self.start[0] + self.width, self.start[1]],
+				[self.start[0] + self.width, self.start[1] + self.height],
+				[self.start[0], self.start[1] + self.height],
+				[self.start[0], self.start[1]]
+				],
+				[1]
+			]]
+
+	def update(self):
+		self.cache_paths = self._get_initial_paths()
+		self.cache_cairo_path = create_cairo_path(self.cache_paths)
+		m11, m12, m21, m22, dx, dy = self.trafo
+		self.cache_cairo_matrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
 
 
 
@@ -294,7 +369,6 @@ class Circle(SelectableObject):pass
 class Polygon(SelectableObject):pass
 class Curve(SelectableObject):pass
 class Char(SelectableObject):pass
-class Pixmap(SelectableObject):pass
 
 
 
