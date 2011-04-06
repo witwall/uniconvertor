@@ -74,6 +74,9 @@ class Color:
 	def __init__(self, val=[libcms.TYPE_RGB_8, [0, 0, 0], 'Black']):
 		self.type, self.value, self.name = val
 
+#Color list definition:
+# [type, values, alpha, name]
+
 class ColorManager:
 
 	use_cms = False
@@ -85,10 +88,10 @@ class ColorManager:
 		self.qcolor_creator = creator
 
 	def get_cairo_color(self, color):
-		if color.type == libcms.TYPE_RGB_8:
-			return [] + color.value
-		if color.type == libcms.TYPE_CMYK_8:
-			return cmyk_to_rgb(color.value)
+		if color[0] == libcms.TYPE_RGB_8:
+			return [] + color[1]
+		if color[0] == libcms.TYPE_CMYK_8:
+			return cmyk_to_rgb(color[1])
 
 	def get_qcolor(self, color):
 		if self.qcolor_cache.has_key(color):
