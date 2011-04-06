@@ -136,38 +136,7 @@ class UCConfig(XmlConfigParser):
 
 	grid_geometry = [0, 0, 2.83465, 2.83465]
 
-#Fill description:
-#   [] empty fill
-
-#	[fill rule,
-#	 fill type,
-#	 color]
-
-#	[fill rule,
-#	 FILL_GRADIENT,
-#	 gradient]
-
-#	[fill rule,
-#	 FILL_TILED,
-#	 pattern]
-
 	default_fill = []
-
-#Stroke description:
-#   [] - empty stroke
-
-#	[stroke rule,
-#	 stroke width,
-#	 color,
-#	 dash,
-#	 caps,
-#	 joint,
-#	 miter limit, - miter limit = 1/sin(angle/2)
-#	 behind flag,
-#	 scalable flag,
-#	 markers,
-#	]
-
 	default_stroke = [
 					STROKE_MIDDLE,
 					0.1 * mm_to_pt,
@@ -180,13 +149,5 @@ class UCConfig(XmlConfigParser):
 					0,
 					[],
 					]
-
-#Text description:
-#   [] - no style
-
 	default_text = []
-
-#Structural style will contain opacity, filters etc.
-#Now it's just reserved
-
 	default_structural_style = []

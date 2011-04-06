@@ -74,8 +74,6 @@ class Color:
 	def __init__(self, val=[libcms.TYPE_RGB_8, [0, 0, 0], 'Black']):
 		self.type, self.value, self.name = val
 
-#Color list definition:
-# [type, values, alpha, name]
 
 class ColorManager:
 

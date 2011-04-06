@@ -344,19 +344,6 @@ class Polygon(SelectableObject):pass
 
 
 
-#Paths definition:
-#[path0, path1, ...]
-
-#Path definition:
-#[start_point, points, end_marker]
-#start_pont - [x,y]
-#end_ marker - is closed [1] if not []
-
-#Points definition:
-#[point0, point1,...]
-# line point - [x,y]
-# curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
-
 class Curve(SelectableObject):pass
 class Char(SelectableObject):pass
 
