@@ -22,43 +22,8 @@ import cairo
 import uc2
 from uc2 import uc_conf
 from uc2 import _
+from uc2 import libcairo
 
-CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 10, 10))
-
-#Paths definition:
-#[path0, path1, ...]
-
-#Path definition:
-#[start_point, points, end_marker]
-#start_pont - [x,y]
-#end_ marker - is closed [1] if not []
-
-#Points definition:
-#[point0, point1,...]
-# line point - [x,y]
-# curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
-
-def create_cairo_path(paths):
-	CTX.new_path()
-	for path in paths:
-		start_point = path[0]
-		points = path[1]
-		end = path[2]
-		x, y = start_point
-		CTX.move_to(x, y)
-		for point in points:
-			if len(point) == 2:
-				x, y = point
-				CTX.line_to(x, y)
-			else:
-				p1, p2, p3, m = point
-				x1, y1 = p1
-				x2, y2 = p2
-				x3, y3 = p3
-				CTX.curve_to(x1, y1, x2, y2, x3, y3)
-		if end:
-			CTX.close_path()
-	return CTX.copy_path()
 
 # Document object enumeration
 DOCUMENT = 1
@@ -296,7 +261,9 @@ class SelectableObject(DocumentObject):
 	"""
 	cid = SELECTABLE_CLASS
 	trafo = []
-	style = None
+	style = [[], [], [], []]
+
+	cache_bbox = []
 
 
 #---------------Compound objects---------------------
@@ -317,11 +284,10 @@ class Rectangle(SelectableObject):
 	width = 10
 	height = 10
 	corners = []
-	style = []
 
 	cache_paths = None
-	cache_cairo_matrix = None
-	cache_cairo_path = None
+	cache_cmatrix = None
+	cache_cpath = None
 
 	def __init__(self, config=uc2.config, parent=None,
 				rect=[0.0, 0.0, 10, 10]):
@@ -359,14 +325,40 @@ class Rectangle(SelectableObject):
 
 	def update(self):
 		self.cache_paths = self._get_initial_paths()
-		self.cache_cairo_path = create_cairo_path(self.cache_paths)
 		m11, m12, m21, m22, dx, dy = self.trafo
-		self.cache_cairo_matrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
+		self.cache_cmatrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
+		self.cache_cpath = libcairo.create_cpath(self.cache_paths)
+		self.update_bbox()
 
+	def update_bbox(self):
+		self.cache_bbox = libcairo.get_cpath_bbox(self.cache_cpath)
+
+	def apply_trafo(self, trafo):
+		m11, m12, m21, m22, dx, dy = trafo
+		matrix = cairo.Matrix(m11, m12, m21, m22, dx, dy)
+		self.cache_cmatrix = self.cache_cmatrix.multiply(matrix)
+		self.cache_cpath = libcairo.apply_cmatrix(self.cache_cpath, matrix)
+		self.trafo = libcairo.get_trafo_from_matrix(self.cache_cmatrix)
 
 
 class Circle(SelectableObject):pass
 class Polygon(SelectableObject):pass
+
+
+
+#Paths definition:
+#[path0, path1, ...]
+
+#Path definition:
+#[start_point, points, end_marker]
+#start_pont - [x,y]
+#end_ marker - is closed [1] if not []
+
+#Points definition:
+#[point0, point1,...]
+# line point - [x,y]
+# curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
+
 class Curve(SelectableObject):pass
 class Char(SelectableObject):pass
 
