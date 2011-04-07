@@ -21,19 +21,6 @@ import cairo
 CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 1000, 1000))
 DIRECT_MATRIX = cairo.Matrix()
 
-#Paths definition:
-#[path0, path1, ...]
-
-#Path definition:
-#[start_point, points, end_marker]
-#start_pont - [x,y]
-#end_ marker - is closed [1] if not []
-
-#Points definition:
-#[point0, point1,...]
-# line point - [x,y]
-# curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
-
 def create_cpath(paths, cmatrix=None):
 	CTX.set_matrix(DIRECT_MATRIX)
 	CTX.new_path()
@@ -65,11 +52,46 @@ def apply_cmatrix(cairo_path, cmatrix):
 	CTX.append_path(cairo_path)
 	return CTX.copy_path()
 
+def normalize_bbox(bbox):
+	x0, y0, x1, y1 = bbox
+	new_bbox = [0, 0, 0, 0]
+	if x0 < x1:
+		new_bbox[0] = x0
+		new_bbox[2] = x1
+	else:
+		new_bbox[0] = x1
+		new_bbox[2] = x0 - x1
+	if y0 < y1:
+		new_bbox[1] = y0
+		new_bbox[3] = y1
+	else:
+		new_bbox[1] = y1
+		new_bbox[3] = y0
+	return new_bbox
+
 def get_cpath_bbox(cpath):
 	CTX.set_matrix(DIRECT_MATRIX)
 	CTX.new_path()
 	CTX.append_path(cpath)
-	return CTX.path_extents()
+	return normalize_bbox(CTX.path_extents())
+
+def sum_bbox(bbox1, bbox2):
+	x0, y0, x1, y1 = bbox1
+	_x0, _y0, _x1, _y1 = bbox2
+	new_x0 = min(x0, _x0, x1, _x1)
+	new_x1 = max(x0, _x0, x1, _x1)
+	new_y0 = min(y0, _y0, y1, _y1)
+	new_y1 = max(y0, _y0, y1, _y1)
+	return [new_x0, new_y0, new_x1, new_y1]
+
+def is_bbox_in_rect(rect, bbox):
+	x0, y0, x1, y1 = rect
+	_x0, _y0, _x1, _y1 = bbox
+	if x0 > _x0: return False
+	if y0 > _y0: return False
+	if x1 < _x1: return False
+	if y1 < _y1: return False
+	return True
 
 def _get_trafo(cmatrix):
 	result = []
