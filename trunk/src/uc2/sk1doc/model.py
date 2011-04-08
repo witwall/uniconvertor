@@ -265,7 +265,39 @@ class SelectableObject(DocumentObject):
 
 
 #---------------Compound objects---------------------
-class Group(SelectableObject):pass
+class Group(SelectableObject):
+
+	cid = GROUP
+	childs = []
+
+	def __init__(self, config=uc2.config, parent=None, childs=[]):
+		self.childs = []
+		self.config = config
+		self.parent = parent
+		self.childs += childs
+
+	def copy(self):
+		childs_copy = []
+		for child in self.childs:
+			childs_copy.append(child.copy())
+		return Group(self.config, None, childs_copy)
+
+	def apply_trafo(self, trafo):
+		for child in self.childs:
+			child.apply_trafo(trafo)
+
+	def update_bbox(self):
+		for child in self.childs:
+			child.update_bbox()
+		if self.childs:
+			self.cache_bbox = deepcopy(self.childs[0].cache_bbox)
+			for child in self.childs[1:]:
+				self.cache_bbox = libcairo.sum_bbox(self.cache_bbox,
+												child.cache_bbox)
+
+	def update(self):
+		self.update_bbox()
+
 class ClipGroup(SelectableObject):pass
 class TextBlock(SelectableObject):pass
 class TextColumn(SelectableObject):pass
