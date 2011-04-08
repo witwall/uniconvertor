@@ -94,9 +94,6 @@ JOIN_ROUND = 1
 JOIN_BEVEL = 2
 
 
-DEFAULT_MITER_ANGLE = 45.0
-DEFAULT_MITER_LIMIT = 1 / math.sin(DEFAULT_MITER_ANGLE / 2.0)
-
 CAP_BUTT = 1
 CAP_ROUND = 2
 CAP_SQUARE = 3
@@ -138,17 +135,33 @@ class UCConfig(XmlConfigParser):
 	grid_geometry = [0, 0, 2.83465, 2.83465]
 
 	default_fill = []
+	default_fill_rule = FILL_EVENODD
+
+
+	default_stroke_rule = STROKE_MIDDLE
+	default_stroke_width = 0.1 * mm_to_pt
+	default_stroke_color = [COLOR_CMYK, [0.0, 0.0, 0.0, 1.0], 1.0, 'Black']
+	default_stroke_dash = []
+	default_stroke_cap = CAP_BUTT
+	default_stroke_join = JOIN_MITER
+	default_stroke_miter_angle = 45.0
+	default_stroke_miter_limit = 1 / math.sin(default_stroke_miter_angle / 2.0)
+	default_stroke_behind_flag = 0
+	default_stroke_scalable_flag = 0
+	default_stroke_markers = []
+
 	default_stroke = [
-					STROKE_MIDDLE,
-					0.1 * mm_to_pt,
-					[COLOR_CMYK, [0.0, 0.0, 0.0, 1.0], 1.0, 'Black'],
-					[],
-					CAP_BUTT,
-					JOIN_MITER,
-					DEFAULT_MITER_LIMIT,
-					0,
-					0,
-					[],
+					default_stroke_rule,
+					default_stroke_width,
+					default_stroke_color,
+					default_stroke_dash,
+					default_stroke_cap,
+					default_stroke_join,
+					default_stroke_miter_limit,
+					default_stroke_behind_flag,
+					default_stroke_scalable_flag,
+					default_stroke_markers,
 					]
+
 	default_text = []
 	default_structural_style = []

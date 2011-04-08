@@ -130,10 +130,10 @@ class Document(DocumentObject):
 		self.config = config
 		self.doc_origin = self.config.doc_origin
 		self.styles = {}
-		self.styles["Default Style"] = [self.config.default_fill,
-									self.config.default_stroke,
-									self.config.default_text,
-									self.config.default_structural_style]
+		self.styles["Default Style"] = [deepcopy(self.config.default_fill),
+									deepcopy(self.config.default_stroke),
+									deepcopy(self.config.default_text),
+									deepcopy(self.config.default_structural_style)]
 
 
 
@@ -153,7 +153,7 @@ class Pages(DocumentObject):
 		self.parent = parent
 		self.config = config
 		format = '' + self.config.page_format
-		size = uc_conf.PAGE_FORMATS[format]
+		size = deepcopy(uc_conf.PAGE_FORMATS[format])
 		orient = config.page_orientation
 		self.page_format = [format, size, orient]
 
@@ -189,7 +189,7 @@ class Page(StructuralObject):
 		self.name = name
 		if parent is None:
 			format = '' + self.config.page_format
-			size = uc_conf.PAGE_FORMATS[format]
+			size = deepcopy(uc_conf.PAGE_FORMATS[format])
 			orient = config.page_orientation
 			self.page_format = [format, size, orient]
 		else:
