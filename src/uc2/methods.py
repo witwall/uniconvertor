@@ -17,21 +17,30 @@
 
 
 class UCMethods:
-	
+
 	presenter = None
 	model = None
-	
+
 	def __init__(self, presenter):
 		self.presenter = presenter
 		self.model = presenter.model
-		
+
 	def set_doc_origin(self, origin):
 		self.model.doc_origin = origin
-		
+
 	def delete_object(self, obj):
 		parent = obj.parent
 		parent.childs.remove(obj)
-	
+
 	def insert_object(self, obj, parent, index):
 		parent.childs.insert(index, obj)
 		obj.parent = parent
+
+	def append_object(self, obj, parent):
+		parent.childs.append(obj)
+		obj.parent = parent
+
+	def append_objects(self, objs, parent):
+		parent.childs += objs
+		for obj in objs:
+			obj.parent = parent
