@@ -47,9 +47,10 @@ def create_cpath(paths, cmatrix=None):
 	return CTX.copy_path()
 
 def apply_cmatrix(cairo_path, cmatrix):
-	CTX.set_matrix(cmatrix)
+	CTX.set_matrix(DIRECT_MATRIX)
 	CTX.new_path()
 	CTX.append_path(cairo_path)
+	CTX.set_matrix(cmatrix)
 	return CTX.copy_path()
 
 def normalize_bbox(bbox):
@@ -100,8 +101,9 @@ def _get_trafo(cmatrix):
 	val = val.replace(')', '')
 	items = val.split(', ')
 	for item in items:
-		result.append(float(item))
-	print result
+		val = item.replace(',', '.')
+		result.append(float(val))
+	return result
 
 def get_trafo_from_matrix(cmatrix):
 	return reverse_trafo(_get_trafo(cmatrix))
