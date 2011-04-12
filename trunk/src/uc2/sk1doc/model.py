@@ -316,7 +316,6 @@ class Rectangle(SelectableObject):
 	corners = []
 
 	cache_paths = None
-	cache_cmatrix = None
 	cache_cpath = None
 
 	def __init__(self, config=uc2.config, parent=None,
@@ -355,20 +354,24 @@ class Rectangle(SelectableObject):
 
 	def update(self):
 		self.cache_paths = self._get_initial_paths()
-		self.cache_cmatrix = libcairo.get_matrix_from_trafo(self.trafo)
-		self.cache_cpath = libcairo.create_cpath(self.cache_paths,
-												self.cache_cmatrix)
+		self.cache_cpath = libcairo.create_cpath(self.cache_paths)
+		libcairo.apply_trafo(self.cache_cpath, self.trafo)
 		self.update_bbox()
 
 	def update_bbox(self):
 		self.cache_bbox = libcairo.get_cpath_bbox(self.cache_cpath)
 
 	def apply_trafo(self, trafo):
-		matrix = libcairo.get_matrix_from_trafo(trafo)
-		self.cache_cmatrix = self.cache_cmatrix.multiply(matrix)
-		self.cache_cpath = libcairo.apply_cmatrix(self.cache_cpath, matrix)
-		self.trafo = libcairo.get_trafo_from_matrix(self.cache_cmatrix)
+		self.cache_cpath = libcairo.apply_trafo(self.cache_cpath, trafo)
+		self.trafo = libcairo.multiply_trafo(self.trafo, trafo)
 		self.update_bbox()
+
+	def get_trafo_snapshot(self):
+		return (self, [] + self.trafo, [] + self.cache_bbox,
+			libcairo.copy_cpath(self.cache_cpath))
+
+	def set_trafo_snapshot(self, snapshot):
+		p, self.trafo, self.cache_bbox, self.cache_cpath = snapshot
 
 
 class Circle(SelectableObject):pass

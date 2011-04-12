@@ -16,9 +16,9 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import cairo
-#import _libcairo
+import _libcairo
 
-CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 1000, 1000))
+CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 100, 100))
 DIRECT_MATRIX = cairo.Matrix()
 
 def create_cpath(paths, cmatrix=None):
@@ -42,16 +42,34 @@ def create_cpath(paths, cmatrix=None):
 				CTX.curve_to(x1, y1, x2, y2, x3, y3)
 		if end:
 			CTX.close_path()
+
+	cairo_path = CTX.copy_path()
 	if not cmatrix is None:
-		CTX.transform(cmatrix)
-	return CTX.copy_path()
+		cairo_path = apply_cmatrix(cairo_path, cmatrix)
+	return cairo_path
 
 def apply_cmatrix(cairo_path, cmatrix):
+	trafo = get_trafo_from_matrix(cmatrix)
+	return apply_trafo(cairo_path, trafo)
+
+def copy_cpath(cairo_path):
 	CTX.set_matrix(DIRECT_MATRIX)
 	CTX.new_path()
 	CTX.append_path(cairo_path)
-	CTX.set_matrix(cmatrix)
 	return CTX.copy_path()
+
+def apply_trafo(cairo_path, trafo, copy=False):
+	if copy:
+		cairo_path = copy_cpath(cairo_path)
+	m11, m12, m21, m22, dx, dy = trafo
+	_libcairo.apply_trafo(cairo_path, m11, m12, m21, m22, dx, dy)
+	return cairo_path
+
+def multiply_trafo(trafo1, trafo2):
+	matrix1 = get_matrix_from_trafo(trafo1)
+	matrix2 = get_matrix_from_trafo(trafo2)
+	matrix = matrix1 * matrix2
+	return _libcairo.get_trafo(matrix)
 
 def normalize_bbox(bbox):
 	x0, y0, x1, y1 = bbox
@@ -106,7 +124,7 @@ def _get_trafo(cmatrix):
 	return result
 
 def get_trafo_from_matrix(cmatrix):
-	return reverse_trafo(_get_trafo(cmatrix))
+	return _libcairo.get_trafo(cmatrix)
 
 def reverse_trafo(trafo):
 	m11, m12, m21, m22, dx, dy = trafo
@@ -119,23 +137,38 @@ def reverse_trafo(trafo):
 	return [m11, m12, m21, m22, dx, dy]
 
 def get_matrix_from_trafo(trafo):
-	m11, m12, m21, m22, dx, dy = reverse_trafo(trafo)
+	m11, m12, m21, m22, dx, dy = trafo
+#	m11, m12, m21, m22, dx, dy = reverse_trafo(trafo)
 	return cairo.Matrix(m11, m12, m21, m22, dx, dy)
 
 def reverse_matrix(cmatrix):
 	return get_matrix_from_trafo(_get_trafo(cmatrix))
 
+def apply_trafo_to_point(point, trafo):
+	x0, y0 = point
+	m11, m12, m21, m22, dx, dy = trafo
+	x1 = m11 * x0 + m12 * y0 + dx
+	y1 = m21 * x0 + m22 * y0 + dy
+	return [x1, y1]
+
+def apply_trafo_to_bbox(bbox, trafo):
+	x0, y0, x1, y1 = bbox
+	start = apply_trafo_to_point([x0, y0], trafo)
+	end = apply_trafo_to_point([x1, y1], trafo)
+	return start + end
 
 def _test():
 	_get_trafo(DIRECT_MATRIX)
-#	print get_trafo_from_matrix(DIRECT_MATRIX)
-#	paths = [
-#			[[0.0, 0.0], [
-#						[100.0, 50.0], [200.0, 40.0], [400.0, 10.0]
-#						], []]
-#			]
-#	cpath = create_cpath(paths)
-#	trafo = [2.0, 0.0, 0.0, 2.0, 0.0, 0.0]
+	print get_trafo_from_matrix(DIRECT_MATRIX)
+	paths = [
+			[[0.0, 0.0], [
+						[100.0, 50.0], [200.0, 40.0], [400.0, 10.0]
+						], []]
+			]
+	cpath = create_cpath(paths)
+	trafo = [1.0, 0.0, 0.0, 2.0, 20.0, 30.0]
+	print apply_cmatrix(cpath, get_matrix_from_trafo(trafo))
+
 #	print reverse_trafo(trafo)
 #	print get_matrix_from_trafo(trafo)
 
