@@ -41,6 +41,63 @@ cairo_DrawRectangle (PyObject *self, PyObject *args) {
 	return Py_None;
 }
 
+
+static PyObject *
+cairo_ApplyTrafoToPath (PyObject *self, PyObject *args) {
+
+	double m11, m12, m21, m22, dx, dy, x, y;
+    int i;
+	PycairoPath *pypath;
+    cairo_path_t *path;
+    cairo_path_data_t *data;
+
+	if (!PyArg_ParseTuple(args, "Odddddd",
+			&pypath, &m11, &m12, &m21, &m22, &dx, &dy)) {
+		return NULL;
+	}
+
+    path = pypath ->path;
+
+    for (i=0; i < path->num_data; i += path->data[i].header.length) {
+        data = &path->data[i];
+		switch (data->header.type) {
+			case CAIRO_PATH_MOVE_TO:
+				x = data[1].point.x;
+				y = data[1].point.y;
+				data[1].point.x = m11 * x + m12 * y + dx;
+				data[1].point.y = m21 * x + m22 * y + dy;
+				break;
+			case CAIRO_PATH_LINE_TO:
+				x = data[1].point.x;
+				y = data[1].point.y;
+				data[1].point.x = m11 * x + m12 * y + dx;
+				data[1].point.y = m21 * x + m22 * y + dy;
+				break;
+			case CAIRO_PATH_CURVE_TO:
+				x = data[1].point.x;
+				y = data[1].point.y;
+				data[1].point.x = m11 * x + m12 * y + dx;
+				data[1].point.y = m21 * x + m22 * y + dy;
+
+				x = data[2].point.x;
+				y = data[2].point.y;
+				data[2].point.x = m11 * x + m12 * y + dx;
+				data[2].point.y = m21 * x + m22 * y + dy;
+
+				x = data[3].point.x;
+				y = data[3].point.y;
+				data[3].point.x = m11 * x + m12 * y + dx;
+				data[3].point.y = m21 * x + m22 * y + dy;
+				break;
+			case CAIRO_PATH_CLOSE_PATH:
+				break;
+        }
+    }
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *
 cairo_ConvertMatrixToTrafo (PyObject *self, PyObject *args) {
 
@@ -67,6 +124,7 @@ static
 PyMethodDef cairo_methods[] = {
 	{"draw_rect", cairo_DrawRectangle, METH_VARARGS},
 	{"get_trafo", cairo_ConvertMatrixToTrafo, METH_VARARGS},
+	{"apply_trafo", cairo_ApplyTrafoToPath, METH_VARARGS},
 	{NULL, NULL}
 };
 
