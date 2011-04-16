@@ -138,7 +138,7 @@ def reverse_trafo(trafo):
 
 def get_matrix_from_trafo(trafo):
 	m11, m12, m21, m22, dx, dy = trafo
-	return cairo.Matrix(m11, m12, m21, m22, dx, dy)
+	return cairo.Matrix(m11, m21, m12, m22, dx, dy)
 
 def reverse_matrix(cmatrix):
 	return get_matrix_from_trafo(_get_trafo(cmatrix))
