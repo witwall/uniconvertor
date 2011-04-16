@@ -138,7 +138,6 @@ def reverse_trafo(trafo):
 
 def get_matrix_from_trafo(trafo):
 	m11, m12, m21, m22, dx, dy = trafo
-#	m11, m12, m21, m22, dx, dy = reverse_trafo(trafo)
 	return cairo.Matrix(m11, m12, m21, m22, dx, dy)
 
 def reverse_matrix(cmatrix):
@@ -156,6 +155,18 @@ def apply_trafo_to_bbox(bbox, trafo):
 	start = apply_trafo_to_point([x0, y0], trafo)
 	end = apply_trafo_to_point([x1, y1], trafo)
 	return start + end
+
+def convert_bbox_to_cpath(bbox):
+	x0, y0, x1, y1 = bbox
+	CTX.set_matrix(DIRECT_MATRIX)
+	CTX.new_path()
+	CTX.move_to(x0, y0)
+	CTX.line_to(x1, y0)
+	CTX.line_to(x1, y1)
+	CTX.line_to(x0, y1)
+	CTX.line_to(x0, y0)
+	CTX.close_path()
+	return CTX.copy_path()
 
 def _test():
 	_get_trafo(DIRECT_MATRIX)
