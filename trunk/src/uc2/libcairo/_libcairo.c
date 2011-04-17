@@ -51,7 +51,7 @@ cairo_ApplyTrafoToPath (PyObject *self, PyObject *args) {
     cairo_path_data_t *data;
 
 	if (!PyArg_ParseTuple(args, "Odddddd",
-			&pypath, &m11, &m12, &m21, &m22, &dx, &dy)) {
+			&pypath, &m11, &m21, &m12, &m22, &dx, &dy)) {
 		return NULL;
 	}
 
@@ -110,13 +110,13 @@ cairo_ConvertMatrixToTrafo (PyObject *self, PyObject *args) {
 
 	matrix = &(py_matrix -> matrix);
 	m11 = matrix -> xx;
-	m12 = matrix -> xy;
 	m21 = matrix -> yx;
+	m12 = matrix -> xy;
 	m22 = matrix -> yy;
 	dx = matrix -> x0;
 	dy = matrix -> y0;
 
-	return Py_BuildValue("[dddddd]", m11, m12, m21, m22, dx, dy);
+	return Py_BuildValue("[dddddd]", m11, m21, m12, m22, dx, dy);
 }
 
 static
