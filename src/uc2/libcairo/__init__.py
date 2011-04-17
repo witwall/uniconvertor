@@ -61,8 +61,8 @@ def copy_cpath(cairo_path):
 def apply_trafo(cairo_path, trafo, copy=False):
 	if copy:
 		cairo_path = copy_cpath(cairo_path)
-	m11, m12, m21, m22, dx, dy = trafo
-	_libcairo.apply_trafo(cairo_path, m11, m12, m21, m22, dx, dy)
+	m11, m21, m12, m22, dx, dy = trafo
+	_libcairo.apply_trafo(cairo_path, m11, m21, m12, m22, dx, dy)
 	return cairo_path
 
 def multiply_trafo(trafo1, trafo2):
@@ -127,17 +127,17 @@ def get_trafo_from_matrix(cmatrix):
 	return _libcairo.get_trafo(cmatrix)
 
 def reverse_trafo(trafo):
-	m11, m12, m21, m22, dx, dy = trafo
+	m11, m21, m12, m22, dx, dy = trafo
 	if m11: m11 = 1.0 / m11
 	if m12: m12 = 1.0 / m12
 	if m21: m21 = 1.0 / m21
 	if m22: m22 = 1.0 / m22
 	dx = -dx
 	dy = -dy
-	return [m11, m12, m21, m22, dx, dy]
+	return [m11, m21, m12, m22, dx, dy]
 
 def get_matrix_from_trafo(trafo):
-	m11, m12, m21, m22, dx, dy = trafo
+	m11, m21, m12, m22, dx, dy = trafo
 	return cairo.Matrix(m11, m21, m12, m22, dx, dy)
 
 def reverse_matrix(cmatrix):
@@ -145,7 +145,7 @@ def reverse_matrix(cmatrix):
 
 def apply_trafo_to_point(point, trafo):
 	x0, y0 = point
-	m11, m12, m21, m22, dx, dy = trafo
+	m11, m21, m12, m22, dx, dy = trafo
 	x1 = m11 * x0 + m12 * y0 + dx
 	y1 = m21 * x0 + m22 * y0 + dy
 	return [x1, y1]
