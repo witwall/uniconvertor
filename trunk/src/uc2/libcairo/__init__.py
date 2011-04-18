@@ -18,7 +18,8 @@
 import cairo
 import _libcairo
 
-CTX = cairo.Context(cairo.ImageSurface(cairo.FORMAT_RGB24, 100, 100))
+SURFACE = cairo.ImageSurface(cairo.FORMAT_RGB24, 1, 1)
+CTX = cairo.Context(SURFACE)
 DIRECT_MATRIX = cairo.Matrix()
 
 def create_cpath(paths, cmatrix=None):
@@ -168,17 +169,53 @@ def convert_bbox_to_cpath(bbox):
 	CTX.close_path()
 	return CTX.copy_path()
 
+def is_point_in_path(point, trafo, object, stroke_width=5.0):
+	dx, dy = point
+	trafo = [] + trafo
+	trafo[4] -= dx
+	trafo[5] -= dy
+	path = object.cache_cpath
+	CTX.set_matrix(get_matrix_from_trafo(trafo))
+	CTX.set_source_rgb(1, 1, 1)
+	CTX.paint()
+	CTX.set_source_rgb(0, 0, 0)
+	CTX.new_path()
+	CTX.append_path(path)
+	if object.style[0]:
+		CTX.fill_preserve()
+	if object.style[1]:
+		stroke = object.style[1]
+		width = stroke[1] * trafo[0]
+		if width < stroke_width: width = stroke_width
+		CTX.set_source_rgb(0, 0, 0)
+		CTX.set_line_width(width)
+		CTX.stroke()
+	pixel = _libcairo.get_pixel(SURFACE)
+	if pixel[0] == pixel[1] == pixel[2] == 255:
+		return False
+	else:
+		return True
+
+class FakeObject:
+	cache_cpath = None
+	style = [[1], [0, 1.0]]
+
 def _test():
-	_get_trafo(DIRECT_MATRIX)
-	print get_trafo_from_matrix(DIRECT_MATRIX)
+#	_get_trafo(DIRECT_MATRIX)
+#	print get_trafo_from_matrix(DIRECT_MATRIX)
 	paths = [
 			[[0.0, 0.0], [
 						[100.0, 50.0], [200.0, 40.0], [400.0, 10.0]
 						], []]
 			]
 	cpath = create_cpath(paths)
-	trafo = [1.0, 0.0, 0.0, 2.0, 20.0, 30.0]
-	print apply_cmatrix(cpath, get_matrix_from_trafo(trafo))
+	obj = FakeObject()
+	obj.cache_cpath = cpath
+	trafo = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+
+	print is_point_in_path([2.0, 12.0], trafo, obj)
+
+#	print apply_cmatrix(cpath, get_matrix_from_trafo(trafo))
 
 #	print reverse_trafo(trafo)
 #	print get_matrix_from_trafo(trafo)

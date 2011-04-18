@@ -40,6 +40,21 @@ cairo_DrawRectangle (PyObject *self, PyObject *args) {
 	return Py_None;
 }
 
+static PyObject *
+cairo_GetSurfaceFirstPixel (PyObject *self, PyObject *args) {
+
+	PycairoSurface *pysurface;
+	cairo_surface_t *surface;
+	unsigned char* src;
+
+	if (!PyArg_ParseTuple(args, "O", &pysurface)) {
+		return NULL;
+	}
+
+	surface = pysurface ->surface;
+	src = cairo_image_surface_get_data( surface );
+	return Py_BuildValue("[iii]", src[0], src[1], src[2]);
+}
 
 static PyObject *
 cairo_ApplyTrafoToPath (PyObject *self, PyObject *args) {
@@ -124,6 +139,7 @@ PyMethodDef cairo_methods[] = {
 	{"draw_rect", cairo_DrawRectangle, METH_VARARGS},
 	{"get_trafo", cairo_ConvertMatrixToTrafo, METH_VARARGS},
 	{"apply_trafo", cairo_ApplyTrafoToPath, METH_VARARGS},
+	{"get_pixel", cairo_GetSurfaceFirstPixel, METH_VARARGS},
 	{NULL, NULL}
 };
 
