@@ -169,7 +169,7 @@ def convert_bbox_to_cpath(bbox):
 	CTX.close_path()
 	return CTX.copy_path()
 
-def is_point_in_path(point, trafo, object, stroke_width=5.0):
+def is_point_in_path(point, trafo, object, stroke_width=5.0, fill_flag=True):
 	dx, dy = point
 	trafo = [] + trafo
 	trafo[4] -= dx
@@ -181,7 +181,7 @@ def is_point_in_path(point, trafo, object, stroke_width=5.0):
 	CTX.set_source_rgb(0, 0, 0)
 	CTX.new_path()
 	CTX.append_path(path)
-	if object.style[0]:
+	if fill_flag and object.style[0]:
 		CTX.fill_preserve()
 	if object.style[1]:
 		stroke = object.style[1]
