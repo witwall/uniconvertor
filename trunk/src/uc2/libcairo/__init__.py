@@ -186,6 +186,7 @@ def is_point_in_path(point, trafo, object, stroke_width=5.0):
 	if object.style[1]:
 		stroke = object.style[1]
 		width = stroke[1] * trafo[0]
+		stroke_width /= trafo[0]
 		if width < stroke_width: width = stroke_width
 		CTX.set_source_rgb(0, 0, 0)
 		CTX.set_line_width(width)
