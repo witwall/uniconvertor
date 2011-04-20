@@ -111,6 +111,14 @@ class DocumentObject:
 	config = None
 	childs = []
 
+	def destroy(self):
+		for child in self.childs:
+			child.destroy()
+		fields = self.__dict__
+		items = fields.keys()
+		for item in items:
+			fields[item] = None
+
 
 class Document(DocumentObject):
 	"""
@@ -329,6 +337,11 @@ class Rectangle(SelectableObject):
 		self.trafo = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
 		self.corners = [0.0, 0.0, 0.0, 0.0]
 		self.style = [[], [], [], []]
+
+	def destroy(self):
+		if not self.cache_cpath is None:
+			del self.cache_cpath
+		SelectableObject.destroy(self)
 
 	def copy(self):
 		rect = Rectangle(self.config)

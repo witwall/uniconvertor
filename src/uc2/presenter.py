@@ -97,6 +97,7 @@ class UCDocPresenter:
 		self.doc_file = ''
 		self.active_page = None
 		self.active_layer = None
+		self.model.destroy()
 		self.model = None
 		try:
 			fs.xremove_dir(self.doc_dir)
