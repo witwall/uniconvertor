@@ -175,6 +175,7 @@ class StructuralObject(DocumentObject):
 	"""
 	cid = STRUCTURAL_CLASS
 	name = ''
+	style = [[], [], [], []]
 
 class Page(StructuralObject):
 	"""
@@ -212,10 +213,14 @@ class Layer(StructuralObject):
 	def __init__(self, config=uc2.config, parent=None, name=_('Layer') + ' 1'):
 		self.cid = LAYER
 		self.childs = []
-		self.parent = parent
 		self.config = config
 		self.name = name
-		self.color = '' + self.config.layer_color
+		self.style = [[], deepcopy(self.config.default_stroke), [],
+					deepcopy(self.config.default_structural_style)]
+		self.parent = parent
+		color = deepcopy(self.config.layer_color)
+		stroke = self.style[1]
+		stroke[2] = color
 		self.childs = []
 
 class GuideLayer(Layer):
@@ -224,6 +229,8 @@ class GuideLayer(Layer):
 	def __init__(self, config=uc2.config, parent=None, name=_('GuideLayer')):
 		Layer.__init__(self, config, parent, name)
 		self.cid = GUIDE_LAYER
+		self.style = [[], deepcopy(self.config.default_stroke), [],
+					deepcopy(self.config.default_structural_style)]
 		self.childs = []
 		self.color = '' + self.config.guide_color
 
@@ -234,6 +241,8 @@ class GridLayer(Layer):
 	def __init__(self, config=uc2.config, parent=None, name=_('GridLayer')):
 		Layer.__init__(self, config, parent, name)
 		self.cid = GRID_LAYER
+		self.style = [[], deepcopy(self.config.default_stroke), [],
+					deepcopy(self.config.default_structural_style)]
 		self.childs = []
 		self.color = '' + self.config.grid_color
 		self.grid = [] + self.config.grid_geometry
