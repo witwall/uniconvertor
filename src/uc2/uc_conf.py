@@ -127,10 +127,10 @@ class UCConfig(XmlConfigParser):
 	page_format = 'A4'
 	page_orientation = PORTRAIT
 
-	layer_color = '#3252A2'
+	layer_color = [COLOR_RGB, [0.196, 0.329, 0.635], 1.0, ''] #'#3252A2'
 	guide_color = '#0051FF'
 	grid_color = '#D3DEE8'
-	master_layer_color = '#000000'
+	master_layer_color = [COLOR_RGB, [0.0, 0.0, 0.0], 1.0, '']#'#000000'
 
 	grid_geometry = [0, 0, 2.83465, 2.83465]
 
