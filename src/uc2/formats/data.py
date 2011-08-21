@@ -21,7 +21,7 @@ from uc2 import _
 
 ALL_FORMATS = 0
 
-SKX = 1
+PDXF = 1
 SK1 = 2
 SK = 3
 
@@ -64,7 +64,7 @@ DWG = 121
 
 FORMAT_DESCRIPTION = {
 ALL_FORMATS : _("All supported formats"),
-SKX : _("SKX graphics /sK1 ver.1.0 and Skencil 2.0/"),
+PDXF : _("PDXF graphics /PrintDesign/"),
 SK1 : _("sK1 graphics /ver.0.9 and older/"),
 SK : _("Sketch/Skencil files"),
 SVG : _("Scalable Vector Graphics files"),
@@ -101,7 +101,7 @@ DWG : _("AutoCAD DWG files"),
 
 FORMAT_EXTENSION = {
 ALL_FORMATS : '',
-SKX : 'skx', SK1 : 'sk1', SK : 'sk',
+PDXF : 'pdxf', SK1 : 'sk1', SK : 'sk',
 SVG : 'svg', SVGZ : 'svgz', ODG : 'odg', ORA : 'ora', XCF : 'xcf', SLA : 'sla', FIG : 'fig',
 CDR : 'cdr', CDT : 'cdt', CDRZ : 'cdr', CDTZ : 'cdt', CMX : 'cmx', CCX : 'ccx', CDRX : 'cdr',
 XAR : 'xar',
@@ -110,9 +110,9 @@ CGM : 'cgm', WMF : 'wmf', EMF : 'emf', XPS : 'xps', VSD : 'vsd',
 PLT : 'plt', HPGL : 'hgl', DXF : 'dxf', DWG : 'dwg',
 }
 
-LOADER_FORMATS = [SKX, SK1, SK]
+LOADER_FORMATS = [PDXF, SK1, SK]
 
-SAVER_FORMATS = [SKX, SK1, SK]
+SAVER_FORMATS = [PDXF, SK1, SK]
 
 from skx import SKX_Loader, SKX_Saver
 from sk1 import SK1_Loader, SK1_Saver
@@ -120,17 +120,17 @@ from sk import SK_Loader, SK_Saver
 
 
 LOADERS = {
-SKX : SKX_Loader, SK1 : SK1_Loader, SK : SK_Loader,
+PDXF : SKX_Loader, SK1 : SK1_Loader, SK : SK_Loader,
 SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : None, CDT : None, CDRZ : None, CDTZ : None, CMX : None, CCX : None, CDRX : None,
 XAR : None,
 AI_PS : None, AI_PDF : None, PS : None, EPS : None, PDF : None, PSD : None,
 CGM : None, WMF : None, EMF : None, XPS : None, VSD : None,
 PLT : None, HPGL : None, DXF : None, DWG : None,
-		}
+}
 
 SAVERS = {
-SKX : SKX_Saver, SK1 : SK1_Saver, SK : SK_Saver,
+PDXF : SKX_Saver, SK1 : SK1_Saver, SK : SK_Saver,
 SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : None, CDT : None, CDRZ : None, CDTZ : None, CMX : None, CCX : None, CDRX : None,
 XAR : None,
