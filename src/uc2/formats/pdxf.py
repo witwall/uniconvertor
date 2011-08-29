@@ -50,7 +50,7 @@ def escape_quote(line):
 
 
 
-class SKX_Loader(AbstractLoader):
+class PDXF_Loader(AbstractLoader):
 	name = 'SKX_Loader'
 	options = {}
 	model = None
@@ -160,7 +160,7 @@ class EntityResolver(handler.EntityResolver): pass
 class DTDHandler(handler.DTDHandler): pass
 
 
-class SKX_Saver(AbstractSaver):
+class PDXF_Saver(AbstractSaver):
 	name = 'SKX_Saver'
 	file = None
 	options = {}

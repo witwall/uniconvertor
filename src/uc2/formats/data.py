@@ -114,13 +114,13 @@ LOADER_FORMATS = [PDXF, SK1, SK]
 
 SAVER_FORMATS = [PDXF, SK1, SK]
 
-from skx import SKX_Loader, SKX_Saver
+from pdxf import PDXF_Loader, PDXF_Saver
 from sk1 import SK1_Loader, SK1_Saver
 from sk import SK_Loader, SK_Saver
 
 
 LOADERS = {
-PDXF : SKX_Loader, SK1 : SK1_Loader, SK : SK_Loader,
+PDXF : PDXF_Loader, SK1 : SK1_Loader, SK : SK_Loader,
 SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : None, CDT : None, CDRZ : None, CDTZ : None, CMX : None, CCX : None, CDRX : None,
 XAR : None,
@@ -130,7 +130,7 @@ PLT : None, HPGL : None, DXF : None, DWG : None,
 }
 
 SAVERS = {
-PDXF : SKX_Saver, SK1 : SK1_Saver, SK : SK_Saver,
+PDXF : PDXF_Saver, SK1 : SK1_Saver, SK : SK_Saver,
 SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : None, CDT : None, CDRZ : None, CDTZ : None, CMX : None, CCX : None, CDRX : None,
 XAR : None,
