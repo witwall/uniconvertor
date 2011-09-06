@@ -51,7 +51,7 @@ def escape_quote(line):
 
 
 class PDXF_Loader(AbstractLoader):
-	name = 'SKX_Loader'
+	name = 'PDXF_Loader'
 	options = {}
 	model = None
 
@@ -63,7 +63,7 @@ class PDXF_Loader(AbstractLoader):
 		self.path = path
 
 		if not zipfile.is_zipfile(self.path):
-			raise IOError(2, _('It seems the file is not SKX file'))
+			raise IOError(2, _('It seems the file is not PDXF file'))
 
 		self._extract_content()
 		self._build_model()
@@ -75,10 +75,10 @@ class PDXF_Loader(AbstractLoader):
 			fl = skx.namelist()
 		except:
 			errtype, value, traceback = sys.exc_info()
-			raise IOError(errtype, _('It seems the SKX file is corrupted') + \
+			raise IOError(errtype, _('It seems the PDXF file is corrupted') + \
 									'\n' + value, traceback)
 		if not 'mimetype' in fl or not skx.read('mimetype') == sk1doc.DOC_MIME:
-			raise IOError(2, _('The file is corrupted or not SKX file'))
+			raise IOError(2, _('The file is corrupted or not PDXF file'))
 
 		filelist = []
 		for item in fl:
@@ -161,7 +161,7 @@ class DTDHandler(handler.DTDHandler): pass
 
 
 class PDXF_Saver(AbstractSaver):
-	name = 'SKX_Saver'
+	name = 'PDXF_Saver'
 	file = None
 	options = {}
 	ident = 0
