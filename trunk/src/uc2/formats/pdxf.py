@@ -70,14 +70,14 @@ class PDXF_Loader(AbstractLoader):
 		return self.model
 
 	def _extract_content(self):
-		skx = ZipFile(self.path, 'r')
+		pdxf = ZipFile(self.path, 'r')
 		try:
-			fl = skx.namelist()
+			fl = pdxf.namelist()
 		except:
 			errtype, value, traceback = sys.exc_info()
 			raise IOError(errtype, _('It seems the PDXF file is corrupted') + \
 									'\n' + value, traceback)
-		if not 'mimetype' in fl or not skx.read('mimetype') == sk1doc.DOC_MIME:
+		if not 'mimetype' in fl or not pdxf.read('mimetype') == sk1doc.DOC_MIME:
 			raise IOError(2, _('The file is corrupted or not PDXF file'))
 
 		filelist = []
@@ -87,7 +87,7 @@ class PDXF_Loader(AbstractLoader):
 			filelist.append(item)
 
 		for item in filelist:
-			source = skx.read(item)
+			source = pdxf.read(item)
 			dest = open(os.path.join(self.presenter.doc_dir, item), 'wb')
 			dest.write(source)
 			dest.close()
@@ -295,10 +295,10 @@ class PDXF_Saver(AbstractSaver):
 
 
 	def _pack_content(self):
-		skx = ZipFile(self.presenter.doc_file, 'w')
+		pdxf = ZipFile(self.presenter.doc_file, 'w')
 		for item in self.content:
 			path, filename = item
 			filename = filename.encode('ascii')
-			skx.write(path, filename, zipfile.ZIP_DEFLATED)
-		skx.close()
+			pdxf.write(path, filename, zipfile.ZIP_DEFLATED)
+		pdxf.close()
 
