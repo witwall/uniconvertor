@@ -170,6 +170,14 @@ if __name__ == "__main__":
 			include_dirs=cairo_include_dirs,
 			libraries=['cairo'])
 
+ 	pycms_src = src_path + 'uc2/cms/'
+	pycms_module = Extension('uc2.cms._pycms',
+			define_macros=[('MAJOR_VERSION', '1'),
+						('MINOR_VERSION', '0')],
+			sources=[pycms_src + '_pycms.c'],
+			libraries=['lcms'],
+			extra_compile_args=["-Wall"])
+
 
 	setup (name='uniconvertor',
 			version=VERSION,
@@ -247,7 +255,7 @@ Export filters:
 
 			scripts=['src/uniconvertor'],
 
-			ext_modules=[cairo_module, ])
+			ext_modules=[cairo_module, pycms_module, ])
 
 #################################################
 # .py source compiling
