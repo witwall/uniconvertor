@@ -22,7 +22,6 @@ import os
 import types
 import _pycms
 
-_pycms = None
 
 INTENT_PERCEPTUAL = 0
 INTENT_RELATIVE_COLORIMETRIC = 1
