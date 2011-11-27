@@ -97,12 +97,12 @@ class UCDocPresenter:
 		self.doc_file = ''
 		self.active_page = None
 		self.active_layer = None
-		self.model.destroy()
+		if not self.model is None:
+			self.model.destroy()
 		self.model = None
 		try:
 			fs.xremove_dir(self.doc_dir)
 		except IOError:
-			print 'error', sys.exc_info()
 			pass
 
 	def get_page_size(self, page=None):
