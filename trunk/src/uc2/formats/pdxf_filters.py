@@ -26,8 +26,8 @@ from xml.sax.xmlreader import InputSource
 from xml.sax import handler
 
 from uc2 import _
-from uc2.sk1doc import model
-from uc2 import sk1doc
+from uc2.formats.pdxf import model
+from uc2.formats import pdxf
 from uc2.utils import fs
 
 from abstract import AbstractLoader, AbstractSaver
@@ -77,7 +77,7 @@ class PDXF_Loader(AbstractLoader):
 			errtype, value, traceback = sys.exc_info()
 			raise IOError(errtype, _('It seems the PDXF file is corrupted') + \
 									'\n' + value, traceback)
-		if not 'mimetype' in fl or not pdxf.read('mimetype') == sk1doc.DOC_MIME:
+		if not 'mimetype' in fl or not pdxf.read('mimetype') == pdxf.DOC_MIME:
 			raise IOError(2, _('The file is corrupted or not PDXF file'))
 
 		filelist = []
@@ -136,7 +136,7 @@ class XMLDocReader(handler.ContentHandler):
 			if self.parent_stack:
 				parent = self.parent_stack[-1][0]
 				if self.parent_stack[-1][1]:
-					sk1doc.add_child(parent, obj)
+					pdxf.add_child(parent, obj)
 				else:
 					if model.CID_TO_PROPNAME.has_key(cid):
 						parent.__dict__[model.CID_TO_PROPNAME[cid]] = obj
@@ -264,7 +264,7 @@ class PDXF_Saver(AbstractSaver):
 	def _write_manifest_entries(self):
 		content = []
 
-		for path in sk1doc.DOC_STRUCTURE:
+		for path in pdxf.DOC_STRUCTURE:
 			pt = os.path.join(self.presenter.doc_dir, path)
 			self.content.append((pt, path + '/'))
 			files = fs.get_files(os.path.join(self.presenter.doc_dir, path))
@@ -284,7 +284,7 @@ class PDXF_Saver(AbstractSaver):
 		pt = os.path.join(self.presenter.doc_dir, 'mimetype')
 		self.content.append((pt, 'mimetype'))
 
-		main = [(sk1doc.DOC_MIME, '/')]
+		main = [(pdxf.DOC_MIME, '/')]
 		main += [('text/xml', 'content.xml')]
 		content = main + content
 
@@ -295,10 +295,10 @@ class PDXF_Saver(AbstractSaver):
 
 
 	def _pack_content(self):
-		pdxf = ZipFile(self.presenter.doc_file, 'w')
+		pdxf_file = ZipFile(self.presenter.doc_file, 'w')
 		for item in self.content:
 			path, filename = item
 			filename = filename.encode('ascii')
-			pdxf.write(path, filename, zipfile.ZIP_DEFLATED)
-		pdxf.close()
+			pdxf_file.write(path, filename, zipfile.ZIP_DEFLATED)
+		pdxf_file.close()
 
