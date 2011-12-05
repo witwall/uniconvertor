@@ -19,10 +19,9 @@ import os
 import sys
 
 import uc2
-import sk1doc
+from uc2.formats import pdxf
 
 from uc2 import _
-from uc2.sk1doc import model
 from uc2 import utils
 from uc2.utils import fs
 from uc2 import formats
@@ -50,7 +49,7 @@ class UCDocPresenter:
 
 
 	def new(self):
-		self.model = sk1doc.create_new_doc(self.config)
+		self.model = pdxf.create_new_doc(self.config)
 		self.active_page = self.model.childs[0].childs[0]
 		self.active_layer = self.active_page.childs[0]
 		self.methods = UCMethods(self)
@@ -119,9 +118,9 @@ class UCDocPresenter:
 	def create_cache_structure(self):
 		doc_cache_dir = os.path.join(self.appdata.app_config_dir, 'docs_cache')
 		self.doc_dir = os.path.join(doc_cache_dir, 'doc_' + self.doc_id)
-		for dir in sk1doc.DOC_STRUCTURE:
+		for dir in pdxf.DOC_STRUCTURE:
 			path = os.path.join(self.doc_dir, dir)
 			os.makedirs(path)
 		mime = open(os.path.join(self.doc_dir, 'mimetype') , 'wb')
-		mime.write(sk1doc.DOC_MIME)
+		mime.write(pdxf.DOC_MIME)
 		mime.close()
