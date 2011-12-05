@@ -65,19 +65,20 @@ class PDXF_Loader(AbstractLoader):
 		if not zipfile.is_zipfile(self.path):
 			raise IOError(2, _('It seems the file is not PDXF file'))
 
+
 		self._extract_content()
 		self._build_model()
 		return self.model
 
 	def _extract_content(self):
-		pdxf = ZipFile(self.path, 'r')
+		pdxf_file = ZipFile(self.path, 'r')
 		try:
-			fl = pdxf.namelist()
+			fl = pdxf_file.namelist()
 		except:
 			errtype, value, traceback = sys.exc_info()
 			raise IOError(errtype, _('It seems the PDXF file is corrupted') + \
 									'\n' + value, traceback)
-		if not 'mimetype' in fl or not pdxf.read('mimetype') == pdxf.DOC_MIME:
+		if not 'mimetype' in fl or not pdxf_file.read('mimetype') == pdxf.DOC_MIME:
 			raise IOError(2, _('The file is corrupted or not PDXF file'))
 
 		filelist = []
@@ -87,7 +88,7 @@ class PDXF_Loader(AbstractLoader):
 			filelist.append(item)
 
 		for item in filelist:
-			source = pdxf.read(item)
+			source = pdxf_file.read(item)
 			dest = open(os.path.join(self.presenter.doc_dir, item), 'wb')
 			dest.write(source)
 			dest.close()
