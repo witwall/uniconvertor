@@ -17,51 +17,51 @@
 
 
 class AbstractLoader:
-	
+
 	name = 'AbstractLoader'
 	options = {}
-	
+
 	def __init__(self):
 		pass
-	
+
 	def load(self, presenter, path):
 		#Should return doc instance
 		return None
-	
+
 	def get_options(self):
-		return options
-	
+		return self.options
+
 	def set_options(self, options):
 		self.options = options
 		self._save_options(self.options)
-	
+
 	def _load_options(self):
 		pass
-	
+
 	def _save_options(self, options):
 		pass
-	
+
 
 class AbstractSaver:
-	
+
 	name = 'AbstractSaver'
 	options = {}
-	
+
 	def __init__(self):
 		pass
-	
+
 	def save(self, presenter, path):
 		pass
-	
+
 	def get_options(self):
-		return options
-	
+		return self.options
+
 	def set_options(self, options):
 		self.options = options
 		self._save_options(self.options)
-	
+
 	def _load_options(self):
 		pass
-	
+
 	def _save_options(self, options):
 		pass
