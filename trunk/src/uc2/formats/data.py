@@ -114,7 +114,7 @@ LOADER_FORMATS = [PDXF, SK1, SK]
 
 SAVER_FORMATS = [PDXF, SK1, SK]
 
-from pdxf import PDXF_Loader, PDXF_Saver
+from pdxf_filters import PDXF_Loader, PDXF_Saver
 from sk1 import SK1_Loader, SK1_Saver
 from sk import SK_Loader, SK_Saver
 
