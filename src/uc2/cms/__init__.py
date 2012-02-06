@@ -78,32 +78,33 @@ class Color:
 class ColorManager:
 
 	use_cms = False
-	qcolor_cache = {}
-	qcolor_creator = None
+#	qcolor_cache = {}
+#	qcolor_creator = None
 
 	def __init__(self, creator=None):
-		self.qcolor_cache = {}
-		self.qcolor_creator = creator
+		pass
+#		self.qcolor_cache = {}
+#		self.qcolor_creator = creator
 
 	def get_cairo_color(self, color):
 		if color[0] == libcms.TYPE_RGB_8:
 			return [] + color[1]
-		if color[0] == libcms.TYPE_CMYK_8:
+		elif color[0] == libcms.TYPE_CMYK_8:
 			return cmyk_to_rgb(color[1])
 
-	def get_qcolor(self, color):
-		if self.qcolor_cache.has_key(color):
-			return self.qcolor_cache[color]
-		if color.type == libcms.TYPE_RGB_8:
-			hex = rgb_to_hexcolor(color.value)
-			qcolor = self.qcolor_creator(hex)
-			self.qcolor_cache[color] = qcolor
-			return qcolor
-		if color.type == libcms.TYPE_CMYK_8:
-			data = cmyk_to_rgb(color.value)
-			hex = rgb_to_hexcolor(data)
-			qcolor = self.qcolor_creator(hex)
-			self.qcolor_cache[color] = qcolor
-			return qcolor
+#	def get_qcolor(self, color):
+#		if self.qcolor_cache.has_key(color):
+#			return self.qcolor_cache[color]
+#		if color.type == libcms.TYPE_RGB_8:
+#			hex = rgb_to_hexcolor(color.value)
+#			qcolor = self.qcolor_creator(hex)
+#			self.qcolor_cache[color] = qcolor
+#			return qcolor
+#		if color.type == libcms.TYPE_CMYK_8:
+#			data = cmyk_to_rgb(color.value)
+#			hex = rgb_to_hexcolor(data)
+#			qcolor = self.qcolor_creator(hex)
+#			self.qcolor_cache[color] = qcolor
+#			return qcolor
 
 
