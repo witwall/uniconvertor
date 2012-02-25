@@ -1,15 +1,18 @@
-#Sun Aug 21 04:59:42 EEST 2011
+#Sat Feb 25 20:12:04 EET 2012
 eclipse.preferences.version=1
 encoding//src/uc2/cfgparser.py=utf-8
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/cms/libcms.py=utf-8
 encoding//src/uc2/formats/__init__.py=utf-8
+encoding//src/uc2/formats/abstract.py=utf-8
 encoding//src/uc2/formats/data.py=utf-8
-encoding//src/uc2/formats/pdxf.py=utf-8
+encoding//src/uc2/formats/pdxf/__init__.py=utf-8
+encoding//src/uc2/formats/pdxf/model.py=utf-8
+encoding//src/uc2/formats/pdxf_filters.py=utf-8
+encoding//src/uc2/formats/sk.py=utf-8
+encoding//src/uc2/formats/sk1.py=utf-8
 encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/methods.py=utf-8
 encoding//src/uc2/presenter.py=utf-8
-encoding//src/uc2/sk1doc/__init__.py=utf-8
-encoding//src/uc2/sk1doc/model.py=utf-8
 encoding//src/uc2/uc_conf.py=utf-8
 encoding//src/uc2/utils/fs.py=utf-8
