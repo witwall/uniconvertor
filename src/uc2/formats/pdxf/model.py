@@ -213,7 +213,10 @@ class Page(StructuralObject):
 		self.layer_counter = 0
 		self.parent = parent
 		self.config = config
-		self.name = name
+		if not name:
+			self.name = _('Page') + ' 1'
+		else:
+			self.name = name
 		if parent is None:
 			format = '' + self.config.page_format
 			size = deepcopy(uc2const.PAGE_FORMATS[format])
@@ -237,7 +240,10 @@ class Layer(StructuralObject):
 		self.cid = LAYER
 		self.childs = []
 		self.config = config
-		self.name = _('Layer') + ' 1'
+		if not name:
+			self.name = _('Layer') + ' 1'
+		else:
+			self.name = name
 		self.style = [[], deepcopy(self.config.default_stroke), [],
 					deepcopy(self.config.default_structural_style)]
 		self.parent = parent
