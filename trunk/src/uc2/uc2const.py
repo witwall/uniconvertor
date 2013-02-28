@@ -20,6 +20,11 @@ from uc2 import _
 """
 The package provides generic application constants
 """
+#Placement constants
+BEFORE = 0
+AFTER = 1
+LOWER = 0
+UPPER = 1
 
 #MODEL TYPES
 GENERIC_MODEL = 0
