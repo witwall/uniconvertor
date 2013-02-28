@@ -127,6 +127,12 @@ class PDXF_Methods:
 		page.name = _('Page') + ' %i' % (parent.page_counter)
 		return page
 
+	def delete_page(self, index=0):
+		parent = self.model.childs[0]
+		pages = parent.childs
+		if index < len(pages):
+			pages.remove(pages[index])
+
 	def add_layer(self, page, layer_name=''):
 		if not layer_name:
 			layer_name = _('Layer') + ' %i' % (page.layer_counter + 1)
