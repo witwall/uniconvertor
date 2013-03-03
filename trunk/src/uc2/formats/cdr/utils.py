@@ -127,7 +127,7 @@ def parse_reg_color(data=''):
 	"""
 	Returns Registration color fill style list.
 	"""
-	return [uc2const.COLOR_SPOT, [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0] ], 1.0, 'All']
+	return [uc2const.COLOR_SPOT, [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0] ], 1.0, 'Registration color']
 
 def parse_cdr_color(color_space, color_bytes):
 	"""
