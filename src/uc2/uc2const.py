@@ -277,7 +277,7 @@ PAGE_FORMATS = {
 			'Visit card #2': (155.90551181102362, 240.94488188976379),
 			}
 
-PAGE_FORMATS_NAMES = [
+PAGE_FORMAT_NAMES = [
 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
 'B1 (ISO)', 'B4 (ISO)', 'B5 (ISO)',
 'C3', 'C4', 'C5', 'C6',
