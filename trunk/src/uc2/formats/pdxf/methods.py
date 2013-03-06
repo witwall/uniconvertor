@@ -98,6 +98,13 @@ class PDXF_Methods:
 		if width > height:orient = uc2const.LANDSCAPE
 		parent.page_format = [format, size, orient]
 
+	def set_default_page_format(self, page_format):
+		parent = self.model.childs[0]
+		parent.page_format = page_format
+
+	def set_page_format(self, page, page_format):
+		page.page_format = page_format
+
 	def add_page(self, page_format=[]):
 		parent = self.model.childs[0]
 		if page_format:
