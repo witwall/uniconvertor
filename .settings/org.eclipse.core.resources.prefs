@@ -1,7 +1,8 @@
-#Mon Mar 04 11:34:25 EET 2013
+#Tue Mar 12 13:43:27 EET 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/formats/cdr/utils.py=utf-8
+encoding//src/uc2/formats/generic.py=utf-8
 encoding//src/uc2/formats/pdxf/const.py=utf-8
 encoding//src/uc2/formats/pdxf/crenderer.py=utf-8
 encoding//src/uc2/formats/pdxf/methods.py=utf-8

@@ -225,6 +225,12 @@ class Page(StructuralObject):
 		else:
 			self.page_format = deepcopy(parent.page_format)
 
+	def resolve(self):
+		is_leaf = False
+		name = '%s: %s' % (CID_TO_NAME[self.cid], self.name)
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
+
 
 class Layer(StructuralObject):
 	"""
@@ -252,6 +258,12 @@ class Layer(StructuralObject):
 		stroke[2] = color
 		self.childs = []
 
+	def resolve(self):
+		is_leaf = False
+		name = '%s: %s' % (CID_TO_NAME[self.cid], self.name)
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
+
 class GuideLayer(Layer):
 	"""
 	Represents guide line layer.
@@ -267,6 +279,12 @@ class GuideLayer(Layer):
 		self.style = [[], [], [], []]
 		self.childs = []
 		self.color = '' + self.config.guide_color
+
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
 
 class GridLayer(Layer):
 	"""
@@ -285,6 +303,12 @@ class GridLayer(Layer):
 		self.childs = []
 		self.color = '' + self.config.grid_color
 		self.grid = [] + self.config.grid_geometry
+
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
 
 class LayerGroup(StructuralObject):
 	"""
@@ -313,6 +337,12 @@ class MasterLayers(LayerGroup):
 		LayerGroup.__init__(self, config, parent)
 		self.cid = MASTER_LAYERS
 		self.childs = []
+
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
 
 
 
@@ -378,6 +408,12 @@ class Group(SelectableObject):
 		for item in childs_snapshots:
 			item[0].set_trafo_snapshot(item)
 
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
+
 class Container(Group):
 
 	cid = CONTAINER
@@ -404,6 +440,12 @@ class Container(Group):
 	def update_bbox(self):
 		self.cache_container = self.childs[0]
 		self.cache_bbox = deepcopy(self.cache_container.cache_bbox)
+
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
 
 #---------------Bitmap objects-----------------------
 
