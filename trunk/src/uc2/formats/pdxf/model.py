@@ -227,7 +227,7 @@ class Page(StructuralObject):
 
 	def resolve(self):
 		is_leaf = False
-		name = '%s: %s' % (CID_TO_NAME[self.cid], self.name)
+		name = '%s' % (self.name)
 		info = '%d' % (len(self.childs))
 		return (is_leaf, name, info)
 
@@ -260,7 +260,7 @@ class Layer(StructuralObject):
 
 	def resolve(self):
 		is_leaf = False
-		name = '%s: %s' % (CID_TO_NAME[self.cid], self.name)
+		name = '%s' % (self.name)
 		info = '%d' % (len(self.childs))
 		return (is_leaf, name, info)
 
