@@ -46,6 +46,7 @@ MASTER_LAYERS = 54
 LAYER = 55
 GRID_LAYER = 57
 GUIDE_LAYER = 58
+DESKTOP_LAYERS = 59
 
 SELECTABLE_CLASS = 100
 COMPOUND_CLASS = 101
@@ -73,6 +74,7 @@ CID_TO_NAME = {
 	PAGES: _('Pages'), PAGE: _('Page'), LAYER_GROUP: _('Layer group'),
 	MASTER_LAYERS: _('Master layers'), LAYER: _('Layer'),
 	GRID_LAYER: _('Grid layer'), GUIDE_LAYER: _('Guide layer'),
+	DESKTOP_LAYERS: _('Desktop layers'),
 
 	GROUP: _('Group'), CONTAINER: _('Container'),
 	TEXT_BLOCK: _('Text block'), TEXT_COLUMN: _('Text column'),
@@ -93,6 +95,7 @@ CID_TO_TAGNAME = {
 	PAGES: 'Pages', PAGE: 'Page', LAYER_GROUP: 'LayerGroup',
 	MASTER_LAYERS: 'MasterLayers', LAYER: 'Layer',
 	GRID_LAYER: 'GridLayer', GUIDE_LAYER: 'GuideLayer',
+	DESKTOP_LAYERS: 'DesktopLayers',
 
 	GROUP: 'Group', CONTAINER: 'Container',
 	TEXT_BLOCK: 'TextBlock', TEXT_COLUMN: 'TextColumn',
@@ -112,6 +115,7 @@ TAGNAME_TO_CID = {
 	'Pages': PAGES, 'Page': PAGE, 'LayerGroup': LAYER_GROUP,
 	'MasterLayers': MASTER_LAYERS, 'Layer': LAYER,
 	'GridLayer': GRID_LAYER, 'GuideLayer': GUIDE_LAYER,
+	'DesktopLayers': DESKTOP_LAYERS,
 
 	'Group': GROUP, 'Container': CONTAINER,
 	'TextBlock': TEXT_BLOCK, 'TextColumn': TEXT_COLUMN,
@@ -329,6 +333,7 @@ class LayerGroup(StructuralObject):
 class MasterLayers(LayerGroup):
 	"""
 	Represents container for master layers applied for all pages.
+	This layer group is the top most.
 	All child layers are in childs list.
 	"""
 	cid = MASTER_LAYERS
@@ -336,6 +341,25 @@ class MasterLayers(LayerGroup):
 	def __init__(self, config, parent=None):
 		LayerGroup.__init__(self, config, parent)
 		self.cid = MASTER_LAYERS
+		self.childs = []
+
+	def resolve(self):
+		is_leaf = False
+		name = '%s' % (CID_TO_NAME[self.cid])
+		info = '%d' % (len(self.childs))
+		return (is_leaf, name, info)
+
+class DesktopLayers(LayerGroup):
+	"""
+	Represents container for desktop layers applied for all pages.
+	This layer group is the lowest.
+	All child layers are in childs list.
+	"""
+	cid = DESKTOP_LAYERS
+
+	def __init__(self, config, parent=None):
+		LayerGroup.__init__(self, config, parent)
+		self.cid = DESKTOP_LAYERS
 		self.childs = []
 
 	def resolve(self):
@@ -703,6 +727,7 @@ CID_TO_CLASS = {
 	PAGES: Pages, PAGE: Page, LAYER_GROUP: LayerGroup,
 	MASTER_LAYERS: MasterLayers, LAYER: Layer,
 	GRID_LAYER: GridLayer, GUIDE_LAYER: GuideLayer,
+	DESKTOP_LAYERS: DesktopLayers,
 
 	GROUP: Group, CONTAINER: Container,
 

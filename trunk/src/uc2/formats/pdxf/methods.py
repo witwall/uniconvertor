@@ -32,10 +32,11 @@ def create_new_doc(config):
 	add_child(pages, page)
 	pages.page_counter += 1
 
+	dl = model.DesktopLayers(config)
 	ml = model.MasterLayers(config)
 	gl = model.GridLayer(config)
 	guide = model.GuideLayer(config)
-	add_childs(doc, [pages, ml, gl, guide])
+	add_childs(doc, [pages, dl, ml, gl, guide])
 
 	return doc
 
