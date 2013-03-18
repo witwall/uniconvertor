@@ -1,4 +1,4 @@
-#Tue Mar 12 13:43:27 EET 2013
+#Mon Mar 18 10:03:57 EET 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/formats/cdr/utils.py=utf-8
@@ -8,4 +8,6 @@ encoding//src/uc2/formats/pdxf/crenderer.py=utf-8
 encoding//src/uc2/formats/pdxf/methods.py=utf-8
 encoding//src/uc2/formats/pdxf/model.py=utf-8
 encoding//src/uc2/formats/pdxf/presenter.py=utf-8
+encoding//src/uc2/libcairo/__init__.py=utf-8
+encoding//src/uc2/libgeom/__init__.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8

@@ -137,24 +137,6 @@ def get_cpath_bbox(cpath):
 	CTX.append_path(cpath)
 	return normalize_bbox(CTX.path_extents())
 
-def sum_bbox(bbox1, bbox2):
-	x0, y0, x1, y1 = bbox1
-	_x0, _y0, _x1, _y1 = bbox2
-	new_x0 = min(x0, _x0, x1, _x1)
-	new_x1 = max(x0, _x0, x1, _x1)
-	new_y0 = min(y0, _y0, y1, _y1)
-	new_y1 = max(y0, _y0, y1, _y1)
-	return [new_x0, new_y0, new_x1, new_y1]
-
-def is_bbox_in_rect(rect, bbox):
-	x0, y0, x1, y1 = rect
-	_x0, _y0, _x1, _y1 = bbox
-	if x0 > _x0: return False
-	if y0 > _y0: return False
-	if x1 < _x1: return False
-	if y1 < _y1: return False
-	return True
-
 def _get_trafo(cmatrix):
 	result = []
 	val = cmatrix.__str__()
