@@ -73,7 +73,6 @@ def mult_points(p0, p1):
 def cr_points(p0, p1):
 	return p0[0] * p1[1] - p0[1] * p1[0]
 
-
 def _flat_segment(p0, p1, p2, p3, tlr):
 	p4 = midpoint(p0, p1)
 	p5 = midpoint(p1, p2)
@@ -144,6 +143,29 @@ def sum_bbox(bbox1, bbox2):
 	new_y0 = min(y0, _y0, y1, _y1)
 	new_y1 = max(y0, _y0, y1, _y1)
 	return [new_x0, new_y0, new_x1, new_y1]
+
+def is_bbox_in_rect(rect, bbox):
+	x0, y0, x1, y1 = rect
+	_x0, _y0, _x1, _y1 = bbox
+	if x0 > _x0: return False
+	if y0 > _y0: return False
+	if x1 < _x1: return False
+	if y1 < _y1: return False
+	return True
+
+def is_point_in_rect(point, rect):
+	x0, y0, x1, y1 = rect
+	x, y = point
+	if x0 <= x <= x1 and y0 <= y <= y1:
+		return True
+	return False
+
+def is_point_in_rect2(point, rect_center, rect_w, rect_h):
+	cx, cy = rect_center
+	x, y = point
+	if abs(x - cx) <= rect_w / 2.0 and abs(y - cy) <= rect_h / 2.0:
+		return True
+	return False
 
 def rotate_point(center, point, angle):
 	m21 = math.sin(angle)
