@@ -63,12 +63,13 @@ PATHS DEFINITION:
 PATH DEFINITION:
 [start_point, points, end_marker]
 start_pont - [x,y]
-end_ marker - is closed [1] if not []
+end_marker - is closed CURVE_CLOSED = 1, if not CURVE_OPENED = 0
 
 POINTS DEFINITION:
 [point0, point1,...]
 line point - [x,y]
 curve point - [[x1,y1],[x2,y2],[x3,y3], marker]
+marker - NODE_CUSP = 0; NODE_SMOOTH = 1; NODE_SYMMETRICAL = 2 
 
 -------------------------------------------------------------------------------
 PAGE FORMAT
