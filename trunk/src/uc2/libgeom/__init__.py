@@ -127,6 +127,27 @@ def flat_paths(paths, tlr):
 	return result
 
 #//////////// generic Bezier math stuff ////////////
+def apply_trafo_to_paths(paths, trafo):
+	new_paths = []
+	for path in paths:
+		new_paths.append(apply_trafo_to_path(path, trafo))
+	return new_paths
+
+def apply_trafo_to_path(path, trafo):
+	new_path = []
+	new_points = []
+	new_path.append(apply_trafo_to_point(path[0], trafo))
+	for point in path[1]:
+		if len(point) == 2:
+			new_points.append(apply_trafo_to_point(point, trafo))
+		else:
+			p0 = apply_trafo_to_point(point[0], trafo)
+			p1 = apply_trafo_to_point(point[1], trafo)
+			p2 = apply_trafo_to_point(point[2], trafo)
+			new_points.append([p0, p1, p2, point[3]])
+	new_path.append(new_points)
+	new_path.append(path[2])
+	return new_path
 
 def apply_trafo_to_point(point, trafo):
 	x0, y0 = point
