@@ -60,6 +60,9 @@ def normalize_point(p):
 def midpoint(p0, p1):
 	return [(p1[0] + p0[0]) / 2.0, (p1[1] + p0[1]) / 2.0]
 
+def contra_point(p0, p1):
+	return [2.0 * p1[0] - p0[0], 2.0 * p1[1] - p0[1]]
+
 
 def add_points(p1, p0):
 	return [p1[0] + p0[0], p1[1] + p0[1]]
@@ -72,6 +75,8 @@ def mult_points(p0, p1):
 
 def cr_points(p0, p1):
 	return p0[0] * p1[1] - p0[1] * p1[0]
+
+#//////////////// Flattering ///////////////
 
 def _flat_segment(p0, p1, p2, p3, tlr):
 	p4 = midpoint(p0, p1)
@@ -138,23 +143,31 @@ def apply_trafo_to_path(path, trafo):
 	new_points = []
 	new_path.append(apply_trafo_to_point(path[0], trafo))
 	for point in path[1]:
-		if len(point) == 2:
 			new_points.append(apply_trafo_to_point(point, trafo))
-		else:
-			p0 = apply_trafo_to_point(point[0], trafo)
-			p1 = apply_trafo_to_point(point[1], trafo)
-			p2 = apply_trafo_to_point(point[2], trafo)
-			new_points.append([p0, p1, p2, point[3]])
 	new_path.append(new_points)
 	new_path.append(path[2])
 	return new_path
 
 def apply_trafo_to_point(point, trafo):
+	if len(point) == 2:
+		return _apply_trafo_to_point(point, trafo)
+	else:
+		return [_apply_trafo_to_point(point[0], trafo),
+			_apply_trafo_to_point(point[1], trafo),
+			_apply_trafo_to_point(point[2], trafo), point[3]]
+
+def _apply_trafo_to_point(point, trafo):
 	x0, y0 = point
 	m11, m21, m12, m22, dx, dy = trafo
 	x1 = m11 * x0 + m12 * y0 + dx
 	y1 = m21 * x0 + m22 * y0 + dy
 	return [x1, y1]
+
+def bezier_base_point(point):
+	if len(point) == 2:
+		return point
+	else:
+		return point[2]
 
 def sum_bbox(bbox1, bbox2):
 	x0, y0, x1, y1 = bbox1
