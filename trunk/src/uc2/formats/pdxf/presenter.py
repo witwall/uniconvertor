@@ -62,6 +62,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 	def new(self):
 		self.model = methods.create_new_doc(self.config)
 		self.methods.update()
+		self.model.do_update()
 
 	def merge(self):
 		pass

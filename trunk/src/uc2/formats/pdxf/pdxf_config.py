@@ -26,21 +26,21 @@ class PDXF_Config(XmlConfigParser):
 	system_encoding = 'utf-8'
 
 	#============== DOCUMENT SECTION ==================
-
-	# 0 - page center
-	# 1 - lower-left page corner
-	# 2 - upper-left page corner 
-	doc_origin = 1
+	doc_origin = const.DOC_ORIGIN_LL
 
 	page_format = 'A4'
 	page_orientation = uc2const.PORTRAIT
 
-	layer_color = [uc2const.COLOR_RGB, [0.196, 0.329, 0.635], 1.0, ''] #'#3252A2'
-	guide_color = '#0051FF'
-	grid_color = '#D3DEE8'
-	master_layer_color = [uc2const.COLOR_RGB, [0.0, 0.0, 0.0], 1.0, '']#'#000000'
+	layer_color = '#3252A2'
+	layer_propeties = [1, 1, 1]
+	master_layer_color = '#000000'
 
-	grid_geometry = [0, 0, 2.83465, 2.83465]
+	guide_layer_color = '#0051FF'
+	guide_layer_propeties = [1, 1, 0]
+
+	grid_layer_color = '#D3DEE8'
+	grid_layer_geometry = [0, 0, uc2const.mm_to_pt, uc2const.mm_to_pt]
+	grid_layer_propeties = [0, 0, 0]
 
 	default_polygon_num = 5
 	default_text = "TEXT text"

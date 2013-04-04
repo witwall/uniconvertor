@@ -19,7 +19,7 @@ from copy import deepcopy
 
 
 from uc2 import uc2const
-from uc2 import _
+from uc2 import _, cms
 from uc2 import libgeom
 from uc2.formats.pdxf import const
 from uc2.formats.generic import ModelObject
@@ -244,22 +244,23 @@ class Layer(StructuralObject):
 	"""
 	cid = LAYER
 	color = ''
+	properties = []
 	name = ''
 
 	def __init__(self, config, parent=None, name=''):
 		self.cid = LAYER
 		self.childs = []
 		self.config = config
+
 		if not name:
 			self.name = _('Layer') + ' 1'
 		else:
 			self.name = name
-		self.style = [[], deepcopy(self.config.default_stroke), [],
-					deepcopy(self.config.default_structural_style)]
+
 		self.parent = parent
-		color = deepcopy(self.config.layer_color)
-		stroke = self.style[1]
-		stroke[2] = color
+		self.color = '' + self.config.layer_color
+		self.style = [[], deepcopy(self.config.default_stroke), [], []]
+		self.properties = [] + self.config.layer_propeties
 		self.childs = []
 
 	def resolve(self):
@@ -267,6 +268,16 @@ class Layer(StructuralObject):
 		name = '%s' % (self.name)
 		info = '%d' % (len(self.childs))
 		return (is_leaf, name, info)
+
+	def update(self):
+		if isinstance(self.color, str):
+			try:
+				self.color = cms.hexcolor_to_rgb(self.color)
+			except:
+				self.color = cms.hexcolor_to_rgb(self.config.layer_color)
+		stroke = self.style[1]
+		if stroke:
+			stroke[2] = [uc2const.COLOR_RGB , self.color, 1.0, '']
 
 class GuideLayer(Layer):
 	"""
@@ -280,9 +291,9 @@ class GuideLayer(Layer):
 	def __init__(self, config, parent=None, name=_('GuideLayer')):
 		Layer.__init__(self, config, parent, name)
 		self.cid = GUIDE_LAYER
-		self.style = [[], [], [], []]
 		self.childs = []
-		self.color = '' + self.config.guide_color
+		self.color = '' + self.config.guide_layer_color
+		self.properties = [] + self.config.guide_layer_propeties
 
 	def resolve(self):
 		is_leaf = False
@@ -303,10 +314,10 @@ class GridLayer(Layer):
 	def __init__(self, config, parent=None, name=_('GridLayer')):
 		Layer.__init__(self, config, parent, name)
 		self.cid = GRID_LAYER
-		self.style = [[], [], [], []]
 		self.childs = []
-		self.color = '' + self.config.grid_color
-		self.grid = [] + self.config.grid_geometry
+		self.color = '' + self.config.grid_layer_color
+		self.grid = [] + self.config.grid_layer_geometry
+		self.properties = [] + self.config.grid_layer_propeties
 
 	def resolve(self):
 		is_leaf = False
