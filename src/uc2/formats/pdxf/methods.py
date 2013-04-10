@@ -165,5 +165,18 @@ class PDXF_Methods:
 	def get_layer(self, page, layer_num=0):
 		return page.childs[layer_num]
 
-	def get_master_layers(self):
+	def is_layer_visible(self, layer):
+		if layer.properties[0]: return True
+		return False
+
+	def get_desktop_layers(self):
 		return self.model.childs[1].childs
+
+	def get_master_layers(self):
+		return self.model.childs[2].childs
+
+	def get_gird_layer(self):
+		return self.model.childs[3]
+
+	def get_guide_layer(self):
+		return self.model.childs[4]
