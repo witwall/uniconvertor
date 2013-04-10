@@ -272,9 +272,9 @@ class Layer(StructuralObject):
 	def update(self):
 		if isinstance(self.color, str):
 			try:
-				self.color = cms.hexcolor_to_rgb(self.color)
+				self.color = cms.hexcolor_to_rgba(self.color)
 			except:
-				self.color = cms.hexcolor_to_rgb(self.config.layer_color)
+				self.color = cms.hexcolor_to_rgba(self.config.layer_color)
 		stroke = self.style[1]
 		if stroke:
 			stroke[2] = [uc2const.COLOR_RGB , self.color, 1.0, '']
@@ -315,7 +315,7 @@ class GridLayer(Layer):
 		Layer.__init__(self, config, parent, name)
 		self.cid = GRID_LAYER
 		self.childs = []
-		self.color = '' + self.config.grid_layer_color
+		self.color = [] + self.config.grid_layer_color
 		self.grid = [] + self.config.grid_layer_geometry
 		self.properties = [] + self.config.grid_layer_propeties
 
