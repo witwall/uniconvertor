@@ -49,6 +49,25 @@ def hexcolor_to_rgb(hexcolor):
 	b = int(hexcolor[5:], 0x10) / 255.0
 	return [r, g, b]
 
+def hexcolor_to_rgba(hexcolor):
+	"""
+	Converts hex color string as a list of float values.
+	For example: #ff00ff => [1.0, 0.0, 1.0, 1.0]
+	"""
+	if len(hexcolor) == 7:
+		r = int(hexcolor[1:3], 0x10) / 255.0
+		g = int(hexcolor[3:5], 0x10) / 255.0
+		b = int(hexcolor[5:], 0x10) / 255.0
+		return [r, g, b, 1.0]
+	elif len(hexcolor) == 9:
+		r = int(hexcolor[1:3], 0x10) / 255.0
+		g = int(hexcolor[3:5], 0x10) / 255.0
+		b = int(hexcolor[5:7], 0x10) / 255.0
+		a = int(hexcolor[7:], 0x10) / 255.0
+		return [r, g, b, a]
+	else:
+		return [0.0, 0.0, 0.0, 1.0]
+
 def gdk_hexcolor_to_rgb(hexcolor):
 	"""
 	Converts hex color string as a list of float values.
