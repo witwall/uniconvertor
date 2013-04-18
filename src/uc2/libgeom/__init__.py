@@ -42,7 +42,7 @@ marker - NODE_CUSP = 0; NODE_SMOOTH = 1; NODE_SYMMETRICAL = 2
 """
 
 
-#/////////// Point operations //////////////////////
+#------------- Point operations -------------
 
 
 def div_point(p, k):
@@ -76,7 +76,56 @@ def mult_points(p0, p1):
 def cr_points(p0, p1):
 	return p0[0] * p1[1] - p0[1] * p1[0]
 
-#//////////////// Flattering ///////////////
+def is_equal_points(p1, p0):
+	ret = False
+	if p1[0] == p0[0] and p1[1] == p0[1]:
+		ret = True
+	return ret
+
+#------------- Bbox operations -------------
+
+def normalize_bbox(bbox):
+	x0, y0, x1, y1 = bbox
+	new_bbox = [0, 0, 0, 0]
+	if x0 < x1:
+		new_bbox[0] = x0
+		new_bbox[2] = x1
+	else:
+		new_bbox[0] = x1
+		new_bbox[2] = x0
+	if y0 < y1:
+		new_bbox[1] = y0
+		new_bbox[3] = y1
+	else:
+		new_bbox[1] = y1
+		new_bbox[3] = y0
+	return new_bbox
+
+def bbox_points(bbox):
+	x0, y0, x1, y1 = normalize_bbox(bbox)
+	return [[x0, y0], [x0, y1], [x1, y0], [x1, y1]]
+
+def bbox_middle_points(bbox):
+	x0, y0, x1, y1 = normalize_bbox(bbox)
+	mx = (x1 - x0) / 2.0 + x0
+	my = (y1 - y0) / 2.0 + y0
+	return [[x0, my], [mx, y1], [x1, my], [mx, y0]]
+
+def bbox_trafo(bbox0, bbox1):
+	x0_0, y0_0, x1_0, y1_0 = normalize_bbox(bbox0)
+	x0_1, y0_1, x1_1, y1_1 = normalize_bbox(bbox0)
+	w0 = x1_0 - x0_0
+	h0 = y1_0 - y0_0
+	w1 = x1_1 - x0_1
+	h1 = y1_1 - y0_1
+	m11 = w1 / w0
+	m22 = h1 / h0
+	dx = x0_1 - x0_0
+	dy = y0_1 - y0_0
+	return [m11, 0.0, 0.0, m22, dx, dy]
+
+
+#------------- Flattering -------------
 
 def _flat_segment(p0, p1, p2, p3, tlr):
 	p4 = midpoint(p0, p1)
@@ -131,7 +180,7 @@ def flat_paths(paths, tlr):
 		result.append(flat_path(path, tlr))
 	return result
 
-#//////////// generic Bezier math stuff ////////////
+#------------- generic Bezier math stuff -------------
 def apply_trafo_to_paths(paths, trafo):
 	new_paths = []
 	for path in paths:
@@ -147,6 +196,12 @@ def apply_trafo_to_path(path, trafo):
 	new_path.append(new_points)
 	new_path.append(path[2])
 	return new_path
+
+def apply_trafo_to_points(points, trafo):
+	ret = []
+	for point in points:
+		ret.append(apply_trafo_to_point(point, trafo))
+	return ret
 
 def apply_trafo_to_point(point, trafo):
 	if len(point) == 2:
@@ -211,7 +266,7 @@ def rotate_point(center, point, angle):
 	return apply_trafo_to_point(point, trafo)
 
 
-#/////////// libcairo wrapper //////////////////////
+#------------- libcairo wrapper -------------
 
 def create_cpath(cache_paths):
 	return libcairo.create_cpath(cache_paths)
@@ -245,7 +300,7 @@ def get_transformed_path(obj):
 
 	return libcairo.get_path_from_cpath(obj.cache_cpath)
 
-#//////////// Object specific routines /////////////
+#------------- Object specific routines -------------
 
 def get_rect_path(start, width, height, corners):
 	mr = min(width, height) / 2.0
