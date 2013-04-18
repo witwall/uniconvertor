@@ -219,7 +219,7 @@ UniConvertor is a multiplatform universal vector graphics translator.
 It uses sK1 model to convert one format to another.
 
 sK1 Project (http://sk1project.org),
-Copyright (C) 2007-2012 by Igor E. Novikov
+Copyright (C) 2007-2013 by Igor E. Novikov
 ------------------------------------------------------------------------------------
 
 Import filters: 
