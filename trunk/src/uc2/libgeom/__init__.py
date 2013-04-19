@@ -111,6 +111,12 @@ def bbox_middle_points(bbox):
 	my = (y1 - y0) / 2.0 + y0
 	return [[x0, my], [mx, y1], [x1, my], [mx, y0]]
 
+def bbox_center(bbox):
+	x0, y0, x1, y1 = normalize_bbox(bbox)
+	mx = (x1 - x0) / 2.0 + x0
+	my = (y1 - y0) / 2.0 + y0
+	return [mx, my]
+
 def bbox_trafo(bbox0, bbox1):
 	x0_0, y0_0, x1_0, y1_0 = normalize_bbox(bbox0)
 	x0_1, y0_1, x1_1, y1_1 = normalize_bbox(bbox0)
