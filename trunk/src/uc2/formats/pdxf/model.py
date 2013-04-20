@@ -47,6 +47,7 @@ LAYER = 55
 GRID_LAYER = 57
 GUIDE_LAYER = 58
 DESKTOP_LAYERS = 59
+GUIDE = 60
 
 SELECTABLE_CLASS = 100
 COMPOUND_CLASS = 101
@@ -74,7 +75,7 @@ CID_TO_NAME = {
 	PAGES: _('Pages'), PAGE: _('Page'), LAYER_GROUP: _('Layer group'),
 	MASTER_LAYERS: _('Master layers'), LAYER: _('Layer'),
 	GRID_LAYER: _('Grid layer'), GUIDE_LAYER: _('Guide layer'),
-	DESKTOP_LAYERS: _('Desktop layers'),
+	DESKTOP_LAYERS: _('Desktop layers'), GUIDE: _('Guide'),
 
 	GROUP: _('Group'), CONTAINER: _('Container'),
 	TEXT_BLOCK: _('Text block'), TEXT_COLUMN: _('Text column'),
@@ -95,7 +96,7 @@ CID_TO_TAGNAME = {
 	PAGES: 'Pages', PAGE: 'Page', LAYER_GROUP: 'LayerGroup',
 	MASTER_LAYERS: 'MasterLayers', LAYER: 'Layer',
 	GRID_LAYER: 'GridLayer', GUIDE_LAYER: 'GuideLayer',
-	DESKTOP_LAYERS: 'DesktopLayers',
+	DESKTOP_LAYERS: 'DesktopLayers', GUIDE: 'Guide',
 
 	GROUP: 'Group', CONTAINER: 'Container',
 	TEXT_BLOCK: 'TextBlock', TEXT_COLUMN: 'TextColumn',
@@ -115,7 +116,7 @@ TAGNAME_TO_CID = {
 	'Pages': PAGES, 'Page': PAGE, 'LayerGroup': LAYER_GROUP,
 	'MasterLayers': MASTER_LAYERS, 'Layer': LAYER,
 	'GridLayer': GRID_LAYER, 'GuideLayer': GUIDE_LAYER,
-	'DesktopLayers': DESKTOP_LAYERS,
+	'DesktopLayers': DESKTOP_LAYERS, 'Guide': GUIDE,
 
 	'Group': GROUP, 'Container': CONTAINER,
 	'TextBlock': TEXT_BLOCK, 'TextColumn': TEXT_COLUMN,
@@ -379,7 +380,20 @@ class DesktopLayers(LayerGroup):
 		info = '%d' % (len(self.childs))
 		return (is_leaf, name, info)
 
-
+class Guide(StructuralObject):
+	"""
+	Represents container for regular layers.
+	The object is not used yet. 
+	All child layers are in childs list.
+	"""
+	cid = GUIDE
+	orientation = uc2const.HORIZONTAL
+	position = 0.0
+	def __init__(self, config, parent=None):
+		self.config = config
+		self.parent = parent
+		self.cid = GUIDE
+		self.childs = []
 
 #================Selectable Objects==================
 class SelectableObject(DocumentObject):
