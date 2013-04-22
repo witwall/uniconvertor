@@ -389,10 +389,12 @@ class Guide(StructuralObject):
 	cid = GUIDE
 	orientation = uc2const.HORIZONTAL
 	position = 0.0
-	def __init__(self, config, parent=None):
+	def __init__(self, config, parent=None, pos=0.0, orient=uc2const.HORIZONTAL):
 		self.config = config
 		self.parent = parent
 		self.cid = GUIDE
+		self.position = pos
+		self.orientation = orient
 		self.childs = []
 
 #================Selectable Objects==================
@@ -752,7 +754,7 @@ CID_TO_CLASS = {
 	PAGES: Pages, PAGE: Page, LAYER_GROUP: LayerGroup,
 	MASTER_LAYERS: MasterLayers, LAYER: Layer,
 	GRID_LAYER: GridLayer, GUIDE_LAYER: GuideLayer,
-	DESKTOP_LAYERS: DesktopLayers,
+	DESKTOP_LAYERS: DesktopLayers, GUIDE: Guide,
 
 	GROUP: Group, CONTAINER: Container,
 
