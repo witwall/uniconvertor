@@ -46,7 +46,6 @@ class PDXF_Presenter(TaggedModelPresenter):
 		self.saver = PDXF_Saver()
 		self.create_cache_structure()
 		self.methods = PDXF_Methods(self)
-		self.cms = cms.ColorManager()
 		self.new()
 
 	def create_cache_structure(self):
@@ -59,8 +58,12 @@ class PDXF_Presenter(TaggedModelPresenter):
 		mime.write(const.DOC_MIME)
 		mime.close()
 
+	def init_cms(self):
+		self.cms = cms.ColorManager()
+
 	def new(self):
 		self.model = methods.create_new_doc(self.config)
+		self.init_cms()
 		self.methods.update()
 		self.model.do_update()
 
@@ -68,6 +71,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 		pass
 
 	def update(self):
+		self.init_cms()
 		TaggedModelPresenter.update(self)
 		if not self.model is None:
 			self.methods.update()
