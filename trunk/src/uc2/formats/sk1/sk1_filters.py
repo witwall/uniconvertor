@@ -91,28 +91,28 @@ class SK1_Loader:
 
 
 	#---PROPERTIES
-	def gl(self, *args):self.string = ''
-	def pe(self, *args):self.string = ''
-	def ps(self, *args):self.string = ''
-	def pgr(self, *args):self.string = ''
-	def pgc(self, *args):self.string = ''
-	def phs(self, *args):self.string = ''
-	def pit(self, *args):self.string = ''
-	def fp(self, *args):self.string = ''
-	def fe(self, *args):self.string = ''
-	def ft(self, *args):self.string = ''
-	def lp(self, *args):self.string = ''
-	def le(self, *args):self.string = ''
-	def lw(self, *args):self.string = ''
-	def lc(self, *args):self.string = ''
-	def lj(self, *args):self.string = ''
-	def ld(self, *args):self.string = ''
-	def la1(self, *args):self.string = ''
-	def la2(self, *args):self.string = ''
-	def Fs(self, *args):self.string = ''
-	def Fn(self, *args):self.string = ''
-	def dstyle(self, *args):self.string = ''
-	def style(self, *args):self.string = ''
+	def gl(self, *args): self.add_string(self.line)
+	def pe(self, *args): self.add_string(self.line)
+	def ps(self, *args): self.add_string(self.line)
+	def pgr(self, *args): self.add_string(self.line)
+	def pgc(self, *args): self.add_string(self.line)
+	def phs(self, *args): self.add_string(self.line)
+	def pit(self, *args): self.add_string(self.line)
+	def fp(self, *args): self.add_string(self.line)
+	def fe(self, *args): self.add_string(self.line)
+	def ft(self, *args): self.add_string(self.line)
+	def lp(self, *args): self.add_string(self.line)
+	def le(self, *args): self.add_string(self.line)
+	def lw(self, *args): self.add_string(self.line)
+	def lc(self, *args): self.add_string(self.line)
+	def lj(self, *args): self.add_string(self.line)
+	def ld(self, *args): self.add_string(self.line)
+	def la1(self, *args): self.add_string(self.line)
+	def la2(self, *args): self.add_string(self.line)
+	def Fs(self, *args): self.add_string(self.line)
+	def Fn(self, *args): self.add_string(self.line)
+	def dstyle(self, *args): self.add_string(self.line)
+	def style(self, *args): self.add_string(self.line)
 
 	#---STRUCTURAL ELEMENTS
 	def document(self, *args):
@@ -137,11 +137,14 @@ class SK1_Loader:
 	def layer(self, *args):
 		if self.active_page is None:
 			page = SK1Page(self.config)
+			current_line = self.line
+			self.line = ''
 			self.string = page.string
 			self.active_page = page
 			self.active_layer = None
 			self.parent_stack = []
 			self.add_object(page, self.model)
+			self.line = current_line
 		layer = SK1Layer(self.config)
 		self.active_layer = layer
 		self.add_object(layer, self.active_page)
