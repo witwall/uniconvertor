@@ -1,16 +1,30 @@
-#Thu Apr 04 19:30:31 EEST 2013
+#Wed Apr 24 15:44:41 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/formats/cdr/utils.py=utf-8
+encoding//src/uc2/formats/data.py=utf-8
 encoding//src/uc2/formats/generic.py=utf-8
+encoding//src/uc2/formats/pdxf/__init__.py=utf-8
 encoding//src/uc2/formats/pdxf/const.py=utf-8
 encoding//src/uc2/formats/pdxf/crenderer.py=utf-8
 encoding//src/uc2/formats/pdxf/methods.py=utf-8
 encoding//src/uc2/formats/pdxf/model.py=utf-8
 encoding//src/uc2/formats/pdxf/pdxf_config.py=utf-8
+encoding//src/uc2/formats/pdxf/pdxf_filters.py=utf-8
 encoding//src/uc2/formats/pdxf/presenter.py=utf-8
+encoding//src/uc2/formats/plt/__init__.py=utf-8
+encoding//src/uc2/formats/plt/model.py=utf-8
+encoding//src/uc2/formats/plt/plt_config.py=utf-8
 encoding//src/uc2/formats/plt/plt_filters.py=utf-8
 encoding//src/uc2/formats/plt/plt_translators.py=utf-8
+encoding//src/uc2/formats/plt/presenter.py=utf-8
+encoding//src/uc2/formats/sk1/__init__.py=utf-8
+encoding//src/uc2/formats/sk1/const.py=utf-8
+encoding//src/uc2/formats/sk1/model.py=utf-8
+encoding//src/uc2/formats/sk1/presenter.py=utf-8
+encoding//src/uc2/formats/sk1/sk1_config.py=utf-8
+encoding//src/uc2/formats/sk1/sk1_filters.py=utf-8
+encoding//src/uc2/formats/sk1/sk1_translators.py=utf-8
 encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/libgeom/__init__.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8
