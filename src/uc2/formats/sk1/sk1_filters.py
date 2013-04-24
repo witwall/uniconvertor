@@ -139,7 +139,7 @@ class SK1_Loader:
 			page = SK1Page(self.config)
 			current_line = self.line
 			self.line = ''
-			self.string = page.string
+			self.string = 'page()'
 			self.active_page = page
 			self.active_layer = None
 			self.parent_stack = []
