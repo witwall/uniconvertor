@@ -77,7 +77,7 @@ class PDXF_Config(XmlConfigParser):
 	default_text_style = []
 	default_structural_style = []
 
-	#============== COLORMANAGEMENT SECTION ===================
+	#============== COLOR MANAGEMENT SECTION ===================
 	default_rgb_profile = ''
 	default_cmyk_profile = ''
 	default_lab_profile = ''
