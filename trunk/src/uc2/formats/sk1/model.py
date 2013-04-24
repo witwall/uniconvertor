@@ -68,6 +68,12 @@ class SK1ModelObject(TextModelObject):
 		if not is_leaf: info = len(self.childs)
 		return (is_leaf, name, info)
 
+	def get_content(self):
+		result = '' + self.string
+		for child in self.childs:
+			result += child.get_content()
+		return result
+
 #--- STRUCTURAL OBJECTS
 
 class SK1Document(SK1ModelObject):
