@@ -181,26 +181,32 @@ class SK1_Loader:
 
 	def B(self, *args):
 		group = SK1Group(self.config)
+		self.string = group.string
+		self.line = ''
 		self.add_object(group)
 		self.parent_stack.append(group)
 
-	def Bi(self, *args):pass
+	def Bi(self, *args):self.string = ''
 
 	def B_(self, *args):
 		self.parent_stack = self.parent_stack[:-1]
 
 	def PT(self, *args):
 		group = SK1Group(self.config)
+		self.string = group.string
+		self.line = ''
 		self.add_object(group)
 		self.parent_stack.append(group)
 
-	def pt(self, *args):pass
+	def pt(self, *args):self.string = ''
 
 	def PT_(self, *args):
 		self.parent_stack = self.parent_stack[:-1]
 
 	def PC(self, *args):
 		group = SK1Group(self.config)
+		self.string = group.string
+		self.line = ''
 		self.add_object(group)
 		self.parent_stack.append(group)
 
@@ -228,4 +234,24 @@ class SK1_Loader:
 	def im(self, *args):self.string = ''
 	def eps(self, *args):self.string = ''
 
-class SK1_Saver:pass
+
+
+class SK1_Saver:
+
+	name = 'SK1_Saver'
+
+	def __init__(self):
+		pass
+
+	def save(self, presenter, path):
+
+		try:
+			file = open(path, 'wb')
+		except:
+			errtype, value, traceback = sys.exc_info()
+			msg = _('Cannot open %s file for writing') % (path)
+			events.emit(events.MESSAGES, msgconst.ERROR, msg)
+			raise IOError(errtype, msg + '\n' + value, traceback)
+
+		file.write(presenter.model.get_content())
+		file.close()
