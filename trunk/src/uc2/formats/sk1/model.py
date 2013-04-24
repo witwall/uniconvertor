@@ -72,6 +72,8 @@ class SK1ModelObject(TextModelObject):
 		result = '' + self.string
 		for child in self.childs:
 			result += child.get_content()
+		if self.end_string:
+			result += self.end_string
 		return result
 
 #--- STRUCTURAL OBJECTS
@@ -81,7 +83,7 @@ class SK1Document(SK1ModelObject):
 	Represents SK1 model root object.
 	"""
 
-	string = '##sK1 1 2\ndocument()'
+	string = '##sK1 1 2\ndocument()\n'
 	cid = DOCUMENT
 
 	def __init__(self, config):
@@ -94,7 +96,7 @@ class SK1Layout(SK1ModelObject):
 	(format_name,(width,height),orientation)
 	"""
 
-	string = "layout('A4',(595.276,841.89),0)"
+	string = "layout('A4',(595.276,841.89),0)\n"
 	cid = LAYOUT
 
 	def __init__(self, config, string=''):
@@ -109,7 +111,7 @@ class SK1Grid(SK1ModelObject):
 	grid=(start_x, start_y, dx, dy)
 	grid_color=(colorspace,color values)
 	"""
-	string = 'grid((0,0,2.83465,2.83465),0,("RGB",0.83,0.87,0.91),\'Grid\')'
+	string = 'grid((0,0,2.83465,2.83465),0,("RGB",0.83,0.87,0.91),\'Grid\')\n'
 	cid = GRID
 
 	def __init__(self, config, string=''):
@@ -121,7 +123,7 @@ class SK1Page(SK1ModelObject):
 	Page values are defined as:
 	(page_name,format_name,(width,height),orientation)
 	"""
-	string = "page('','A4',(595.276,841.89),0)"
+	string = "page('','A4',(595.276,841.89),0)\n"
 	cid = PAGE
 
 	def __init__(self, config, string=''):
@@ -133,7 +135,7 @@ class SK1Layer(SK1ModelObject):
 	Layer values are defined as:
 	(layer_name,visible,printable,locked,outlined,layer_color)
 	"""
-	string = "layer('Layer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))"
+	string = "layer('Layer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))\n"
 	cid = LAYER
 
 	def __init__(self, config, string=''):
@@ -145,7 +147,7 @@ class SK1MasterLayer(SK1ModelObject):
 	Layer values are defined as:
 	(layer_name,visible,printable,locked,outlined,layer_color)
 	"""
-	string = "masterlayer('MasterLayer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))"
+	string = "masterlayer('MasterLayer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))\n"
 	cid = MASTERLAYER
 
 	def __init__(self, config, string=''):
@@ -157,7 +159,7 @@ class SK1GuideLayer(SK1ModelObject):
 	Layer values are defined as:
 	(layer_name,visible,printable,locked,outlined,layer_color)
 	"""
-	string = "guidelayer('Guide Lines',1,0,0,1,(\"RGB\",0.0,0.3,1.0))"
+	string = "guidelayer('Guide Lines',1,0,0,1,(\"RGB\",0.0,0.3,1.0))\n"
 	cid = GUIDELAYER
 
 	def __init__(self, config, string=''):
@@ -169,7 +171,7 @@ class SK1Guide(SK1ModelObject):
 	Guideline values are defined as:
 	(point,orientation)
 	"""
-	string = "guide((0.0,0.0),0)"
+	string = "guide((0.0,0.0),0)\n"
 	cid = GUIDE
 
 	def __init__(self, config, string=''):
@@ -182,8 +184,8 @@ class SK1Group(SK1ModelObject):
 	Represents Group object.
 	All nested objects are in childs list.
 	"""
-	string = 'G()'
-	end_string = 'G_()'
+	string = 'G()\n'
+	end_string = 'G_()\n'
 	cid = GROUP
 
 	def __init__(self, config):
@@ -195,8 +197,8 @@ class SK1MaskGroup(SK1ModelObject):
 	All nested objects are in childs list.
 	The first object in childs list is the mask.
 	"""
-	string = 'M()'
-	end_string = 'M_()'
+	string = 'M()\n'
+	end_string = 'M_()\n'
 	cid = MASKGROUP
 
 	def __init__(self, config):
