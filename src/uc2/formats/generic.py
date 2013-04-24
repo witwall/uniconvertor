@@ -61,7 +61,9 @@ class ModelObject:
 
 class TextModelObject(ModelObject):
 
+	properties = []
 	string = ''
+	end_string = ''
 
 GENERIC_TAGS = ['cid', 'childs', 'parent', 'config', 'tag']
 IDENT = '\t'
