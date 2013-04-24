@@ -27,11 +27,10 @@ from uc2.formats.sk1.sk1_translators import SK1_to_PDXF_Translator
 
 class SK1_Presenter(TextModelPresenter):
 
-	cid = uc2const.PLT
+	cid = uc2const.SK1
 
 	config = None
 	doc_file = ''
-	model = None
 
 	def __init__(self, appdata, cnf={}):
 		self.config = SK1_Config()
@@ -44,7 +43,14 @@ class SK1_Presenter(TextModelPresenter):
 		self.new()
 
 	def new(self):
-		self.model = None
+		self.model = model.SK1Document(self.config)
+		self.model.childs.append(model.SK1Layout(self.config))
+		self.model.childs.append(model.SK1Grid(self.config))
+		page = model.SK1Page(self.config)
+		self.model.childs.append(page)
+		page.childs.append(model.SK1Layer(self.config))
+		self.model.childs.append(model.SK1MasterLayer(self.config))
+		self.model.childs.append(model.SK1GuideLayer(self.config))
 
 	def traslate_from_pdxf(self, pdxf_doc):
 		translator = PDXF_to_SK1_Translator()
