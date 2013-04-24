@@ -15,8 +15,48 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class SK1_Loader:
-	pass
+import os
+import sys
 
-class SK1_Saver:
-	pass
+from uc2 import _, events, msgconst
+from uc2.formats.sk1 import model
+from uc2.formats.sk1.presenter import SK1_Presenter
+from uc2.formats.pdxf.presenter import PDXF_Presenter
+
+def sk1_loader(appdata, filename, translate=True, cnf={}, **kw):
+	if kw: cnf.update(kw)
+	doc = SK1_Presenter(appdata, cnf)
+	doc.load(filename)
+	if translate:
+		pdxf_doc = PDXF_Presenter(appdata, cnf)
+		pdxf_doc.doc_file = filename
+		doc.traslate_to_pdxf(pdxf_doc)
+		doc.close()
+		doc = pdxf_doc
+	return doc
+
+def sk1_saver(pdxf_doc, filename, translate=True, cnf={}, **kw):
+	if kw: cnf.update(kw)
+	if translate:
+		plt_doc = SK1_Presenter(pdxf_doc.appdata, cnf)
+		plt_doc.traslate_from_pdxf(pdxf_doc)
+		plt_doc.save(filename)
+		plt_doc.close()
+	else:
+		pdxf_doc.save(filename)
+
+def check_sk1(path):
+	try:
+		file = open(path, 'rb')
+	except:
+		errtype, value, traceback = sys.exc_info()
+		msg = _('Cannot open %s file for reading') % (path)
+		events.emit(events.MESSAGES, msgconst.ERROR, msg)
+		raise IOError(errtype, msg + '\n' + value, traceback)
+
+	string = file.read(5)
+
+	file.close()
+	if string == '##sK1':
+			return True
+	return False
