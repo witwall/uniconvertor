@@ -61,7 +61,7 @@ class SK1_Loader:
 			if not self.line: break
 			self.line = self.line.rstrip('\r\n')
 			position = float(file.tell()) / float(file_size) * 0.95
-			if position - self.position > 0.05:
+			if position - self.position > 0.01:
 				self.position = position
 				msg = _('Parsing in process...')
 				events.emit(events.FILTER_INFO, msg, position)
@@ -83,7 +83,8 @@ class SK1_Loader:
 				parent = self.parent_stack[-1]
 			else:
 				parent = self.active_layer
-		self.add_string(self.line)
+		if self.line:
+			self.add_string(self.line)
 		obj.parent = parent
 		parent.childs.append(obj)
 		obj.string = self.string
@@ -139,7 +140,7 @@ class SK1_Loader:
 			page = SK1Page(self.config)
 			current_line = self.line
 			self.line = ''
-			self.string = 'page()'
+			self.string = page.string
 			self.active_page = page
 			self.active_layer = None
 			self.parent_stack = []
