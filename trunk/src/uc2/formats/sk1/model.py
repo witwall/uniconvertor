@@ -15,8 +15,12 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import Image
+
 from uc2 import _
+from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
+
 
 # Document object enumeration
 DOCUMENT = 1
@@ -35,7 +39,8 @@ RECTANGLE = 30
 ELLIPSE = 31
 CURVE = 32
 TEXT = 33
-
+BITMAPDATA = 34
+IMAGE = 35
 
 CID_TO_NAME = {
 	DOCUMENT: _('Document'), LAYOUT: _('Layout'), GRID: _('Grid'),
@@ -44,7 +49,8 @@ CID_TO_NAME = {
 
 	GROUP: _('Group'), MASKGROUP: _('MaskGroup'),
 
-	RECTANGLE:_('Rectangle'), ELLIPSE:_('Ellipse'), CURVE:_('Curve'), TEXT:_('Text'),
+	RECTANGLE:_('Rectangle'), ELLIPSE:_('Ellipse'), CURVE:_('Curve'),
+	TEXT:_('Text'), BITMAPDATA:_('BitmapData'), IMAGE:_('Image'),
 	}
 
 class SK1ModelObject(TextModelObject):
@@ -75,6 +81,13 @@ class SK1ModelObject(TextModelObject):
 		if self.end_string:
 			result += self.end_string
 		return result
+
+	def write_content(self, file):
+		file.write(self.string)
+		for child in self.childs:
+			child.write_content(file)
+		if self.end_string:
+			file.write(self.end_string)
 
 #--- STRUCTURAL OBJECTS
 
@@ -254,6 +267,47 @@ class SK1Text(SK1ModelObject):
 	"""
 	string = ''
 	cid = TEXT
+
+	def __init__(self, config):
+		SK1ModelObject.__init__(self, config)
+
+class SK1BitmapData(SK1ModelObject):
+	"""
+	Bitmap image data. Object is defined as:
+	
+	bm(ID)	
+	
+	The bitmap data follows as a base64 encoded JPEG file.
+	"""
+	string = ''
+	cid = BITMAPDATA
+	raw_image = None
+
+	def __init__(self, config):
+		SK1ModelObject.__init__(self, config)
+
+	def read_data(self, file):
+		decoder = Base64Decode(SubFileDecode(file, '-'))
+		self.raw_image = Image.open(decoder)
+		self.raw_image.load()
+
+	def write_content(self, file):
+		file.write(self.string)
+		vfile = Base64Encode(file)
+		if self.raw_image.mode == "CMYK":
+			self.raw_image.save(vfile, 'JPEG', quality=100)
+		else:
+			self.raw_image.save(vfile, 'PNG')
+		file.write('\n-')
+
+class SK1Image(SK1ModelObject):
+	"""
+	Image object. ID has to be the id of a previously defined
+	bitmap data object (defined by bm). The object is defined as:
+	im(TRAFO, ID)
+	"""
+	string = ''
+	cid = IMAGE
 
 	def __init__(self, config):
 		SK1ModelObject.__init__(self, config)
