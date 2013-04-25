@@ -1,6 +1,7 @@
-#Wed Apr 24 15:44:41 EEST 2013
+#Thu Apr 25 11:44:16 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
+encoding//src/uc2/formats/cdr/model.py=utf-8
 encoding//src/uc2/formats/cdr/utils.py=utf-8
 encoding//src/uc2/formats/data.py=utf-8
 encoding//src/uc2/formats/generic.py=utf-8
