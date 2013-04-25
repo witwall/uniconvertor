@@ -99,6 +99,7 @@ class SK1_Loader:
 	def gl(self, *args): self.add_string(self.line)
 	def pe(self, *args): self.add_string(self.line)
 	def ps(self, *args): self.add_string(self.line)
+	def pgl(self, *args): self.add_string(self.line)
 	def pgr(self, *args): self.add_string(self.line)
 	def pgc(self, *args): self.add_string(self.line)
 	def phs(self, *args): self.add_string(self.line)
