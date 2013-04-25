@@ -168,6 +168,16 @@ if __name__ == "__main__":
 
 	src_path = 'src/'
 
+	filter_src = src_path + 'uc2/utils/streamfilter/'
+	filter_module = Extension('uc2.utils.streamfilter',
+			define_macros=[('MAJOR_VERSION', '1'),
+						('MINOR_VERSION', '0')],
+			sources=[filter_src + 'streamfilter.c', filter_src + 'filterobj.c',
+					filter_src + 'linefilter.c', filter_src + 'subfilefilter.c',
+					filter_src + 'base64filter.c', filter_src + 'nullfilter.c',
+					filter_src + 'stringfilter.c', filter_src + 'binfile.c',
+					filter_src + 'hexfilter.c'])
+
 	cairo_src = src_path + 'uc2/libcairo/'
 	cairo_include_dirs = ['/usr/include/cairo', '/usr/include/pycairo']
 	cairo_module = Extension('uc2.libcairo._libcairo',
@@ -290,7 +300,7 @@ Export filters:
 
 			scripts=['src/uniconvertor'],
 
-			ext_modules=[cairo_module, pycms_module, libimg_module, ])
+			ext_modules=[cairo_module, pycms_module, libimg_module, filter_module])
 
 #################################################
 # .py source compiling
