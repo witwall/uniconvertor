@@ -20,7 +20,7 @@ import sys, os
 from uc2 import _, events, msgconst
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
 SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
-SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text
+SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image
 
 class SK1_Loader:
 	name = 'SK1_Loader'
@@ -47,30 +47,31 @@ class SK1_Loader:
 
 		file_size = os.path.getsize(path)
 		try:
-			file = open(path, 'rb')
+			self.file = open(path, 'rb')
 		except:
 			errtype, value, traceback = sys.exc_info()
 			msg = _('Cannot open %s file for writing') % (path)
 			events.emit(events.MESSAGES, msgconst.ERROR, msg)
 			raise IOError(errtype, msg + '\n' + value, traceback)
 
-		self.add_string(file.readline().rstrip('\r\n'))
+		self.add_string(self.file.readline().rstrip('\r\n'))
 
 		while True:
-			self.line = file.readline()
+			self.line = self.file.readline()
 			if not self.line: break
 			self.line = self.line.rstrip('\r\n')
-			position = float(file.tell()) / float(file_size) * 0.95
+			position = float(self.file.tell()) / float(file_size) * 0.95
 			if position - self.position > 0.01:
 				self.position = position
 				msg = _('Parsing in process...')
 				events.emit(events.FILTER_INFO, msg, position)
-			try:
-				code = compile('self.' + self.line, '<string>', 'exec')
-				exec code
-			except:pass
+			if self.line:
+				try:
+					code = compile('self.' + self.line, '<string>', 'exec')
+					exec code
+				except:print 'error>>', self.line
 
-		file.close()
+		self.file.close()
 		self.position = 0
 		return self.model
 
@@ -78,15 +79,18 @@ class SK1_Loader:
 		self.string += string + '\n'
 
 	def add_object(self, obj, parent=''):
-		if not parent:
-			if self.parent_stack:
-				parent = self.parent_stack[-1]
-			else:
-				parent = self.active_layer
+		if self.model is None:
+			self.model = obj
+		else:
+			if not parent:
+				if self.parent_stack:
+					parent = self.parent_stack[-1]
+				else:
+					parent = self.active_layer
+			obj.parent = parent
+			parent.childs.append(obj)
 		if self.line:
 			self.add_string(self.line)
-		obj.parent = parent
-		parent.childs.append(obj)
 		obj.string = self.string
 		self.string = ''
 
@@ -117,10 +121,7 @@ class SK1_Loader:
 
 	#---STRUCTURAL ELEMENTS
 	def document(self, *args):
-		self.add_string(self.line)
-		self.model = SK1Document(self.config)
-		self.model.string = self.string
-		self.string = ''
+		self.add_object(SK1Document(self.config))
 
 	def layout(self, *args):
 		self.add_object(SK1Layout(self.config), self.model)
@@ -231,10 +232,15 @@ class SK1_Loader:
 	def txt(self, *args):
 		self.add_object(SK1Text(self.config))
 
-	def bm(self, *args):self.string = ''
-	def im(self, *args):self.string = ''
-	def eps(self, *args):self.string = ''
+	def bm(self, *args):
+		bmd_obj = SK1BitmapData(self.config)
+		self.add_object(bmd_obj)
+		bmd_obj.read_data(self.file)
 
+	def im(self, *args):
+		self.add_object(SK1Image(self.config))
+
+	def eps(self, *args):self.string = ''
 
 
 class SK1_Saver:
@@ -254,5 +260,5 @@ class SK1_Saver:
 			events.emit(events.MESSAGES, msgconst.ERROR, msg)
 			raise IOError(errtype, msg + '\n' + value, traceback)
 
-		file.write(presenter.model.get_content())
+		presenter.model.write_content(file)
 		file.close()
