@@ -1,6 +1,7 @@
-#Thu Apr 25 11:44:16 EEST 2013
+#Fri Apr 26 10:50:45 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
+encoding//src/uc2/formats/cdr/const.py=utf-8
 encoding//src/uc2/formats/cdr/model.py=utf-8
 encoding//src/uc2/formats/cdr/utils.py=utf-8
 encoding//src/uc2/formats/data.py=utf-8
@@ -18,14 +19,16 @@ encoding//src/uc2/formats/plt/model.py=utf-8
 encoding//src/uc2/formats/plt/plt_config.py=utf-8
 encoding//src/uc2/formats/plt/plt_filters.py=utf-8
 encoding//src/uc2/formats/plt/plt_translators.py=utf-8
+encoding//src/uc2/formats/plt/pltconst.py=utf-8
 encoding//src/uc2/formats/plt/presenter.py=utf-8
+encoding//src/uc2/formats/riff/model.py=utf-8
 encoding//src/uc2/formats/sk1/__init__.py=utf-8
-encoding//src/uc2/formats/sk1/const.py=utf-8
 encoding//src/uc2/formats/sk1/model.py=utf-8
 encoding//src/uc2/formats/sk1/presenter.py=utf-8
 encoding//src/uc2/formats/sk1/sk1_config.py=utf-8
 encoding//src/uc2/formats/sk1/sk1_filters.py=utf-8
 encoding//src/uc2/formats/sk1/sk1_translators.py=utf-8
+encoding//src/uc2/formats/sk1/sk1const.py=utf-8
 encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/libgeom/__init__.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8
