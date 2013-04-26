@@ -42,11 +42,11 @@ class ModelObject:
 
 	def update(self): pass
 
-	def do_update(self):
+	def do_update(self, presenter):
 		for child in self.childs:
 			child.parent = self
 			child.config = self.config
-			child.do_update()
+			child.do_update(presenter)
 		self.update()
 
 	def count(self):
@@ -96,68 +96,64 @@ class ModelPresenter:
 	loader = None
 	saver = None
 	methods = None
+	obj_num = 0
 
 	def new(self):pass
 
 	def load(self, path):
 		if path and os.path.lexists(path):
 			try:
-				msg = _('Parsing is started...')
-				events.emit(events.FILTER_INFO, msg, 0.03)
-				events.emit(events.MESSAGES, msgconst.INFO, msg)
+				self.parsing_msg(0.03)
+				self.send_info(_('Parsing is started...'))
 				self.model = self.loader.load(self, path)
 			except:
 				self.close()
 				raise IOError(_('Error while loading') + ' ' + path,
 							sys.exc_info()[1], sys.exc_info()[2])
 
-			msg = _('Document model is created')
-			events.emit(events.MESSAGES, msgconst.OK, msg)
-
+			self.send_ok(_('Document model is created'))
 			self.doc_file = path
 		else:
 			msg = _('Error while loading:') + ' ' + _('file doesn\'t exist')
-			events.emit(events.MESSAGES, msgconst.ERROR, msg)
+			self.send_error(msg)
 			raise IOError(msg)
 		self.update()
 
 	def update(self):
 		if not self.model is None:
-			msg = _('%s model update...') % (uc2const.FORMAT_NAMES[self.cid])
-			events.emit(events.FILTER_INFO, msg , 0.95)
+			self.obj_num = self.model.count() + 1
+			self.update_msg(0.0)
 			try:
 				self.model.config = self.config
-				self.model.do_update()
+				self.model.do_update(self)
 			except:
 				print sys.exc_info()[1], sys.exc_info()[2]
 				msg = _('Exception while document model update')
-				events.emit(events.MESSAGES, msgconst.ERROR, msg)
+				self.send_error(msg)
 				raise IOError(msg)
 
 			msg = _('Document model is updated successfully')
-			events.emit(events.FILTER_INFO, msg, 0.98)
-			events.emit(events.MESSAGES, msgconst.OK, msg)
+			self.send_progress_message(msg, 0.99)
+			self.send_ok(msg)
 
 	def save(self, path):
 		if path:
 			self.doc_file = path
 			try:
-				msg = _('Saving is started...')
-				events.emit(events.FILTER_INFO, msg, 0.03)
-				events.emit(events.MESSAGES, msgconst.INFO, msg)
+				self.saving_msg(0.03)
+				self.send_info(_('Saving is started...'))
 				self.saver.save(self, path)
 			except:
 				msg = _('Error while saving') + ' ' + path
-				events.emit(events.MESSAGES, msgconst.ERROR, msg)
+				self.send_error(msg)
 				raise IOError(msg, sys.exc_info()[1], sys.exc_info()[2])
 		else:
-			msg = _('Error while saving:') + ' ' + _('Empty file name')
-			events.emit(events.MESSAGES, msgconst.ERROR, msg)
+			self.send_error(_('Error while saving:') + ' ' + _('Empty file name'))
 			raise IOError(msg)
 
 		msg = _('Document model is saved successfully')
-		events.emit(events.FILTER_INFO, msg, 0.95)
-		events.emit(events.MESSAGES, msgconst.OK, msg)
+		self.send_progress_message(msg, 0.95)
+		self.send_ok(msg)
 
 	def close(self):
 		file = self.doc_file
@@ -166,17 +162,39 @@ class ModelPresenter:
 			self.model.destroy()
 		self.model = None
 
-		msg = _('Document model is destroyed for') + ' %s' % (file)
-		events.emit(events.MESSAGES, msgconst.OK, msg)
+		self.send_ok(_('Document model is destroyed for') + ' %s' % (file))
 
 		if self.doc_dir and os.path.lexists(self.doc_dir):
 			try:
 				fs.xremove_dir(self.doc_dir)
-				msg = _('Cache is cleared for') + ' %s' % (file)
-				events.emit(events.MESSAGES, msgconst.OK, msg)
+				self.send_ok(_('Cache is cleared for') + ' %s' % (file))
 			except IOError:
-				msg = _('Cache clearing is unsuccessful')
-				events.emit(events.MESSAGES, msgconst.ERROR, msg)
+				self.send_srror(_('Cache clearing is unsuccessful'))
+
+	def update_msg(self, val):
+		msg = _('%s model update in progress...') % (uc2const.FORMAT_NAMES[self.cid])
+		self.send_progress_message(msg, val)
+
+	def parsing_msg(self, val):
+		msg = _('Parsing in progress...')
+		self.send_progress_message(msg, val)
+
+
+	def saving_msg(self, val):
+		msg = _('Saving in progress...')
+		self.send_progress_message(msg, val)
+
+	def send_progress_message(self, msg, val):
+		events.emit(events.FILTER_INFO, msg, val)
+
+	def send_ok(self, msg):
+		events.emit(events.MESSAGES, msgconst.OK, msg)
+
+	def send_info(self, msg):
+		events.emit(events.MESSAGES, msgconst.INFO, msg)
+
+	def send_error(self, msg):
+		events.emit(events.MESSAGES, msgconst.ERROR, msg)
 
 class TextModelPresenter(ModelPresenter):
 
