@@ -15,9 +15,12 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from copy import deepcopy
 import Image
 
-from uc2 import _
+from uc2 import _, uc2const
+from uc2.formats.pdxf import const
+from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
@@ -52,6 +55,60 @@ CID_TO_NAME = {
 	RECTANGLE:_('Rectangle'), ELLIPSE:_('Ellipse'), CURVE:_('Curve'),
 	TEXT:_('Text'), BITMAPDATA:_('BitmapData'), IMAGE:_('Image'),
 	}
+#r,g,b,c,m,y,k,name,palette
+#color_spec[3],color_spec[4],color_spec[5],
+#								color_spec[6],color_spec[7],color_spec[8],color_spec[9],
+#								color_spec[2],color_spec[1]
+def get_pdxf_color(clr):
+	if not clr: return deepcopy(sk1const.default_color)
+	color_spec = clr[0]
+	if color_spec == sk1const.RGB:
+		result = [sk1const.RGB, [clr[1], clr[2], clr[3]], 1.0, '']
+		if len(clr) == 5:result[2] = clr[4]
+		return result
+	elif color_spec == sk1const.CMYK:
+		result = [sk1const.CMYK, [clr[1], clr[2], clr[3], clr[4]], 1.0, '']
+		if len(clr) == 6:result[2] = clr[5]
+		return result
+	elif color_spec == sk1const.SPOT:
+		result = [sk1const.SPOT, [[clr[3], clr[4], clr[5]],
+					[clr[6], clr[7], clr[8], clr[9]], clr[1]], 1.0, clr[2]]
+		if len(clr) == 11:result[2] = clr[10]
+		return result
+	else:
+		return deepcopy(sk1const.default_color)
+
+def get_sk1_color(clr):
+	if not clr: return deepcopy(sk1const.default_sk1color)
+	color_spec = clr[0]
+	val = clr[1]
+	alpha = clr[2]
+	name = clr[3]
+	if color_spec == sk1const.RGB:
+		if clr[2] == 1.0:
+			result = (sk1const.RGB, val[0], val[1], val[2])
+		else:
+			result = (sk1const.RGB, val[0], val[1], val[2], alpha)
+		return result
+	elif color_spec == sk1const.CMYK:
+		if clr[2] == 1.0:
+			result = (sk1const.CMYK, val[0], val[1], val[2], val[3])
+		else:
+			result = (sk1const.CMYK, val[0], val[1], val[2], val[3], alpha)
+		return result
+	elif color_spec == sk1const.SPOT:
+		rgb = val[0]
+		cmyk = val[1]
+		pal = val[2]
+		if clr[2] == 1.0:
+			result = (sk1const.SPOT, pal, clr[3], rgb[0], rgb[1], rgb[2],
+					cmyk[0], cmyk[1], cmyk[2], cmyk[3])
+		else:
+			result = (sk1const.SPOT, pal, name, rgb[0], rgb[1], rgb[2],
+					cmyk[0], cmyk[1], cmyk[2], cmyk[3], alpha)
+		return result
+	else:
+		return deepcopy(sk1const.default_sk1color)
 
 class SK1ModelObject(TextModelObject):
 	"""
@@ -111,9 +168,19 @@ class SK1Layout(SK1ModelObject):
 
 	string = "layout('A4',(595.276,841.89),0)\n"
 	cid = LAYOUT
+	format = 'A4'
+	size = uc2const.PAGE_FORMATS['A4']
+	orientation = uc2const.PORTRAIT
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, format='', size=(), orientation=uc2const.PORTRAIT):
+		if format: self.format = format
+		if size: self.size = size
+		if orientation: self.orientation = orientation
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		args = (self.format, self.size, self.orientation)
+		self.string = 'layout' + args.__str__() + '\n'
 
 class SK1Grid(SK1ModelObject):
 	"""
@@ -126,9 +193,22 @@ class SK1Grid(SK1ModelObject):
 	"""
 	string = 'grid((0,0,2.83465,2.83465),0,("RGB",0.83,0.87,0.91),\'Grid\')\n'
 	cid = GRID
+	grid = sk1const.default_grid
+	visibility = 0
+	grid_color = sk1const.default_grid_color
+	layer_name = 'Grid'
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, grid=(), visibility=0, grid_color=(), layer_name=''):
+		if grid:self.grid = grid
+		if visibility:self.visibility = visibility
+		if grid_color:self.grid_color = get_pdxf_color(grid_color)
+		if layer_name:self.layer_name = layer_name
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		color = get_sk1_color(self.grid_color)
+		args = (self.grid, self.visibility, color, self.layer_name)
+		self.string = 'grid' + args.__str__() + '\n'
 
 class SK1Page(SK1ModelObject):
 	"""
@@ -138,9 +218,21 @@ class SK1Page(SK1ModelObject):
 	"""
 	string = "page('','A4',(595.276,841.89),0)\n"
 	cid = PAGE
+	name = ''
+	format = 'A4'
+	size = uc2const.PAGE_FORMATS['A4']
+	orientation = uc2const.PORTRAIT
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, name='', format='', size=(), orientation=uc2const.PORTRAIT):
+		if name:self.name = name
+		if format:self.format = format
+		if size:self.size = size
+		if orientation:self.orientation = orientation
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		args = (self.name, self.format, self.size, self.orientation)
+		self.string = 'page' + args.__str__() + '\n'
 
 class SK1Layer(SK1ModelObject):
 	"""
@@ -150,9 +242,24 @@ class SK1Layer(SK1ModelObject):
 	"""
 	string = "layer('Layer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))\n"
 	cid = LAYER
+	name = ''
+	layer_properties = []
+	layer_color = sk1const.default_layer_color
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, name='', properties=[], layer_color=()):
+		if name:self.name = name
+		if properties:
+			self.layer_properties = properties
+		else:
+			self.layer_properties = [] + sk1const.default_layer_properties
+		if layer_color: self.layer_color = get_pdxf_color(layer_color)
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		color = get_sk1_color(self.layer_color)
+		p1, p2, p3, p4 = self.layer_properties
+		args = (self.name, p1, p2, p3, p4, color)
+		self.string = 'layer' + args.__str__() + '\n'
 
 class SK1MasterLayer(SK1ModelObject):
 	"""
@@ -162,9 +269,24 @@ class SK1MasterLayer(SK1ModelObject):
 	"""
 	string = "masterlayer('MasterLayer 1',1,1,0,0,(\"RGB\",0.196,0.314,0.635))\n"
 	cid = MASTERLAYER
+	name = ''
+	layer_properties = []
+	layer_color = sk1const.default_layer_color
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, name='', properties=[], layer_color=()):
+		if name:self.name = name
+		if properties:
+			self.layer_properties = properties
+		else:
+			self.layer_properties = [] + sk1const.default_layer_properties
+		if layer_color: self.layer_color = get_pdxf_color(layer_color)
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		color = get_sk1_color(self.layer_color)
+		p1, p2, p3, p4 = self.layer_properties
+		args = (self.name, p1, p2, p3, p4, color)
+		self.string = 'masterlayer' + args.__str__() + '\n'
 
 class SK1GuideLayer(SK1ModelObject):
 	"""
@@ -174,9 +296,25 @@ class SK1GuideLayer(SK1ModelObject):
 	"""
 	string = "guidelayer('Guide Lines',1,0,0,1,(\"RGB\",0.0,0.3,1.0))\n"
 	cid = GUIDELAYER
+	name = 'Guides'
+	layer_properties = []
+	layer_color = sk1const.default_guidelayer_color
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, name='', properties=[], layer_color=()):
+		if name:self.name = name
+		if properties:
+			self.layer_properties = properties
+		else:
+			self.layer_properties = [] + sk1const.default_guidelayer_properties
+		if layer_color: self.layer_color = get_pdxf_color(layer_color)
+		SK1ModelObject.__init__(self, config)
+
+
+	def update(self):
+		color = get_sk1_color(self.layer_color)
+		p1, p2, p3, p4 = self.layer_properties
+		args = (self.name, p1, p2, p3, p4, color)
+		self.string = 'guidelayer' + args.__str__() + '\n'
 
 class SK1Guide(SK1ModelObject):
 	"""
@@ -186,9 +324,25 @@ class SK1Guide(SK1ModelObject):
 	"""
 	string = "guide((0.0,0.0),0)\n"
 	cid = GUIDE
+	position = 0
+	orientation = uc2const.HORIZONTAL
 
-	def __init__(self, config, string=''):
-		SK1ModelObject.__init__(self, config, string)
+	def __init__(self, config, point=(), orientation=uc2const.HORIZONTAL):
+		if point:
+			if orientation == uc2const.VERTICAL:
+				self.position = point[0]
+			else:
+				self.position = point[1]
+		self.orientation = orientation
+		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		if self.orientation == uc2const.VERTICAL:
+			point = (self.position, 0.0)
+		else:
+			point = (0.0, self.position)
+		args = (point, self.orientation)
+		self.string = 'guide' + args.__str__() + '\n'
 
 #--- SELECTABLE OBJECTS
 
@@ -230,9 +384,23 @@ class SK1Rectangle(SK1ModelObject):
 	"""
 	string = ''
 	cid = RECTANGLE
+	trafo = ()
+	radius1 = None
+	radius2 = None
 
-	def __init__(self, config):
+	def __init__(self, config, trafo, radius1, radius2):
+		self.trafo = trafo
+		self.radius1 = radius1
+		self.radius2 = radius2
 		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		if not self.radius1 is None and not self.radius2 is None:
+			m11, m12, m21, m22, dx, dy = self.trafo
+			args = (m11, m12, m21, m22, dx, dy, self.radius1, self.radius2)
+			self.string = 'r' + args.__str__() + '\n'
+		else:
+			self.string = 'r' + self.trafo.__str__() + '\n'
 
 class SK1Ellipse(SK1ModelObject):
 	"""
@@ -241,9 +409,26 @@ class SK1Ellipse(SK1ModelObject):
 	"""
 	string = ''
 	cid = ELLIPSE
+	trafo = ()
+	start_angle = None
+	end_angle = None
+	arc_type = None
 
-	def __init__(self, config):
+	def __init__(self, config, trafo, start_angle, end_angle, arc_type):
+		self.trafo = trafo
+		self.start_angle = start_angle
+		self.end_angle = end_angle
+		self.arc_type = arc_type
 		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		if not self.start_angle is None and not self.end_angle is None:
+			m11, m12, m21, m22, dx, dy = self.trafo
+			args = (m11, m12, m21, m22, dx, dy,
+				self.start_angle, self.end_angle, self.arc_type)
+			self.string = 'e' + args.__str__() + '\n'
+		else:
+			self.string = 'e' + self.trafo.__str__() + '\n'
 
 class SK1Curve(SK1ModelObject):
 	"""
@@ -256,9 +441,37 @@ class SK1Curve(SK1ModelObject):
 	"""
 	string = ''
 	cid = CURVE
+	paths = []
 
-	def __init__(self, config):
+	def __init__(self, config, paths):
+		self.paths = paths
 		SK1ModelObject.__init__(self, config)
+
+	def add_line(self, point):
+		x, y = point
+		self.string += 'bs' + (x, y, 0).__str__() + '\n'
+
+	def add_segment(self, point):
+		point0, point1, point2, cont = point
+		args = (point0[0], point0[1], point1[0], point1[1], point2[0], point2[1], cont)
+		self.string += 'bc' + args.__str__() + '\n'
+
+	def update(self):
+		self.string = 'b()\n'
+		start = True
+		for path in self.paths:
+			if start:
+				start = False
+			else:
+				self.string += 'bn()\n'
+			self.add_line(path[0])
+			for point in path[1]:
+				if len(point) == 2:
+					self.add_line(point)
+				else:
+					self.add_segment(point)
+			if path[2] == const.CURVE_CLOSED:
+				self.string += 'bC()\n'
 
 class SK1Text(SK1ModelObject):
 	"""
@@ -267,9 +480,29 @@ class SK1Text(SK1ModelObject):
 	"""
 	string = ''
 	cid = TEXT
+	text = ''
+	trafo = ()
+	horiz_align = None
+	vert_align = None
+	chargap = None
+	wordgap = None
+	linegap = None
 
-	def __init__(self, config):
+	def __init__(self, config, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
+		self.text = text
+		self.trafo = trafo
+		self.horiz_align = horiz_align
+		self.vert_align = vert_align
+		self.chargap = chargap
+		self.wordgap = wordgap
+		self.linegap = linegap
 		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		args = (self.text, self.trafo, self.horiz_align, self.vert_align,
+			self.chargap, self.wordgap, self.linegap)
+		self.string = 'txt' + args.__str__() + '\n'
+
 
 class SK1BitmapData(SK1ModelObject):
 	"""
@@ -282,14 +515,20 @@ class SK1BitmapData(SK1ModelObject):
 	string = ''
 	cid = BITMAPDATA
 	raw_image = None
+	id = ''
 
-	def __init__(self, config):
+	def __init__(self, config, id=''):
+		if id: self.id = id
 		SK1ModelObject.__init__(self, config)
 
 	def read_data(self, file):
 		decoder = Base64Decode(SubFileDecode(file, '-'))
 		self.raw_image = Image.open(decoder)
 		self.raw_image.load()
+
+	def update(self):
+		self.string = 'bm(%i)\n' % (self.id)
+		self.end_string = '-\n'
 
 	def write_content(self, file):
 		file.write(self.string)
@@ -298,7 +537,9 @@ class SK1BitmapData(SK1ModelObject):
 			self.raw_image.save(vfile, 'JPEG', quality=100)
 		else:
 			self.raw_image.save(vfile, 'PNG')
-		file.write('\n-')
+		vfile.close()
+		file.write(self.end_string)
+
 
 class SK1Image(SK1ModelObject):
 	"""
@@ -308,6 +549,13 @@ class SK1Image(SK1ModelObject):
 	"""
 	string = ''
 	cid = IMAGE
+	trafo = ()
+	id = ''
 
-	def __init__(self, config):
+	def __init__(self, config, trafo, id):
+		self.trafo = trafo
+		self.id = id
 		SK1ModelObject.__init__(self, config)
+
+	def update(self):
+		self.string = 'im' + (self.trafo, self.id).__str__() + '\n'
