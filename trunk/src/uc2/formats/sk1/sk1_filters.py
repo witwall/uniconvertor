@@ -16,9 +16,11 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os
+from copy import deepcopy
 
 from uc2 import _, events, msgconst, uc2const
 from uc2.formats.pdxf import const
+from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
 SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
 SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image
@@ -36,6 +38,7 @@ class SK1_Loader:
 	active_page = None
 	active_layer = None
 	parent_stack = []
+	obj_style = []
 
 	position = 0
 
@@ -55,7 +58,8 @@ class SK1_Loader:
 			events.emit(events.MESSAGES, msgconst.ERROR, msg)
 			raise IOError(errtype, msg + '\n' + value, traceback)
 
-		self.add_string(self.file.readline().rstrip('\r\n'))
+		header = self.file.readline()
+		self.reset_style()
 
 		while True:
 			self.line = self.file.readline()
@@ -75,6 +79,9 @@ class SK1_Loader:
 		self.file.close()
 		self.position = 0
 		return self.model
+
+	def reset_style(self):
+		self.obj_style = deepcopy(sk1const.default_style)
 
 	def add_string(self, string):
 		self.string += string + '\n'
@@ -226,15 +233,24 @@ class SK1_Loader:
 	#---PRIMITIVES
 	def r(self, m11, m12, m21, m22, dx, dy, radius1=None, radius2=None):
 		trafo = (m11, m12, m21, m22, dx, dy)
-		self.add_object(SK1Rectangle(self.config, trafo, radius1, radius2))
+		obj = SK1Rectangle(self.config, trafo, radius1, radius2)
+		obj.style = self.obj_style
+		self.reset_style()
+		self.add_object(obj)
 
 	def e(self, m11, m12, m21, m22, dx, dy, start_angle=None, end_angle=None, arc_type=None):
 		trafo = (m11, m12, m21, m22, dx, dy)
-		self.add_object(SK1Ellipse(self.config, trafo, start_angle, end_angle, arc_type))
+		obj = SK1Ellipse(self.config, trafo, start_angle, end_angle, arc_type)
+		obj.style = self.obj_style
+		self.reset_style()
+		self.add_object(obj)
 
 	def b(self):
 		self.paths = [[None, [], const.CURVE_OPENED]]
-		self.add_object(SK1Curve(self.config, self.paths))
+		obj = SK1Curve(self.config, self.paths)
+		obj.style = self.obj_style
+		self.reset_style()
+		self.add_object(obj)
 
 	def bs(self, x, y, cont):
 		point = [x, y]
@@ -261,10 +277,14 @@ class SK1_Loader:
 		self.paths[-1][2] = const.CURVE_CLOSED
 
 	def txt(self, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
-		self.add_object(SK1Text(self.config, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap))
+		obj = SK1Text(self.config, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap)
+		obj.style = self.obj_style
+		self.reset_style()
+		self.add_object(obj)
 
 	def bm(self, id):
 		bmd_obj = SK1BitmapData(self.config, id)
+		self.reset_style()
 		self.add_object(bmd_obj)
 		try:
 			bmd_obj.read_data(self.file)
@@ -272,6 +292,7 @@ class SK1_Loader:
 		self.presenter.resources[id] = bmd_obj.raw_image
 
 	def im(self, trafo, id):
+		self.reset_style()
 		self.add_object(SK1Image(self.config, trafo, id))
 
 	def eps(self, *args):self.string = ''
