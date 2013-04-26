@@ -23,7 +23,8 @@ from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
 SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
-SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image
+SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
+get_pdxf_color
 
 class SK1_Loader:
 	name = 'SK1_Loader'
@@ -107,17 +108,47 @@ class SK1_Loader:
 	def pgc(self, *args): pass
 	def phs(self, *args): pass
 	def pit(self, *args): pass
-	def fp(self, *args): pass
-	def fe(self, *args): pass
+
+	def fp(self, color):
+		if not self.obj_style[0] or not self.obj_style[0][1] == const.FILL_SOLID:
+			self.obj_style[0] = deepcopy(sk1const.solid_fill)
+		fill_style = self.obj_style[0]
+		fill_style[2] = get_pdxf_color(color)
+
+	def fe(self):
+		self.obj_style[0] = []
+
 	def ft(self, *args): pass
-	def lp(self, *args): pass
-	def le(self, *args): pass
-	def lw(self, *args): pass
-	def lc(self, *args): pass
-	def lj(self, *args): pass
-	def ld(self, *args): pass
+	def lp(self, color):
+		line_style = self.obj_style[1]
+		line_style[1] = get_pdxf_color(color)
+
+	def le(self):
+		self.obj_style[1] = []
+
+	def lw(self, width):
+		line_style = self.obj_style[1]
+		line_style[1] = width
+
+	def lc(self, cap):
+		line_style = self.obj_style[1]
+		line_style[4] = cap
+
+	def lj(self, join):
+		line_style = self.obj_style[1]
+		line_style[5] = join
+
+	def ld(self, dashes):
+		result = []
+		if dashes:
+			for item in dashes:
+				result.append(item)
+		line_style = self.obj_style[1]
+		line_style[3] = result
+
 	def la1(self, *args): pass
 	def la2(self, *args): pass
+
 	def Fs(self, *args): pass
 	def Fn(self, *args): pass
 	def dstyle(self, *args): pass
