@@ -31,6 +31,7 @@ class SK1_Presenter(TextModelPresenter):
 
 	config = None
 	doc_file = ''
+	resources = None
 
 	def __init__(self, appdata, cnf={}):
 		self.config = SK1_Config()
@@ -40,6 +41,7 @@ class SK1_Presenter(TextModelPresenter):
 		self.appdata = appdata
 		self.loader = SK1_Loader()
 		self.saver = SK1_Saver()
+		self.resources = {}
 		self.new()
 
 	def new(self):
@@ -51,6 +53,7 @@ class SK1_Presenter(TextModelPresenter):
 		page.childs.append(model.SK1Layer(self.config))
 		self.model.childs.append(model.SK1MasterLayer(self.config))
 		self.model.childs.append(model.SK1GuideLayer(self.config))
+		self.update()
 
 	def traslate_from_pdxf(self, pdxf_doc):
 		translator = PDXF_to_SK1_Translator()
