@@ -10,7 +10,8 @@ name - string color name
 
 Complete example: ['CMYK', [0.0, 0.0, 0.0, 0.9], 1.0, '90% Black']
 
-For spot color:['SPOT', [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]], 1.0, 'Black']
+For spot color:
+['SPOT', [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0],'palette'], 1.0, 'Black']
 i.e. values list contains RGB and CMYK values
 
 -------------------------------------------------------------------------------
