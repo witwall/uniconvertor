@@ -75,7 +75,10 @@ class SK1_Loader:
 				try:
 					code = compile('self.' + self.line, '<string>', 'exec')
 					exec code
-				except:print 'error>>', self.line
+				except:
+					print 'error>>', self.line
+					errtype, value, traceback = sys.exc_info()
+					print errtype, value, traceback
 
 		self.file.close()
 		self.position = 0
@@ -99,6 +102,10 @@ class SK1_Loader:
 			obj.parent = parent
 			parent.childs.append(obj)
 
+	def check_stroke(self):
+		if not self.obj_style[1]:
+			self.obj_style[1] = deepcopy(sk1const.stroke_style)
+
 	#---PROPERTIES
 	def gl(self, *args): pass
 	def pe(self, *args): pass
@@ -120,6 +127,7 @@ class SK1_Loader:
 
 	def ft(self, *args): pass
 	def lp(self, color):
+		self.check_stroke()
 		line_style = self.obj_style[1]
 		line_style[1] = get_pdxf_color(color)
 
@@ -127,18 +135,22 @@ class SK1_Loader:
 		self.obj_style[1] = []
 
 	def lw(self, width):
+		self.check_stroke()
 		line_style = self.obj_style[1]
 		line_style[1] = width
 
 	def lc(self, cap):
+		self.check_stroke()
 		line_style = self.obj_style[1]
 		line_style[4] = cap
 
 	def lj(self, join):
+		self.check_stroke()
 		line_style = self.obj_style[1]
 		line_style[5] = join
 
 	def ld(self, dashes):
+		self.check_stroke()
 		result = []
 		if dashes:
 			for item in dashes:
