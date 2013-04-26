@@ -37,6 +37,9 @@ default_guidelayer_properties = [1, 0, 0, 1]
 default_guidelayer_color = [RGB, [0.0, 0.3, 1.0], 1.0, '']
 
 
+
+solid_fill = [const.FILL_EVENODD, const.FILL_SOLID, fallback_color]
+
 fill_style = []
 default_stroke_rule = const.STROKE_MIDDLE
 default_stroke_width = 0.0
