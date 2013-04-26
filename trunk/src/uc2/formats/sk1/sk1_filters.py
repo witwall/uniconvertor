@@ -90,36 +90,31 @@ class SK1_Loader:
 					parent = self.active_layer
 			obj.parent = parent
 			parent.childs.append(obj)
-		if self.line:
-			self.add_string(self.line)
-		obj.string = self.string
-		self.string = ''
-
 
 	#---PROPERTIES
-	def gl(self, *args): self.add_string(self.line)
-	def pe(self, *args): self.add_string(self.line)
-	def ps(self, *args): self.add_string(self.line)
-	def pgl(self, *args): self.add_string(self.line)
-	def pgr(self, *args): self.add_string(self.line)
-	def pgc(self, *args): self.add_string(self.line)
-	def phs(self, *args): self.add_string(self.line)
-	def pit(self, *args): self.add_string(self.line)
-	def fp(self, *args): self.add_string(self.line)
-	def fe(self, *args): self.add_string(self.line)
-	def ft(self, *args): self.add_string(self.line)
-	def lp(self, *args): self.add_string(self.line)
-	def le(self, *args): self.add_string(self.line)
-	def lw(self, *args): self.add_string(self.line)
-	def lc(self, *args): self.add_string(self.line)
-	def lj(self, *args): self.add_string(self.line)
-	def ld(self, *args): self.add_string(self.line)
-	def la1(self, *args): self.add_string(self.line)
-	def la2(self, *args): self.add_string(self.line)
-	def Fs(self, *args): self.add_string(self.line)
-	def Fn(self, *args): self.add_string(self.line)
-	def dstyle(self, *args): self.add_string(self.line)
-	def style(self, *args): self.add_string(self.line)
+	def gl(self, *args): pass
+	def pe(self, *args): pass
+	def ps(self, *args): pass
+	def pgl(self, *args): pass
+	def pgr(self, *args): pass
+	def pgc(self, *args): pass
+	def phs(self, *args): pass
+	def pit(self, *args): pass
+	def fp(self, *args): pass
+	def fe(self, *args): pass
+	def ft(self, *args): pass
+	def lp(self, *args): pass
+	def le(self, *args): pass
+	def lw(self, *args): pass
+	def lc(self, *args): pass
+	def lj(self, *args): pass
+	def ld(self, *args): pass
+	def la1(self, *args): pass
+	def la2(self, *args): pass
+	def Fs(self, *args): pass
+	def Fn(self, *args): pass
+	def dstyle(self, *args): pass
+	def style(self, *args): pass
 
 	#---STRUCTURAL ELEMENTS
 	def document(self, *args):
@@ -147,7 +142,7 @@ class SK1_Loader:
 		obj = SK1Grid(self.config, grid, visibility, grid_color, layer_name)
 		self.add_object(obj, self.model)
 
-	def page(self, name, format, size, orientation):
+	def page(self, name='', format='', size='', orientation=0):
 		page = SK1Page(self.config, name, format, size, orientation)
 		self.active_page = page
 		self.active_layer = None
@@ -156,15 +151,7 @@ class SK1_Loader:
 
 	def layer(self, name, p1, p2, p3, p4, layer_color):
 		if self.active_page is None:
-			page = SK1Page(self.config)
-			current_line = self.line
-			self.line = ''
-			self.string = page.string
-			self.active_page = page
-			self.active_layer = None
-			self.parent_stack = []
-			self.add_object(page, self.model)
-			self.line = current_line
+			self.page()
 		properties = [p1, p2, p3, p4]
 		layer = SK1Layer(self.config, name, properties, layer_color)
 		self.active_layer = layer
