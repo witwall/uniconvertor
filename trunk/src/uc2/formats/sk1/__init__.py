@@ -33,6 +33,8 @@ def sk1_loader(appdata, filename, translate=True, cnf={}, **kw):
 		doc.traslate_to_pdxf(pdxf_doc)
 		doc.close()
 		doc = pdxf_doc
+	else:
+		doc.update()
 	return doc
 
 def sk1_saver(pdxf_doc, filename, translate=True, cnf={}, **kw):
