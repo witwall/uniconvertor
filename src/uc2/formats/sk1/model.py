@@ -60,7 +60,7 @@ CID_TO_NAME = {
 #								color_spec[6],color_spec[7],color_spec[8],color_spec[9],
 #								color_spec[2],color_spec[1]
 def get_pdxf_color(clr):
-	if not clr: return deepcopy(sk1const.default_color)
+	if not clr: return deepcopy(sk1const.fallback_color)
 	color_spec = clr[0]
 	if color_spec == sk1const.RGB:
 		result = [sk1const.RGB, [clr[1], clr[2], clr[3]], 1.0, '']
@@ -76,10 +76,10 @@ def get_pdxf_color(clr):
 		if len(clr) == 11:result[2] = clr[10]
 		return result
 	else:
-		return deepcopy(sk1const.default_color)
+		return deepcopy(sk1const.fallback_color)
 
 def get_sk1_color(clr):
-	if not clr: return deepcopy(sk1const.default_sk1color)
+	if not clr: return deepcopy(sk1const.fallback_sk1color)
 	color_spec = clr[0]
 	val = clr[1]
 	alpha = clr[2]
@@ -108,7 +108,7 @@ def get_sk1_color(clr):
 					cmyk[0], cmyk[1], cmyk[2], cmyk[3], alpha)
 		return result
 	else:
-		return deepcopy(sk1const.default_sk1color)
+		return deepcopy(sk1const.fallback_sk1color)
 
 class SK1ModelObject(TextModelObject):
 	"""
@@ -384,6 +384,7 @@ class SK1Rectangle(SK1ModelObject):
 	"""
 	string = ''
 	cid = RECTANGLE
+	style = []
 	trafo = ()
 	radius1 = None
 	radius2 = None
@@ -409,6 +410,7 @@ class SK1Ellipse(SK1ModelObject):
 	"""
 	string = ''
 	cid = ELLIPSE
+	style = []
 	trafo = ()
 	start_angle = None
 	end_angle = None
@@ -441,6 +443,7 @@ class SK1Curve(SK1ModelObject):
 	"""
 	string = ''
 	cid = CURVE
+	style = []
 	paths = []
 
 	def __init__(self, config, paths):
@@ -480,6 +483,7 @@ class SK1Text(SK1ModelObject):
 	"""
 	string = ''
 	cid = TEXT
+	style = []
 	text = ''
 	trafo = ()
 	horiz_align = None
