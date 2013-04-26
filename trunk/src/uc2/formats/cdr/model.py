@@ -498,8 +498,8 @@ class CdrUniObject(RiffList):
 			name = obj_parse[self.obj_type][1]
 		return (False, name, str(self.chunk_size))
 
-	def do_update(self):
-		RiffList.do_update(self)
+	def do_update(self, presenter):
+		RiffList.do_update(self, presenter)
 		self.obj_type = None
 
 		lgob_chunk = find_chunk(self.childs, 'lgob')
@@ -659,7 +659,7 @@ class CdrObject(RiffList):
 		name = 'Object'
 		return (False, name, str(self.chunk_size))
 
-	def do_update(self):
+	def do_update(self, presenter):
 		type = None
 
 		lgob_chunk = find_chunk(self.childs, 'lgob')
@@ -676,9 +676,9 @@ class CdrObject(RiffList):
 			index = self.parent.childs.index(self)
 			self.parent.childs.insert(index, new_obj)
 			self.parent.childs.remove(self)
-			new_obj.do_update()
+			new_obj.do_update(presenter)
 		else:
-			RiffList.do_update(self)
+			RiffList.do_update(self, presenter)
 
 ##############################################	
 #            Property objects
