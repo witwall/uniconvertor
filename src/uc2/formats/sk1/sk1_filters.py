@@ -23,8 +23,8 @@ from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
 SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
-SK1Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
-get_pdxf_color
+Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
+get_pdxf_color, Trafo
 
 class SK1_Loader:
 	name = 'SK1_Loader'
@@ -100,6 +100,7 @@ class SK1_Loader:
 				else:
 					parent = self.active_layer
 			obj.parent = parent
+			obj.config = self.config
 			parent.childs.append(obj)
 
 	def check_stroke(self):
@@ -274,9 +275,10 @@ class SK1_Loader:
 		self.parent_stack = self.parent_stack[:-1]
 
 	#---PRIMITIVES
-	def r(self, m11, m12, m21, m22, dx, dy, radius1=None, radius2=None):
-		trafo = (m11, m12, m21, m22, dx, dy)
-		obj = SK1Rectangle(self.config, trafo, radius1, radius2)
+	def r(self, m11, m12, m21, m22, dx, dy, radius1=0, radius2=0):
+		trafo = Trafo(m11, m12, m21, m22, dx, dy)
+		trafo_list = [m11, m12, m21, m22, dx, dy]
+		obj = Rectangle(trafo, radius1, radius2, trafo_list)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
