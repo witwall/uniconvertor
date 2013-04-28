@@ -117,9 +117,12 @@ class SK1ModelObject(TextModelObject):
 	Defines common object functionality
 	"""
 
+	objects = []
+
 	def __init__(self, config=None, string=''):
 		self.config = config
 		self.childs = []
+		self.objects = []
 		if string:
 			self.string = string
 
