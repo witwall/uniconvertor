@@ -56,10 +56,7 @@ CID_TO_NAME = {
 	RECTANGLE:_('Rectangle'), ELLIPSE:_('Ellipse'), CURVE:_('Curve'),
 	TEXT:_('Text'), BITMAPDATA:_('BitmapData'), IMAGE:_('Image'),
 	}
-#r,g,b,c,m,y,k,name,palette
-#color_spec[3],color_spec[4],color_spec[5],
-#								color_spec[6],color_spec[7],color_spec[8],color_spec[9],
-#								color_spec[2],color_spec[1]
+
 def get_pdxf_color(clr):
 	if not clr: return deepcopy(sk1const.fallback_color)
 	color_spec = clr[0]
