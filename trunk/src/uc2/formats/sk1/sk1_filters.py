@@ -277,8 +277,7 @@ class SK1_Loader:
 	#---PRIMITIVES
 	def r(self, m11, m12, m21, m22, dx, dy, radius1=0, radius2=0):
 		trafo = Trafo(m11, m12, m21, m22, dx, dy)
-		trafo_list = [m11, m12, m21, m22, dx, dy]
-		obj = Rectangle(trafo, radius1, radius2, trafo_list)
+		obj = Rectangle(trafo, radius1, radius2)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
@@ -286,8 +285,7 @@ class SK1_Loader:
 	def e(self, m11, m12, m21, m22, dx, dy, start_angle=0.0, end_angle=0.0,
 		arc_type=sk1const.ArcPieSlice):
 		trafo = Trafo(m11, m12, m21, m22, dx, dy)
-		trafo_list = [m11, m12, m21, m22, dx, dy]
-		obj = Ellipse(trafo, start_angle, end_angle, arc_type, trafo_list)
+		obj = Ellipse(trafo, start_angle, end_angle, arc_type)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
