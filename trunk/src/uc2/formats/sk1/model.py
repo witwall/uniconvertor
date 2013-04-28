@@ -24,6 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
+from _sk1objs import Trafo
 
 # Document object enumeration
 DOCUMENT = 1
@@ -116,7 +117,7 @@ class SK1ModelObject(TextModelObject):
 	Defines common object functionality
 	"""
 
-	def __init__(self, config, string=''):
+	def __init__(self, config=None, string=''):
 		self.config = config
 		self.childs = []
 		if string:
@@ -377,7 +378,7 @@ class SK1MaskGroup(SK1ModelObject):
 
 #--- Primitive objects
 
-class SK1Rectangle(SK1ModelObject):
+class Rectangle(SK1ModelObject):
 	"""
 	Represents Rectangle object.
 	r(TRAFO [, RADIUS1, RADIUS2])
@@ -385,23 +386,37 @@ class SK1Rectangle(SK1ModelObject):
 	string = ''
 	cid = RECTANGLE
 	style = []
-	trafo = ()
-	radius1 = None
-	radius2 = None
+	trafo = None
+	trafo_list = []
+	radius1 = 0
+	radius2 = 0
+	properties = None
 
-	def __init__(self, config, trafo, radius1, radius2):
+	is_Rectangle = 1
+
+	def __init__(self, trafo=None, radius1=0, radius2=0,
+					properties=None, duplicate=None, trafo_list=[]):
+		if trafo is not None and trafo.m11 == trafo.m21 == trafo.m12 == trafo.m22 == 0:
+			trafo = Trafo(1, 0, 0, -1, trafo.v1, trafo.v2)
 		self.trafo = trafo
+		self.trafo_list = trafo_list
 		self.radius1 = radius1
 		self.radius2 = radius2
-		SK1ModelObject.__init__(self, config)
+		self.properties = properties
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		if not self.radius1 is None and not self.radius2 is None:
-			m11, m12, m21, m22, dx, dy = self.trafo
-			args = (m11, m12, m21, m22, dx, dy, self.radius1, self.radius2)
+		if self.trafo is None:
+			self.trafo = Trafo(*self.trafo_list)
+		elif not self.trafo_list:
+			self.trafo_list = list(self.trafo.coeff())
+
+		if self.radius1 == self.radius2 == 0:
+			args = self.trafo.coeff()
 			self.string = 'r' + args.__str__() + '\n'
 		else:
-			self.string = 'r' + self.trafo.__str__() + '\n'
+			args = self.trafo.coeff() + (self.radius1, self.radius2)
+			self.string = 'r' + args.__str__() + '\n'
 
 class SK1Ellipse(SK1ModelObject):
 	"""
