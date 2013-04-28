@@ -24,7 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
-from _sk1objs import Trafo, CreatePath
+from _sk1objs import Trafo, CreatePath, Point
 
 # Document object enumeration
 DOCUMENT = 1
@@ -385,10 +385,10 @@ class Rectangle(SK1ModelObject):
 	string = ''
 	cid = RECTANGLE
 	style = []
+	properties = None
 	trafo = None
 	radius1 = 0
 	radius2 = 0
-	properties = None
 
 	is_Rectangle = 1
 
@@ -419,11 +419,11 @@ class Ellipse(SK1ModelObject):
 	string = ''
 	cid = ELLIPSE
 	style = []
+	properties = None
 	trafo = None
 	start_angle = 0.0
 	end_angle = 0.0
 	arc_type = sk1const.ArcPieSlice
-	properties = None
 
 	is_Ellipse = 1
 
@@ -448,16 +448,114 @@ class Ellipse(SK1ModelObject):
 			args = self.trafo.coeff() + (self.start_angle, self.end_angle, self.arc_type)
 			self.string = 'e' + args.__str__() + '\n'
 			
-class PolyBezier:
-
+class PolyBezier(SK1ModelObject):
+	"""
+	Represents Bezier curve object.
+	b()             start a bezier obj
+	bs(X, Y, CONT)  append a line segment
+	bc(X1, Y1, X2, Y2, X3, Y3, CONT)  append a bezier segment
+	bn()	        start a new path
+	bC()            close path
+	"""	
+	string = ''
+	cid = CURVE
+	style = []
+	properties = None
+	paths = ()
+	
 	is_Bezier	  = 1
 
-	def __init__(self, paths = None, properties = None, duplicate = None):
+	def __init__(self, paths = None, properties = None, duplicate = None, paths_list=[]):
 		if paths:
-			self.paths = paths
+			if isinstance(paths, tuple):
+				self.paths = paths
+			elif isinstance(paths, list):
+				self.paths = tuple(paths)
+			else:
+				self.paths = (CreatePath(),)
 		else:
-			self.paths = (CreatePath(),)
+			self.paths = None
 		self.properties=properties
+		self.paths_list=paths_list
+		SK1ModelObject.__init__(self)
+		
+	def set_paths_from_list(self):
+		paths=[]
+		for path in self.paths_list:
+			p=CreatePath()
+			p.AppendLine(Point(*path[0]))
+			points=path[1]
+			for point in points:
+				if len(point)==2:
+					p.AppendLine(Point(*point))
+				else:
+					point0=Point(*point[0])
+					point1=Point(*point[1])
+					point2=Point(*point[2])
+					p.AppendBezier(point0,point1,point2,point[3])
+			if path[2]:
+				p.ClosePath()
+			paths.append(p)
+		self.paths=tuple(paths)
+		
+	def update(self):
+		if self.paths and not self.paths_list:
+			self.set_list_from_paths()
+		if self.paths_list and not self.paths:
+			self.set_paths_from_list()
+		self.update_from_list()
+		
+	def get_line_point(self, x,y,arg):
+		return [x,y]
+	
+	def get_segment_point(self,x0,y0,x1,y1,x2,y2,cont):
+		return [[x0,y0],[x1,y1],[x2,y2],cont]
+		
+	def set_list_from_paths(self):
+		self.paths_list=[]
+		for path in self.paths:	
+			path_list=[None,[],const.CURVE_OPENED]
+			list = path.get_save()
+			points=path_list[1]
+			start=True
+			for item in list:
+				if len(item) == 3:
+					point=self.get_line_point(*item)
+					if start:
+						start=False
+						path_list[0]=point
+					else:
+						points.append(point)
+				elif len(item) == 7:
+					points.append(self.get_segment_point(*item))
+			if path.closed:path_list[2]=const.CURVE_CLOSED
+			self.paths_list.append(path_list)
+
+	def add_line(self, point):
+		x, y = point
+		self.string += 'bs' + (x, y, 0).__str__() + '\n'
+
+	def add_segment(self, point):
+		point0, point1, point2, cont = point
+		args = (point0[0], point0[1], point1[0], point1[1], point2[0], point2[1], cont)
+		self.string += 'bc' + args.__str__() + '\n'
+
+	def update_from_list(self):
+		self.string = 'b()\n'
+		start = True
+		for path in self.paths:
+			if start:
+				start = False
+			else:
+				self.string += 'bn()\n'
+			self.add_line(path[0])
+			for point in path[1]:
+				if len(point) == 2:
+					self.add_line(point)
+				else:
+					self.add_segment(point)
+			if path[2] == const.CURVE_CLOSED:
+				self.string += 'bC()\n'
 		
 
 class SK1Curve(SK1ModelObject):
