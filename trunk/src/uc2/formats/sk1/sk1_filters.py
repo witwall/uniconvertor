@@ -311,7 +311,7 @@ class SK1_Loader:
 		path = self.paths[-1]
 		points = path[1]
 		if path[0] is None:
-			path[0] = point
+			path[0] = point[0]
 		else:
 			points.append(point)
 
