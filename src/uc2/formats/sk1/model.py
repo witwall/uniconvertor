@@ -24,7 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
-from _sk1objs import Trafo
+from _sk1objs import Trafo, CreatePath
 
 # Document object enumeration
 DOCUMENT = 1
@@ -386,7 +386,6 @@ class Rectangle(SK1ModelObject):
 	cid = RECTANGLE
 	style = []
 	trafo = None
-	trafo_list = []
 	radius1 = 0
 	radius2 = 0
 	properties = None
@@ -394,23 +393,17 @@ class Rectangle(SK1ModelObject):
 	is_Rectangle = 1
 
 	def __init__(self, trafo=None, radius1=0, radius2=0,
-					properties=None, duplicate=None, trafo_list=[]):
+					properties=None, duplicate=None):
 
 		if trafo is not None and trafo.m11 == trafo.m21 == trafo.m12 == trafo.m22 == 0:
 			trafo = Trafo(1, 0, 0, -1, trafo.v1, trafo.v2)
 		self.trafo = trafo
-		self.trafo_list = trafo_list
 		self.radius1 = radius1
 		self.radius2 = radius2
 		self.properties = properties
 		SK1ModelObject.__init__(self)
 
 	def update(self):
-		if self.trafo is None:
-			self.trafo = Trafo(*self.trafo_list)
-		elif not self.trafo_list:
-			self.trafo_list = list(self.trafo.coeff())
-
 		if self.radius1 == self.radius2 == 0:
 			args = self.trafo.coeff()
 			self.string = 'r' + args.__str__() + '\n'
@@ -427,7 +420,6 @@ class Ellipse(SK1ModelObject):
 	cid = ELLIPSE
 	style = []
 	trafo = None
-	trafo_list = []
 	start_angle = 0.0
 	end_angle = 0.0
 	arc_type = sk1const.ArcPieSlice
@@ -437,12 +429,11 @@ class Ellipse(SK1ModelObject):
 
 	def __init__(self, trafo=None, start_angle=0.0, end_angle=0.0,
 					arc_type=sk1const.ArcPieSlice, properties=None,
-					duplicate=None, trafo_list=[]):
+					duplicate=None):
 
 		if trafo is not None and trafo.m11 == trafo.m21 == trafo.m12 == trafo.m22 == 0:
 			trafo = Trafo(1, 0, 0, -1, trafo.v1, trafo.v2)
 		self.trafo = trafo
-		self.trafo_list = trafo_list
 		self.start_angle = start_angle
 		self.end_angle = end_angle
 		self.arc_type = arc_type
@@ -450,17 +441,24 @@ class Ellipse(SK1ModelObject):
 		SK1ModelObject.__init__(self)
 
 	def update(self):
-		if self.trafo is None:
-			self.trafo = Trafo(*self.trafo_list)
-		elif not self.trafo_list:
-			self.trafo_list = list(self.trafo.coeff())
-
 		if self.start_angle == self.end_angle:
 			args = self.trafo.coeff()
 			self.string = 'e' + args.__str__() + '\n'
 		else:
 			args = self.trafo.coeff() + (self.start_angle, self.end_angle, self.arc_type)
 			self.string = 'e' + args.__str__() + '\n'
+			
+class PolyBezier:
+
+	is_Bezier	  = 1
+
+	def __init__(self, paths = None, properties = None, duplicate = None):
+		if paths:
+			self.paths = paths
+		else:
+			self.paths = (CreatePath(),)
+		self.properties=properties
+		
 
 class SK1Curve(SK1ModelObject):
 	"""
