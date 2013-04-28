@@ -59,7 +59,7 @@ class SK1_Loader:
 			events.emit(events.MESSAGES, msgconst.ERROR, msg)
 			raise IOError(errtype, msg + '\n' + value, traceback)
 
-		header = self.file.readline()
+		self.file.readline()
 		self.reset_style()
 
 		while True:
