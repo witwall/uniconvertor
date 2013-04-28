@@ -310,7 +310,6 @@ class SK1GuideLayer(SK1ModelObject):
 		if layer_color: self.layer_color = get_pdxf_color(layer_color)
 		SK1ModelObject.__init__(self, config)
 
-
 	def update(self):
 		color = get_sk1_color(self.layer_color)
 		p1, p2, p3, p4 = self.layer_properties
@@ -396,6 +395,7 @@ class Rectangle(SK1ModelObject):
 
 	def __init__(self, trafo=None, radius1=0, radius2=0,
 					properties=None, duplicate=None, trafo_list=[]):
+
 		if trafo is not None and trafo.m11 == trafo.m21 == trafo.m12 == trafo.m22 == 0:
 			trafo = Trafo(1, 0, 0, -1, trafo.v1, trafo.v2)
 		self.trafo = trafo
@@ -418,7 +418,7 @@ class Rectangle(SK1ModelObject):
 			args = self.trafo.coeff() + (self.radius1, self.radius2)
 			self.string = 'r' + args.__str__() + '\n'
 
-class SK1Ellipse(SK1ModelObject):
+class Ellipse(SK1ModelObject):
 	"""
 	Represents Ellipse object.
 	e(TRAFO, [start_angle, end_angle, arc_type])
@@ -426,26 +426,39 @@ class SK1Ellipse(SK1ModelObject):
 	string = ''
 	cid = ELLIPSE
 	style = []
-	trafo = ()
-	start_angle = None
-	end_angle = None
-	arc_type = None
+	trafo = None
+	trafo_list = []
+	start_angle = 0.0
+	end_angle = 0.0
+	arc_type = sk1const.ArcPieSlice
+	properties = None
 
-	def __init__(self, config, trafo, start_angle, end_angle, arc_type):
+	def __init__(self, trafo=None, start_angle=0.0, end_angle=0.0,
+					arc_type=sk1const.ArcPieSlice, properties=None,
+					duplicate=None, trafo_list=[]):
+
+		if trafo is not None and trafo.m11 == trafo.m21 == trafo.m12 == trafo.m22 == 0:
+			trafo = Trafo(1, 0, 0, -1, trafo.v1, trafo.v2)
 		self.trafo = trafo
+		self.trafo_list = trafo_list
 		self.start_angle = start_angle
 		self.end_angle = end_angle
 		self.arc_type = arc_type
-		SK1ModelObject.__init__(self, config)
+		self.properties = properties
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		if not self.start_angle is None and not self.end_angle is None:
-			m11, m12, m21, m22, dx, dy = self.trafo
-			args = (m11, m12, m21, m22, dx, dy,
-				self.start_angle, self.end_angle, self.arc_type)
+		if self.trafo is None:
+			self.trafo = Trafo(*self.trafo_list)
+		elif not self.trafo_list:
+			self.trafo_list = list(self.trafo.coeff())
+
+		if self.start_angle == self.end_angle:
+			args = self.trafo.coeff()
 			self.string = 'e' + args.__str__() + '\n'
 		else:
-			self.string = 'e' + self.trafo.__str__() + '\n'
+			args = self.trafo.coeff() + (self.start_angle, self.end_angle, self.arc_type)
+			self.string = 'e' + args.__str__() + '\n'
 
 class SK1Curve(SK1ModelObject):
 	"""
