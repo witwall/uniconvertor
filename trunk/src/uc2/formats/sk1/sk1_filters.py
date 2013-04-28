@@ -23,7 +23,7 @@ from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
 SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
-Rectangle, SK1Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
+Rectangle, Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
 get_pdxf_color, Trafo
 
 class SK1_Loader:
@@ -283,9 +283,11 @@ class SK1_Loader:
 		self.reset_style()
 		self.add_object(obj)
 
-	def e(self, m11, m12, m21, m22, dx, dy, start_angle=None, end_angle=None, arc_type=None):
-		trafo = (m11, m12, m21, m22, dx, dy)
-		obj = SK1Ellipse(self.config, trafo, start_angle, end_angle, arc_type)
+	def e(self, m11, m12, m21, m22, dx, dy, start_angle=0.0, end_angle=0.0,
+		arc_type=sk1const.ArcPieSlice):
+		trafo = Trafo(m11, m12, m21, m22, dx, dy)
+		trafo_list = [m11, m12, m21, m22, dx, dy]
+		obj = Ellipse(trafo, start_angle, end_angle, arc_type, trafo_list)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
