@@ -119,7 +119,7 @@ class SK1ModelObject(TextModelObject):
 	def __init__(self, config=None, string=''):
 		self.config = config
 		self.childs = []
-		self.objects = []
+		self.objects = self.childs
 		if string:
 			self.string = string
 
