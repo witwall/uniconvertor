@@ -178,6 +178,17 @@ if __name__ == "__main__":
 					filter_src + 'stringfilter.c', filter_src + 'binfile.c',
 					filter_src + 'hexfilter.c'])
 
+ 	sk1objs_src = src_path + 'uc2/formats/sk1/sk1objs/'
+	sk1objs_module = Extension('uc2.formats.sk1._sk1objs',
+			define_macros=[('MAJOR_VERSION', '1'),
+						('MINOR_VERSION', '0')],
+			sources=[sk1objs_src + '_sketchmodule.c', sk1objs_src + 'skpoint.c',
+					sk1objs_src + 'skcolor.c', sk1objs_src + 'sktrafo.c',
+					sk1objs_src + 'skrect.c', sk1objs_src + 'skfm.c',
+					sk1objs_src + 'curvefunc.c', sk1objs_src + 'curveobject.c',
+					sk1objs_src + 'curvelow.c', sk1objs_src + 'curvemisc.c',
+					sk1objs_src + 'skaux.c', sk1objs_src + 'skimage.c', ])
+
 	cairo_src = src_path + 'uc2/libcairo/'
 	cairo_include_dirs = ['/usr/include/cairo', '/usr/include/pycairo']
 	cairo_module = Extension('uc2.libcairo._libcairo',
@@ -300,7 +311,8 @@ Export filters:
 
 			scripts=['src/uniconvertor'],
 
-			ext_modules=[cairo_module, pycms_module, libimg_module, filter_module])
+			ext_modules=[cairo_module, pycms_module, libimg_module,
+						filter_module, sk1objs_module])
 
 #################################################
 # .py source compiling
