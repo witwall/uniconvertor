@@ -433,6 +433,8 @@ class Ellipse(SK1ModelObject):
 	arc_type = sk1const.ArcPieSlice
 	properties = None
 
+	is_Ellipse = 1
+
 	def __init__(self, trafo=None, start_angle=0.0, end_angle=0.0,
 					arc_type=sk1const.ArcPieSlice, properties=None,
 					duplicate=None, trafo_list=[]):
