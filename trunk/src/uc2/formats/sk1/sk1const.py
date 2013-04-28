@@ -20,6 +20,10 @@ import math
 from uc2 import uc2const
 from uc2.formats.pdxf import const
 
+ArcArc = 0
+ArcChord = 1
+ArcPieSlice = 2
+
 RGB = uc2const.COLOR_RGB
 CMYK = uc2const.COLOR_CMYK
 SPOT = uc2const.COLOR_SPOT
