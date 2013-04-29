@@ -483,7 +483,7 @@ class PolyBezier(SK1ModelObject):
 	properties = None
 	paths = ()
 
-	is_Bezier	 = 1
+	is_Bezier = 1
 
 	def __init__(self, paths=None, properties=None, duplicate=None, paths_list=[]):
 		if paths:
@@ -500,7 +500,7 @@ class PolyBezier(SK1ModelObject):
 		SK1ModelObject.__init__(self)
 
 	def set_paths_from_list(self):
-		paths = []
+		self.paths = ()
 		for path in self.paths_list:
 			p = CreatePath()
 			p.AppendLine(Point(*path[0]))
@@ -515,8 +515,7 @@ class PolyBezier(SK1ModelObject):
 					p.AppendBezier(point0, point1, point2, point[3])
 			if path[2]:
 				p.ClosePath()
-			paths.append(p)
-		self.paths = tuple(paths)
+			self.paths = self.paths + (p,)
 
 	def get_line_point(self, x, y, arg):
 		return [x, y]
@@ -528,10 +527,10 @@ class PolyBezier(SK1ModelObject):
 		self.paths_list = []
 		for path in self.paths:
 			path_list = [None, [], const.CURVE_OPENED]
-			list = path.get_save()
+			plist = path.get_save()
 			points = path_list[1]
 			start = True
-			for item in list:
+			for item in plist:
 				if len(item) == 3:
 					point = self.get_line_point(*item)
 					if start:
@@ -556,7 +555,7 @@ class PolyBezier(SK1ModelObject):
 	def update_from_list(self):
 		self.string = 'b()\n'
 		start = True
-		for path in self.paths:
+		for path in self.paths_list:
 			if start:
 				start = False
 			else:
