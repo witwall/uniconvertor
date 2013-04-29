@@ -347,14 +347,14 @@ class SK1Guide(SK1ModelObject):
 	position = 0
 	orientation = uc2const.HORIZONTAL
 
-	def __init__(self, config, point=(), orientation=uc2const.HORIZONTAL):
+	def __init__(self, point=(), orientation=uc2const.HORIZONTAL):
 		if point:
 			if orientation == uc2const.VERTICAL:
 				self.position = point[0]
 			else:
 				self.position = point[1]
 		self.orientation = orientation
-		SK1ModelObject.__init__(self, config)
+		SK1ModelObject.__init__(self)
 
 	def update(self):
 		if self.orientation == uc2const.VERTICAL:
