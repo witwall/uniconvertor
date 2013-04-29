@@ -234,7 +234,7 @@ class SK1_Loader:
 
 	#---GROUPS
 	def G(self):
-		group = SK1Group(self.config)
+		group = SK1Group()
 		self.add_object(group)
 		self.parent_stack.append(group)
 
@@ -242,7 +242,7 @@ class SK1_Loader:
 		self.parent_stack = self.parent_stack[:-1]
 
 	def M(self):
-		mgroup = SK1MaskGroup(self.config)
+		mgroup = SK1MaskGroup()
 		self.add_object(mgroup)
 		self.parent_stack.append(mgroup)
 
@@ -250,7 +250,7 @@ class SK1_Loader:
 		self.parent_stack = self.parent_stack[:-1]
 
 	def B(self):
-		group = SK1Group(self.config)
+		group = SK1Group()
 		self.string = group.string
 		self.line = ''
 		self.add_object(group)
@@ -262,7 +262,7 @@ class SK1_Loader:
 		self.parent_stack = self.parent_stack[:-1]
 
 	def PT(self):
-		group = SK1Group(self.config)
+		group = SK1Group()
 		self.string = group.string
 		self.line = ''
 		self.add_object(group)
@@ -274,7 +274,7 @@ class SK1_Loader:
 		self.parent_stack = self.parent_stack[:-1]
 
 	def PC(self, *args):
-		group = SK1Group(self.config)
+		group = SK1Group()
 		self.string = group.string
 		self.line = ''
 		self.add_object(group)
@@ -331,13 +331,13 @@ class SK1_Loader:
 		self.paths[-1][2] = const.CURVE_CLOSED
 
 	def txt(self, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
-		obj = SK1Text(self.config, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap)
+		obj = SK1Text(text, trafo, horiz_align, vert_align, chargap, wordgap, linegap)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
 
 	def bm(self, id):
-		bmd_obj = SK1BitmapData(self.config, id)
+		bmd_obj = SK1BitmapData(id)
 		self.reset_style()
 		self.add_object(bmd_obj)
 		try:
