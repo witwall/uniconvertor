@@ -24,7 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
-from _sk1objs import Trafo, CreatePath, Point
+from _sk1objs import Trafo, CreatePath, Point, Translation
 
 # Document object enumeration
 DOCUMENT = 1
@@ -179,11 +179,11 @@ class SK1Layout(SK1ModelObject):
 	size = uc2const.PAGE_FORMATS['A4']
 	orientation = uc2const.PORTRAIT
 
-	def __init__(self, config, format='', size=(), orientation=uc2const.PORTRAIT):
+	def __init__(self, format='', size=(), orientation=uc2const.PORTRAIT):
 		if format: self.format = format
 		if size: self.size = size
 		if orientation: self.orientation = orientation
-		SK1ModelObject.__init__(self, config)
+		SK1ModelObject.__init__(self)
 
 	def update(self):
 		args = (self.format, self.size, self.orientation)
@@ -200,21 +200,27 @@ class SK1Grid(SK1ModelObject):
 	"""
 	string = 'grid((0,0,2.83465,2.83465),0,("RGB",0.83,0.87,0.91),\'Grid\')\n'
 	cid = GRID
-	grid = sk1const.default_grid
-	visibility = 0
+	geometry = sk1const.default_grid
+	visible = 0
 	grid_color = sk1const.default_grid_color
-	layer_name = 'Grid'
+	name = 'Grid'
+	is_GridLayer = 1
 
-	def __init__(self, config, grid=(), visibility=0, grid_color=(), layer_name=''):
-		if grid:self.grid = grid
-		if visibility:self.visibility = visibility
-		if grid_color:self.grid_color = get_pdxf_color(grid_color)
-		if layer_name:self.layer_name = layer_name
-		SK1ModelObject.__init__(self, config)
+	def __init__(self, geometry=sk1const.default_grid, visible=0,
+				grid_color=sk1const.default_grid_color, name=_("Grid")):
+		if len(geometry) == 2:
+			self.geometry = (0, 0) + geometry
+		elif len(geometry) == 4:
+			self.geometry = geometry
+		else:
+			self.geometry = sk1const.default_grid
+		self.visible = visible
+		self.grid_color = grid_color
+		self.name = name
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		color = get_sk1_color(self.grid_color)
-		args = (self.grid, self.visibility, color, self.layer_name)
+		args = (self.geometry, self.visible, self.grid_color, self.name)
 		self.string = 'grid' + args.__str__() + '\n'
 
 class SK1Pages(SK1ModelObject):
@@ -244,12 +250,12 @@ class SK1Page(SK1ModelObject):
 	size = uc2const.PAGE_FORMATS['A4']
 	orientation = uc2const.PORTRAIT
 
-	def __init__(self, config, name='', format='', size=(), orientation=uc2const.PORTRAIT):
+	def __init__(self, name='', format='', size=(), orientation=uc2const.PORTRAIT):
 		if name:self.name = name
 		if format:self.format = format
 		if size:self.size = size
 		if orientation:self.orientation = orientation
-		SK1ModelObject.__init__(self, config)
+		SK1ModelObject.__init__(self)
 
 	def update(self):
 		args = (self.name, self.format, self.size, self.orientation)
@@ -266,20 +272,29 @@ class SK1Layer(SK1ModelObject):
 	name = ''
 	layer_properties = []
 	layer_color = sk1const.default_layer_color
+	visible = 1
+	printable = 1
+	locked = 0
+	outlined = 0
+	is_MasterLayer = 0
+	is_Page = 0
 
-	def __init__(self, config, name='', properties=[], layer_color=()):
-		if name:self.name = name
-		if properties:
-			self.layer_properties = properties
-		else:
-			self.layer_properties = [] + sk1const.default_layer_properties
-		if layer_color: self.layer_color = get_pdxf_color(layer_color)
-		SK1ModelObject.__init__(self, config)
+	def __init__(self, name=_("New Layer"),
+					visible=1, printable=1, locked=0,
+					outlined=0, outline_color=sk1const.default_layer_color,
+					is_MasterLayer=0, is_Page=0):
+		self.name = name
+		self.visible = visible
+		self.printable = printable
+		self.locked = locked
+		self.outlined = outlined
+		self.is_MasterLayer = is_MasterLayer
+		self.is_Page = is_Page
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		color = get_sk1_color(self.layer_color)
-		p1, p2, p3, p4 = self.layer_properties
-		args = (self.name, p1, p2, p3, p4, color)
+		args = (self.name, self.visible, self.printable, self.locked,
+			self.outlined, self.layer_color)
 		self.string = 'layer' + args.__str__() + '\n'
 
 class SK1MasterLayer(SK1ModelObject):
@@ -293,20 +308,29 @@ class SK1MasterLayer(SK1ModelObject):
 	name = ''
 	layer_properties = []
 	layer_color = sk1const.default_layer_color
+	visible = 1
+	printable = 1
+	locked = 0
+	outlined = 0
+	is_MasterLayer = 1
+	is_Page = 0
 
-	def __init__(self, config, name='', properties=[], layer_color=()):
-		if name:self.name = name
-		if properties:
-			self.layer_properties = properties
-		else:
-			self.layer_properties = [] + sk1const.default_layer_properties
-		if layer_color: self.layer_color = get_pdxf_color(layer_color)
-		SK1ModelObject.__init__(self, config)
+	def __init__(self, name=_("MasterLayer"),
+					visible=1, printable=1, locked=0,
+					outlined=0, outline_color=sk1const.default_layer_color,
+					is_MasterLayer=1, is_Page=0):
+		self.name = name
+		self.visible = visible
+		self.printable = printable
+		self.locked = locked
+		self.outlined = outlined
+		self.is_MasterLayer = is_MasterLayer
+		self.is_Page = is_Page
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		color = get_sk1_color(self.layer_color)
-		p1, p2, p3, p4 = self.layer_properties
-		args = (self.name, p1, p2, p3, p4, color)
+		args = (self.name, self.visible, self.printable, self.locked,
+			self.outlined, self.layer_color)
 		self.string = 'masterlayer' + args.__str__() + '\n'
 
 class SK1GuideLayer(SK1ModelObject):
@@ -317,23 +341,32 @@ class SK1GuideLayer(SK1ModelObject):
 	"""
 	string = "guidelayer('Guide Lines',1,0,0,1,(\"RGB\",0.0,0.3,1.0))\n"
 	cid = GUIDELAYER
-	name = 'Guides'
+	name = 'GuideLayer'
 	layer_properties = []
 	layer_color = sk1const.default_guidelayer_color
+	visible = 1
+	printable = 0
+	locked = 0
+	outlined = 0
+	is_MasterLayer = 0
+	is_Page = 0
 
-	def __init__(self, config, name='', properties=[], layer_color=()):
-		if name:self.name = name
-		if properties:
-			self.layer_properties = properties
-		else:
-			self.layer_properties = [] + sk1const.default_guidelayer_properties
-		if layer_color: self.layer_color = get_pdxf_color(layer_color)
-		SK1ModelObject.__init__(self, config)
+	def __init__(self, name=_("GuideLayer"),
+					visible=1, printable=0, locked=0,
+					outlined=0, outline_color=sk1const.default_layer_color,
+					is_MasterLayer=0, is_Page=0):
+		self.name = name
+		self.visible = visible
+		self.printable = printable
+		self.locked = locked
+		self.outlined = outlined
+		self.is_MasterLayer = is_MasterLayer
+		self.is_Page = is_Page
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		color = get_sk1_color(self.layer_color)
-		p1, p2, p3, p4 = self.layer_properties
-		args = (self.name, p1, p2, p3, p4, color)
+		args = (self.name, self.visible, self.printable, self.locked,
+			self.outlined, self.layer_color)
 		self.string = 'guidelayer' + args.__str__() + '\n'
 
 class SK1Guide(SK1ModelObject):
