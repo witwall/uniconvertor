@@ -23,7 +23,7 @@ from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Pages, \
 SK1Page, SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, \
-SK1MaskGroup, Rectangle, Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
+SK1MaskGroup, Rectangle, Ellipse, PolyBezier, SK1Text, SK1BitmapData, SK1Image, \
 get_pdxf_color, Trafo
 
 class SK1_Loader:
@@ -304,7 +304,7 @@ class SK1_Loader:
 
 	def b(self):
 		self.paths = [[None, [], const.CURVE_OPENED]]
-		obj = SK1Curve(self.config, self.paths)
+		obj = PolyBezier(paths_list=self.paths)
 		obj.style = self.obj_style
 		self.reset_style()
 		self.add_object(obj)
