@@ -162,9 +162,14 @@ class SK1Document(SK1ModelObject):
 	grid = None
 	masterlayer = None
 	guidelayer = None
+	meta = None
 
 	def __init__(self, config):
+		self.meta = MetaInfo()
 		SK1ModelObject.__init__(self, config)
+
+class MetaInfo:
+	pass
 
 class SK1Layout(SK1ModelObject):
 	"""
