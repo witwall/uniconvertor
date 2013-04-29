@@ -379,6 +379,7 @@ class SK1Guide(SK1ModelObject):
 	cid = GUIDE
 	position = 0
 	orientation = uc2const.HORIZONTAL
+	is_GuideLine = 1
 
 	def __init__(self, point=(), orientation=uc2const.HORIZONTAL):
 		if point:
@@ -386,6 +387,8 @@ class SK1Guide(SK1ModelObject):
 				self.position = point[0]
 			else:
 				self.position = point[1]
+		else:
+			self.position = 0.0
 		self.orientation = orientation
 		SK1ModelObject.__init__(self)
 
@@ -408,8 +411,8 @@ class SK1Group(SK1ModelObject):
 	end_string = 'G_()\n'
 	cid = GROUP
 
-	def __init__(self, config):
-		SK1ModelObject.__init__(self, config)
+	def __init__(self):
+		SK1ModelObject.__init__(self)
 
 class SK1MaskGroup(SK1ModelObject):
 	"""
@@ -421,8 +424,8 @@ class SK1MaskGroup(SK1ModelObject):
 	end_string = 'M_()\n'
 	cid = MASKGROUP
 
-	def __init__(self, config):
-		SK1ModelObject.__init__(self, config)
+	def __init__(self):
+		SK1ModelObject.__init__(self)
 
 #BlendGroup
 #TextOnPath
@@ -626,7 +629,7 @@ class SK1Text(SK1ModelObject):
 	wordgap = None
 	linegap = None
 
-	def __init__(self, config, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
+	def __init__(self, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
 		self.text = text
 		self.trafo = trafo
 		self.horiz_align = horiz_align
@@ -634,7 +637,7 @@ class SK1Text(SK1ModelObject):
 		self.chargap = chargap
 		self.wordgap = wordgap
 		self.linegap = linegap
-		SK1ModelObject.__init__(self, config)
+		SK1ModelObject.__init__(self)
 
 	def update(self):
 		args = (self.text, self.trafo, self.horiz_align, self.vert_align,
@@ -655,9 +658,9 @@ class SK1BitmapData(SK1ModelObject):
 	raw_image = None
 	id = ''
 
-	def __init__(self, config, id=''):
+	def __init__(self, id=''):
 		if id: self.id = id
-		SK1ModelObject.__init__(self, config)
+		SK1ModelObject.__init__(self)
 
 	def read_data(self, file):
 		decoder = Base64Decode(SubFileDecode(file, '-'))
@@ -665,7 +668,7 @@ class SK1BitmapData(SK1ModelObject):
 		self.raw_image.load()
 
 	def update(self):
-		self.string = 'bm(%i)\n' % (self.id)
+		self.string = 'bm(%d)\n' % (self.id)
 		self.end_string = '-\n'
 
 	def write_content(self, file):
@@ -704,7 +707,7 @@ class SK1Image(SK1ModelObject):
 
 	def write_content(self, file):
 		if self.image:
-			file.write('bm(%i)\n' % (self.id))
+			file.write('bm(%d)\n' % (self.id))
 			vfile = Base64Encode(file)
 			if self.raw_image.mode == "CMYK":
 				self.raw_image.save(vfile, 'JPEG', quality=100)
