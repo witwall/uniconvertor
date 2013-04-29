@@ -21,9 +21,9 @@ from copy import deepcopy
 from uc2 import _, events, msgconst, uc2const
 from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
-from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Page, \
-SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, SK1MaskGroup, \
-Rectangle, Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
+from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Pages, \
+SK1Page, SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, \
+SK1MaskGroup, Rectangle, Ellipse, SK1Curve, SK1Text, SK1BitmapData, SK1Image, \
 get_pdxf_color, Trafo
 
 class SK1_Loader:
@@ -33,6 +33,7 @@ class SK1_Loader:
 	paths = []
 	options = {}
 	model = None
+	pages = None
 
 	string = ''
 	line = ''
@@ -188,17 +189,26 @@ class SK1_Loader:
 				orientation = args[1]
 		obj = SK1Layout(self.config, format, size, orientation)
 		self.add_object(obj, self.model)
+		self.model.layout = obj
 
 	def grid(self, grid, visibility, grid_color, layer_name):
 		obj = SK1Grid(self.config, grid, visibility, grid_color, layer_name)
 		self.add_object(obj, self.model)
+		self.model.grid = obj
+
+	def add_pages(self, *args):
+		self.pages = SK1Pages()
+		self.add_object(self.pages, self.model)
+		self.model.pages = self.pages
 
 	def page(self, name='', format='', size='', orientation=0):
+		if self.pages is None:
+			self.add_pages()
 		page = SK1Page(self.config, name, format, size, orientation)
 		self.active_page = page
 		self.active_layer = None
 		self.parent_stack = []
-		self.add_object(page, self.model)
+		self.add_object(page, self.pages)
 
 	def layer(self, name, p1, p2, p3, p4, layer_color):
 		if self.active_page is None:
@@ -213,12 +223,14 @@ class SK1_Loader:
 		mlayer = SK1MasterLayer(self.config, name, properties, layer_color)
 		self.active_layer = mlayer
 		self.add_object(mlayer, self.model)
+		self.model.masterlayer = mlayer
 
 	def guidelayer(self, name, p1, p2, p3, p4, layer_color):
 		properties = [p1, p2, p3, p4]
 		glayer = SK1GuideLayer(self.config, name, properties, layer_color)
 		self.active_layer = glayer
 		self.add_object(glayer, self.model)
+		self.model.guidelayer = glayer
 
 	def guide(self, point, orientation):
 		self.add_object(SK1Guide(self.config))
@@ -333,12 +345,19 @@ class SK1_Loader:
 		self.add_object(bmd_obj)
 		try:
 			bmd_obj.read_data(self.file)
-		except:pass
+		except:
+			print 'error>>', self.line
+			errtype, value, traceback = sys.exc_info()
+			print errtype, value, traceback
 		self.presenter.resources[id] = bmd_obj.raw_image
 
 	def im(self, trafo, id):
 		self.reset_style()
-		self.add_object(SK1Image(self.config, trafo, id))
+		trafo = Trafo(*trafo)
+		image = None
+		if self.presenter.resources.has_key(id):
+			image = self.presenter.resources[id]
+		self.add_object(SK1Image(trafo, id, image))
 
 	def eps(self, *args):self.string = ''
 
