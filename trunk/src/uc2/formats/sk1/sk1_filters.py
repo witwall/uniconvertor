@@ -187,12 +187,12 @@ class SK1_Loader:
 				format = ''
 				size = args[0]
 				orientation = args[1]
-		obj = SK1Layout(self.config, format, size, orientation)
+		obj = SK1Layout(format, size, orientation)
 		self.add_object(obj, self.model)
 		self.model.layout = obj
 
 	def grid(self, grid, visibility, grid_color, layer_name):
-		obj = SK1Grid(self.config, grid, visibility, grid_color, layer_name)
+		obj = SK1Grid(grid, visibility, grid_color, layer_name)
 		self.add_object(obj, self.model)
 		self.model.grid = obj
 
@@ -204,7 +204,7 @@ class SK1_Loader:
 	def page(self, name='', format='', size='', orientation=0):
 		if self.pages is None:
 			self.add_pages()
-		page = SK1Page(self.config, name, format, size, orientation)
+		page = SK1Page(name, format, size, orientation)
 		self.active_page = page
 		self.active_layer = None
 		self.parent_stack = []
@@ -213,21 +213,18 @@ class SK1_Loader:
 	def layer(self, name, p1, p2, p3, p4, layer_color):
 		if self.active_page is None:
 			self.page()
-		properties = [p1, p2, p3, p4]
-		layer = SK1Layer(self.config, name, properties, layer_color)
+		layer = SK1Layer(name, p1, p2, p3, p4, layer_color)
 		self.active_layer = layer
 		self.add_object(layer, self.active_page)
 
 	def masterlayer(self, name, p1, p2, p3, p4, layer_color):
-		properties = [p1, p2, p3, p4]
-		mlayer = SK1MasterLayer(self.config, name, properties, layer_color)
+		mlayer = SK1MasterLayer(name, p1, p2, p3, p4, layer_color)
 		self.active_layer = mlayer
 		self.add_object(mlayer, self.model)
 		self.model.masterlayer = mlayer
 
 	def guidelayer(self, name, p1, p2, p3, p4, layer_color):
-		properties = [p1, p2, p3, p4]
-		glayer = SK1GuideLayer(self.config, name, properties, layer_color)
+		glayer = SK1GuideLayer(name, p1, p2, p3, p4, layer_color)
 		self.active_layer = glayer
 		self.add_object(glayer, self.model)
 		self.model.guidelayer = glayer
