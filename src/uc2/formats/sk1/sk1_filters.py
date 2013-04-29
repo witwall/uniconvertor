@@ -233,7 +233,7 @@ class SK1_Loader:
 		self.model.guidelayer = glayer
 
 	def guide(self, point, orientation):
-		self.add_object(SK1Guide(self.config))
+		self.add_object(SK1Guide(point, orientation))
 
 	#---GROUPS
 	def G(self):
