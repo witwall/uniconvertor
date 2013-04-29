@@ -46,13 +46,24 @@ class SK1_Presenter(TextModelPresenter):
 
 	def new(self):
 		self.model = model.SK1Document(self.config)
-		self.model.childs.append(model.SK1Layout(self.config))
-		self.model.childs.append(model.SK1Grid(self.config))
-		page = model.SK1Page(self.config)
-		self.model.childs.append(page)
-		page.childs.append(model.SK1Layer(self.config))
-		self.model.childs.append(model.SK1MasterLayer(self.config))
-		self.model.childs.append(model.SK1GuideLayer(self.config))
+		layout = model.SK1Layout()
+		self.model.childs.append(layout)
+		self.model.layout = layout
+		grid = model.SK1Grid()
+		self.model.childs.append(grid)
+		self.model.grid = grid
+		pages = model.SK1Pages()
+		self.model.childs.append(pages)
+		self.model.pages = pages
+		page = model.SK1Page()
+		pages.childs.append(page)
+		page.childs.append(model.SK1Layer())
+		mlayer = model.SK1MasterLayer()
+		self.model.childs.append(mlayer)
+		self.model.masterlayer = mlayer
+		glayer = model.SK1GuideLayer()
+		self.model.childs.append(glayer)
+		self.model.guidelayer = glayer
 		self.update()
 
 	def traslate_from_pdxf(self, pdxf_doc):
