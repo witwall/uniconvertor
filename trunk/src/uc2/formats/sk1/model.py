@@ -30,14 +30,15 @@ from _sk1objs import Trafo, CreatePath, Point
 DOCUMENT = 1
 LAYOUT = 2
 GRID = 3
-PAGE = 4
-LAYER = 5
-MASTERLAYER = 6
-GUIDELAYER = 7
-GUIDE = 8
+PAGES = 4
+PAGE = 5
+LAYER = 6
+MASTERLAYER = 7
+GUIDELAYER = 8
+GUIDE = 9
 
-GROUP = 9
-MASKGROUP = 10
+GROUP = 20
+MASKGROUP = 21
 
 RECTANGLE = 30
 ELLIPSE = 31
@@ -48,7 +49,7 @@ IMAGE = 35
 
 CID_TO_NAME = {
 	DOCUMENT: _('Document'), LAYOUT: _('Layout'), GRID: _('Grid'),
-	PAGE: _('Page'), LAYER: _('Layer'), MASTERLAYER: _('MasterLayer'),
+	PAGES: _('Pages'), PAGE: _('Page'), LAYER: _('Layer'), MASTERLAYER: _('MasterLayer'),
 	GUIDELAYER: _('GuideLayer'), GUIDE: _('Guideline'), GUIDE: _('Guideline'),
 
 	GROUP: _('Group'), MASKGROUP: _('MaskGroup'),
@@ -156,6 +157,11 @@ class SK1Document(SK1ModelObject):
 
 	string = '##sK1 1 2\ndocument()\n'
 	cid = DOCUMENT
+	layout = None
+	pages = None
+	grid = None
+	masterlayer = None
+	guidelayer = None
 
 	def __init__(self, config):
 		SK1ModelObject.__init__(self, config)
@@ -210,6 +216,20 @@ class SK1Grid(SK1ModelObject):
 		color = get_sk1_color(self.grid_color)
 		args = (self.grid, self.visibility, color, self.layer_name)
 		self.string = 'grid' + args.__str__() + '\n'
+
+class SK1Pages(SK1ModelObject):
+	"""
+	Represents container for Page objects.
+	Has no any values and used to be a childs list holder.
+	"""
+	cid = PAGES
+
+	def __init__(self):
+		SK1ModelObject.__init__(self)
+
+	def write_content(self, file):
+		for child in self.childs:
+			child.write_content(file)
 
 class SK1Page(SK1ModelObject):
 	"""
@@ -681,11 +701,27 @@ class SK1Image(SK1ModelObject):
 	cid = IMAGE
 	trafo = ()
 	id = ''
+	image = None
 
-	def __init__(self, config, trafo, id):
+	def __init__(self, trafo=None, id='', image=None):
 		self.trafo = trafo
 		self.id = id
-		SK1ModelObject.__init__(self, config)
+		self.image = image
+		SK1ModelObject.__init__(self)
 
 	def update(self):
-		self.string = 'im' + (self.trafo, self.id).__str__() + '\n'
+		if self.image and not self.id:
+			self.id = id(self.image)
+		self.string = 'im' + (self.trafo.coeff(), self.id).__str__() + '\n'
+
+	def write_content(self, file):
+		if self.image:
+			file.write('bm(%i)\n' % (self.id))
+			vfile = Base64Encode(file)
+			if self.raw_image.mode == "CMYK":
+				self.raw_image.save(vfile, 'JPEG', quality=100)
+			else:
+				self.raw_image.save(vfile, 'PNG')
+			vfile.close()
+			file.write('-\n')
+			file.write(self.string)
