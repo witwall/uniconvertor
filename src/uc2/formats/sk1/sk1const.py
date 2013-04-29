@@ -20,6 +20,9 @@ import math
 from uc2 import uc2const
 from uc2.formats.pdxf import const
 
+Portrait = uc2const.PORTRAIT
+Landscape = uc2const.LANDSCAPE
+
 ArcArc = 0
 ArcChord = 1
 ArcPieSlice = 2
