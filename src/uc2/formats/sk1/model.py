@@ -577,50 +577,6 @@ class PolyBezier(SK1ModelObject):
 		self.update_from_list()
 
 
-class SK1Curve(SK1ModelObject):
-	"""
-	Represents Bezier curve object.
-	b()             start a bezier obj
-	bs(X, Y, CONT)  append a line segment
-	bc(X1, Y1, X2, Y2, X3, Y3, CONT)  append a bezier segment
-	bn()	        start a new path
-	bC()            close path
-	"""
-	string = ''
-	cid = CURVE
-	style = []
-	paths = []
-
-	def __init__(self, config, paths):
-		self.paths = paths
-		SK1ModelObject.__init__(self, config)
-
-	def add_line(self, point):
-		x, y = point
-		self.string += 'bs' + (x, y, 0).__str__() + '\n'
-
-	def add_segment(self, point):
-		point0, point1, point2, cont = point
-		args = (point0[0], point0[1], point1[0], point1[1], point2[0], point2[1], cont)
-		self.string += 'bc' + args.__str__() + '\n'
-
-	def update(self):
-		self.string = 'b()\n'
-		start = True
-		for path in self.paths:
-			if start:
-				start = False
-			else:
-				self.string += 'bn()\n'
-			self.add_line(path[0])
-			for point in path[1]:
-				if len(point) == 2:
-					self.add_line(point)
-				else:
-					self.add_segment(point)
-			if path[2] == const.CURVE_CLOSED:
-				self.string += 'bC()\n'
-
 class SK1Text(SK1ModelObject):
 	"""
 	Represents Text object.
