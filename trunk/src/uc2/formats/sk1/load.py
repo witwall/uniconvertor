@@ -35,19 +35,16 @@ from copy import deepcopy
 from uc2 import _
 from uc2.formats.sk1.sk1const import ArcPieSlice
 
-from uc2.formats.sk1.model import SK1Document, SK1Pages, SK1Page, SK1Layer, \
-SK1Group
+from uc2.formats.sk1.model import SK1Document, SK1Pages, SK1Page, SK1Layer
+from uc2.formats.sk1.model import SK1Group
 from uc2.formats.sk1.model import PolyBezier, Rectangle, Ellipse
-
-from uc2.formats.sk1.model import Trafo, Translation
-
-
-from app.events.warn import warn, INTERNAL, pdebug
 
 from app.Graphics import text
 from app import Style, PropertyStack, EmptyPattern, SketchLoadError, \
 		ImageData, Image
 
+
+from uc2.formats.sk1.model import Trafo, Translation
 
 doc_class = SK1Document
 pages_class = SK1Pages
@@ -291,7 +288,7 @@ class GenericLoader(LoaderWithComposites):
 		doc.meta.format_name = self.format_name
 
 	def add_message(self, message):
-		pdebug(('load', 'echo_messages'), message)
+#		pdebug(('load', 'echo_messages'), message)
 		self.messages[message] = self.messages.get(message, 0) + 1
 
 	def Messages(self):
