@@ -24,7 +24,9 @@ from uc2.formats.sk1 import sk1const
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Pages, \
 SK1Page, SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, \
 SK1MaskGroup, Rectangle, Ellipse, PolyBezier, SK1Text, SK1BitmapData, SK1Image, \
-get_pdxf_color, Trafo
+MultiGradient, EmptyPattern, SolidPattern, LinearGradient, RadialGradient, \
+ConicalGradient, HatchingPattern, ImageTilePattern, Style, \
+get_pdxf_color, Trafo, Point
 
 class SK1_Loader:
 	name = 'SK1_Loader'
@@ -41,6 +43,11 @@ class SK1_Loader:
 	active_layer = None
 	parent_stack = []
 	obj_style = []
+
+	style = None
+	style_dict = {}
+	pattern = None
+	gradient = None
 
 	position = 0
 
@@ -61,7 +68,7 @@ class SK1_Loader:
 			raise IOError(errtype, msg + '\n' + value, traceback)
 
 		self.file.readline()
-		self.reset_style()
+		self.style = Style()
 
 		while True:
 			self.line = self.file.readline()
@@ -85,11 +92,9 @@ class SK1_Loader:
 		self.position = 0
 		return self.model
 
-	def reset_style(self):
-		self.obj_style = deepcopy(sk1const.default_style)
-
-	def add_string(self, string):
-		self.string += string + '\n'
+	def set_style(self, obj):
+		obj.properties = self.style
+		self.style = Style()
 
 	def add_object(self, obj, parent=''):
 		if self.model is None:
@@ -104,69 +109,92 @@ class SK1_Loader:
 			obj.config = self.config
 			parent.childs.append(obj)
 
-	def check_stroke(self):
-		if not self.obj_style[1]:
-			self.obj_style[1] = deepcopy(sk1const.stroke_style)
-
 	#---PROPERTIES
-	def gl(self, *args): pass
-	def pe(self, *args): pass
-	def ps(self, *args): pass
-	def pgl(self, *args): pass
-	def pgr(self, *args): pass
-	def pgc(self, *args): pass
-	def phs(self, *args): pass
-	def pit(self, *args): pass
+	def gl(self, colors):
+		self.gradient = MultiGradient(colors)
 
-	def fp(self, color):
-		if not self.obj_style[0] or not self.obj_style[0][1] == const.FILL_SOLID:
-			self.obj_style[0] = deepcopy(sk1const.solid_fill)
-		fill_style = self.obj_style[0]
-		fill_style[2] = get_pdxf_color(color)
+	def pe(self):
+		self.pattern = EmptyPattern
+
+	def ps(self, color):
+		self.pattern = SolidPattern(color)
+
+	def pgl(self, dx, dy, border=0):
+		if not self.gradient: self.gradient = MultiGradient()
+		self.pattern = LinearGradient(self.gradient, Point(dx, dy), border)
+
+	def pgr(self, dx, dy, border=0):
+		if not self.gradient: self.gradient = MultiGradient()
+		self.pattern = RadialGradient(self.gradient, Point(dx, dy), border)
+
+	def pgc(self, cx, cy, dx, dy):
+		if not self.gradient: self.gradient = MultiGradient()
+		self.pattern = ConicalGradient(self.gradient, Point(cx, cy), Point(dx, dy))
+
+	def phs(self, color, background, dx, dy, dist, width):
+		self.pattern = HatchingPattern(color, background, Point(dx, dy), dist, width)
+
+	def pit(self, id, trafo):
+		trafo = apply(Trafo, trafo)
+		self.pattern = ImageTilePattern(self.id_dict[id], trafo)
+
+	def fp(self, color=None):
+		if color is None:
+			self.style.fill_pattern = self.pattern
+		else:
+			self.style.fill_pattern = SolidPattern(color)
 
 	def fe(self):
-		self.obj_style[0] = []
+		self.style.fill_pattern = EmptyPattern
 
-	def ft(self, *args): pass
-	def lp(self, color):
-		self.check_stroke()
-		line_style = self.obj_style[1]
-		line_style[1] = get_pdxf_color(color)
+	def ft(self, bool):
+		self.style.fill_transform = bool
+
+	def lp(self, color=None):
+		if color is None:
+			self.style.line_pattern = self.pattern
+		else:
+			self.style.line_pattern = SolidPattern(color)
 
 	def le(self):
-		self.obj_style[1] = []
+		self.style.line_pattern = EmptyPattern
 
 	def lw(self, width):
-		self.check_stroke()
-		line_style = self.obj_style[1]
-		line_style[1] = width
+		self.style.line_width = width
 
 	def lc(self, cap):
-		self.check_stroke()
-		line_style = self.obj_style[1]
-		line_style[4] = cap
+		if not 1 <= cap <= 3: cap = 1
+		self.style.line_cap = cap
 
 	def lj(self, join):
-		self.check_stroke()
-		line_style = self.obj_style[1]
-		line_style[5] = join
+		self.style.line_join = join
 
 	def ld(self, dashes):
-		self.check_stroke()
-		result = []
-		if dashes:
-			for item in dashes:
-				result.append(item)
-		line_style = self.obj_style[1]
-		line_style[3] = result
+		self.style.line_dashes = dashes
 
-	def la1(self, *args): pass
-	def la2(self, *args): pass
+	def la1(self, args=None):
+		self.style.line_arrow1 = args
 
-	def Fs(self, *args): pass
-	def Fn(self, *args): pass
-	def dstyle(self, *args): pass
-	def style(self, *args): pass
+	def la2(self, args=None):
+		self.style.line_arrow2 = args
+
+	def Fs(self, size):
+		self.style.font_size = size
+
+	def Fn(self, name):
+		self.style.font = name
+
+	def dstyle(self, name=''):
+		if name:
+			self.style.name = name
+			self.model.styles[name] = self.style
+			self.style = Style()
+
+	def style(self, name=''):
+		pass
+
+	def use_style(self, name=''):
+		pass
 
 	#---STRUCTURAL ELEMENTS
 	def document(self, *args):
@@ -287,23 +315,20 @@ class SK1_Loader:
 	def r(self, m11, m12, m21, m22, dx, dy, radius1=0, radius2=0):
 		trafo = Trafo(m11, m12, m21, m22, dx, dy)
 		obj = Rectangle(trafo, radius1, radius2)
-		obj.style = self.obj_style
-		self.reset_style()
+		self.set_style(obj)
 		self.add_object(obj)
 
 	def e(self, m11, m12, m21, m22, dx, dy, start_angle=0.0, end_angle=0.0,
 		arc_type=sk1const.ArcPieSlice):
 		trafo = Trafo(m11, m12, m21, m22, dx, dy)
 		obj = Ellipse(trafo, start_angle, end_angle, arc_type)
-		obj.style = self.obj_style
-		self.reset_style()
+		self.set_style(obj)
 		self.add_object(obj)
 
 	def b(self):
 		self.paths = [[None, [], const.CURVE_OPENED]]
 		obj = PolyBezier(paths_list=self.paths)
-		obj.style = self.obj_style
-		self.reset_style()
+		self.set_style(obj)
 		self.add_object(obj)
 
 	def bs(self, x, y, cont):
@@ -332,13 +357,11 @@ class SK1_Loader:
 
 	def txt(self, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
 		obj = SK1Text(text, trafo, horiz_align, vert_align, chargap, wordgap, linegap)
-		obj.style = self.obj_style
-		self.reset_style()
+		self.set_style(obj)
 		self.add_object(obj)
 
 	def bm(self, id):
 		bmd_obj = SK1BitmapData(id)
-		self.reset_style()
 		self.add_object(bmd_obj)
 		try:
 			bmd_obj.read_data(self.file)
@@ -349,7 +372,6 @@ class SK1_Loader:
 		self.presenter.resources[id] = bmd_obj.raw_image
 
 	def im(self, trafo, id):
-		self.reset_style()
 		trafo = Trafo(*trafo)
 		image = None
 		if self.presenter.resources.has_key(id):
