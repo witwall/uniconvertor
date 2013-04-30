@@ -16,7 +16,7 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import deepcopy
-import Image
+import Image, sys
 
 from uc2 import _, uc2const
 from uc2.formats.pdxf import const
@@ -37,6 +37,8 @@ MASTERLAYER = 7
 GUIDELAYER = 8
 GUIDE = 9
 
+STYLE = 10
+
 GROUP = 20
 MASKGROUP = 21
 
@@ -52,6 +54,7 @@ CID_TO_NAME = {
 	PAGES: _('Pages'), PAGE: _('Page'), LAYER: _('Layer'), MASTERLAYER: _('MasterLayer'),
 	GUIDELAYER: _('GuideLayer'), GUIDE: _('Guideline'), GUIDE: _('Guideline'),
 
+	STYLE: _('Style'),
 	GROUP: _('Group'), MASKGROUP: _('MaskGroup'),
 
 	RECTANGLE:_('Rectangle'), ELLIPSE:_('Ellipse'), CURVE:_('Curve'),
@@ -116,6 +119,7 @@ class SK1ModelObject(TextModelObject):
 	"""
 
 	objects = []
+	properties = None
 
 	def __init__(self, config=None, string=''):
 		self.config = config
@@ -142,6 +146,8 @@ class SK1ModelObject(TextModelObject):
 		return result
 
 	def write_content(self, file):
+		if not self.properties is None:
+			 self.properties.write_content(file)
 		file.write(self.string)
 		for child in self.childs:
 			child.write_content(file)
@@ -163,6 +169,7 @@ class SK1Document(SK1ModelObject):
 	masterlayer = None
 	guidelayer = None
 	meta = None
+	styles = {}
 
 	def __init__(self, config):
 		self.meta = MetaInfo()
@@ -405,6 +412,253 @@ class SK1Guide(SK1ModelObject):
 		args = (point, self.orientation)
 		self.string = 'guide' + args.__str__() + '\n'
 
+#--- PROPERTIES OBJECTS
+
+
+class Pattern:
+
+	is_procedural = 1
+	is_Empty = 0
+	is_Solid = 0
+	is_Gradient = 0
+	is_RadialGradient = 0
+	is_AxialGradient = 0
+	is_ConicalGradient = 0
+	is_Hatching = 0
+	is_Tiled = 0
+	is_Image = 0
+
+	name = ''
+
+class EmptyPattern_(Pattern):
+
+	is_procedural = 0
+	is_Empty = 1
+
+EmptyPattern = EmptyPattern_()
+
+class SolidPattern(Pattern):
+
+	is_procedural = 0
+	is_Solid = 1
+	color = ()
+
+	def __init__(self, color=None, duplicate=None):
+		if color:
+			self.color = color
+		else:
+			self.color = deepcopy(sk1const.fallback_sk1color)
+
+class MultiGradient:
+
+	colors = []
+
+	def __init__(self, colors=[], duplicate=None):
+		if not colors:
+			start_color = deepcopy(sk1const.black_color)
+			end_color = deepcopy(sk1const.white_color)
+			colors = [(0, start_color), (1, end_color)]
+		self.colors = colors
+
+	def write_content(self, file):
+		val = self.colors.__str__()
+		write = file.write
+		write('gl(' + val + ')\n')
+
+def CreateSimpleGradient(start_color, end_color):
+	return MultiGradient([(0, start_color), (1, end_color)])
+
+class GradientPattern(Pattern):
+
+	is_Gradient = 1
+
+class LinearGradient(GradientPattern):
+
+	is_AxialGradient = 1
+
+	def __init__(self, gradient=None, direction=Point(0, -1),
+					border=0, duplicate=None):
+		self.gradient = gradient
+		self.direction = direction
+		self.border = border
+
+	def write_content(self, file):
+		self.gradient.write_content(file)
+		file.write('pgl(%g,%g,%g)\n' % (round(self.direction.x, 10),
+							round(self.direction.y, 10), self.border))
+
+class RadialGradient(GradientPattern):
+
+	is_RadialGradient = 1
+
+	def __init__(self, gradient=None, center=Point(0.5, 0.5),
+					border=0, duplicate=None):
+		self.gradient = gradient
+		self.center = center
+		self.border = border
+
+	def write_content(self, file):
+		self.gradient.write_content(file)
+		file.write('pgr(%g,%g,%g)\n' % (self.center.x, self.center.y, self.border))
+
+class ConicalGradient(GradientPattern):
+
+	is_ConicalGradient = 1
+
+	def __init__(self, gradient=None,
+					center=Point(0.5, 0.5), direction=Point(1, 0),
+					duplicate=None):
+		self.gradient = gradient
+		self.center = center
+		self.direction = direction
+
+	def write_content(self, file):
+		self.gradient.write_content(file)
+		file.write('pgc(%g,%g,%g,%g)\n' % (tuple(self.center) + (round(self.direction.x, 10),
+											round(self.direction.y, 10))))
+
+class HatchingPattern(Pattern):
+
+	is_Hatching = 1
+
+	def __init__(self, foreground=None, background=None,
+					direction=Point(1, 0),
+					spacing=5.0, width=0.5, duplicate=None):
+		if foreground is None:	foreground = deepcopy(sk1const.black_color)
+		self.foreground = foreground
+		if background is None:	background = deepcopy(sk1const.white_color)
+		self.background = background
+		self.spacing = spacing
+		self.width = width
+		self.direction = direction
+
+	def write_content(self, file):
+		color = self.foreground.__str__()
+		background = self.background.__str__()
+		#TODO: check spacing field
+		file.write('phs(%s,%s,%g,%g,%g,%g)\n'
+						% (color, background, self.direction.x, self.direction.y,
+						self.distance, self.width))
+
+class ImageTilePattern(Pattern):
+
+	is_Tiled = 1
+	is_Image = 1
+	data = None
+	id = None
+
+	def __init__(self, data=None, trafo=None, duplicate=None):
+		if trafo is None: trafo = Trafo(1, 0, 0, -1, 0, 0)
+		self.trafo = trafo
+		self.data = data
+		self.image = self.data
+
+	def write_content(self, file):
+		if self.image and not self.id:
+			self.id = id(self.image)
+		if self.image:
+			file.write('bm(%d)\n' % (self.id))
+			vfile = Base64Encode(file)
+			if self.raw_image.mode == "CMYK":
+				self.raw_image.save(vfile, 'JPEG', quality=100)
+			else:
+				self.raw_image.save(vfile, 'PNG')
+			vfile.close()
+			file.write('-\n')
+			val = (self.id, self.trafo.coeff()).__str__()
+			file.write('pit' + val + '\n')
+
+class Style:
+	"""
+	Represents object style.
+	"""
+
+	is_dynamic = 0
+	name = ''
+
+	fill_pattern = EmptyPattern
+	fill_transform = 1
+	line_pattern = SolidPattern(deepcopy(sk1const.black_color))
+	line_width = 0.0
+	line_join = sk1const.JoinMiter
+	line_cap = sk1const.CapButt
+	line_dashes = ()
+	line_arrow1 = None
+	line_arrow2 = None
+	font = None
+	font_size = 12.0
+
+	def __init__(self, name='', duplicate=None, base_style=False, **kw):
+		if name:
+			self.name = name
+		if base_style:
+			self.fill_pattern = EmptyPattern
+			self.fill_transform = 1
+			color = deepcopy(sk1const.black_color)
+			self.line_pattern = SolidPattern(color)
+			self.line_width = 0.0
+			self.line_join = sk1const.JoinMiter
+			self.line_cap = sk1const.CapButt
+			self.line_dashes = ()
+			self.line_arrow1 = None
+			self.line_arrow2 = None
+			self.font = None
+			self.font_size = 12.0
+		else:
+			for key, value in kw.items():
+				setattr(self, key, value)
+
+	def __str__(self):
+		result = 'Style instance:\n'
+		for item in self.__dict__.keys():
+			result += item + '=' + str(self.__dict__[item]) + '\n'
+		return result
+
+	def write_content(self, file):
+		write = file.write
+		if hasattr(self, 'fill_pattern'):
+			pattern = self.fill_pattern
+			if pattern is EmptyPattern:
+				write('fe()\n')
+			elif isinstance(pattern, SolidPattern):
+				write('fp(' + pattern.color.__str__() + ')\n')
+			else:
+				pattern.write_content(file)
+				write('fp()\n')
+		if not self.fill_transform:
+			write('ft(%d)\n' % self.fill_transform)
+		if hasattr(self, 'line_pattern'):
+			pattern = self.line_pattern
+			if pattern is EmptyPattern:
+				write('le()\n')
+			elif isinstance(pattern, SolidPattern):
+				write('lp(' + pattern.color.__str__() + ')\n')
+			else:
+				pattern.write_content(file)
+				write('lp()\n')
+		if self.line_width :
+			write('lw(%g)\n' % self.line_width)
+		if not self.line_cap == sk1const.CapButt:
+			write('lc(%d)\n' % self.line_cap)
+		if not self.line_join == sk1const.JoinMiter:
+			write('lj(%d)\n' % self.line_join)
+		if self.line_dashes:
+			write('ld(' + self.line_dashes.__str__() + ')\n')
+		if self.line_arrow1:
+			if self.line_arrow1 is not None:
+				write('la1(' + self.line_arrow1.__str__() + ')\n')
+			else:
+				write('la1()\n')
+		if self.line_arrow2:
+			if self.line_arrow2 is not None:
+				write('la2(' + self.line_arrow2.__str__() + ')\n')
+			else:
+				write('la2()\n')
+		if self.font:
+			write('Fn(\'%s\')\n' % self.font)
+		if not self.font_size == 12:
+			write('Fs(%g)\n' % self.font_size)
+
 #--- SELECTABLE OBJECTS
 
 class SK1Group(SK1ModelObject):
@@ -628,6 +882,7 @@ class SK1Text(SK1ModelObject):
 	style = []
 	text = ''
 	trafo = ()
+	properties = None
 	horiz_align = None
 	vert_align = None
 	chargap = None
