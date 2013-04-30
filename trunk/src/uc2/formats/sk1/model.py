@@ -61,56 +61,7 @@ CID_TO_NAME = {
 	TEXT:_('Text'), BITMAPDATA:_('BitmapData'), IMAGE:_('Image'),
 	}
 
-def get_pdxf_color(clr):
-	if not clr: return deepcopy(sk1const.fallback_color)
-	color_spec = clr[0]
-	if color_spec == sk1const.RGB:
-		result = [sk1const.RGB, [clr[1], clr[2], clr[3]], 1.0, '']
-		if len(clr) == 5:result[2] = clr[4]
-		return result
-	elif color_spec == sk1const.CMYK:
-		result = [sk1const.CMYK, [clr[1], clr[2], clr[3], clr[4]], 1.0, '']
-		if len(clr) == 6:result[2] = clr[5]
-		return result
-	elif color_spec == sk1const.SPOT:
-		result = [sk1const.SPOT, [[clr[3], clr[4], clr[5]],
-					[clr[6], clr[7], clr[8], clr[9]], clr[1]], 1.0, clr[2]]
-		if len(clr) == 11:result[2] = clr[10]
-		return result
-	else:
-		return deepcopy(sk1const.fallback_color)
 
-def get_sk1_color(clr):
-	if not clr: return deepcopy(sk1const.fallback_sk1color)
-	color_spec = clr[0]
-	val = clr[1]
-	alpha = clr[2]
-	name = clr[3]
-	if color_spec == sk1const.RGB:
-		if clr[2] == 1.0:
-			result = (sk1const.RGB, val[0], val[1], val[2])
-		else:
-			result = (sk1const.RGB, val[0], val[1], val[2], alpha)
-		return result
-	elif color_spec == sk1const.CMYK:
-		if clr[2] == 1.0:
-			result = (sk1const.CMYK, val[0], val[1], val[2], val[3])
-		else:
-			result = (sk1const.CMYK, val[0], val[1], val[2], val[3], alpha)
-		return result
-	elif color_spec == sk1const.SPOT:
-		rgb = val[0]
-		cmyk = val[1]
-		pal = val[2]
-		if clr[2] == 1.0:
-			result = (sk1const.SPOT, pal, clr[3], rgb[0], rgb[1], rgb[2],
-					cmyk[0], cmyk[1], cmyk[2], cmyk[3])
-		else:
-			result = (sk1const.SPOT, pal, name, rgb[0], rgb[1], rgb[2],
-					cmyk[0], cmyk[1], cmyk[2], cmyk[3], alpha)
-		return result
-	else:
-		return deepcopy(sk1const.fallback_sk1color)
 
 class SK1ModelObject(TextModelObject):
 	"""
