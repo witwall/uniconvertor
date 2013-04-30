@@ -23,6 +23,15 @@ from uc2.formats.pdxf import const
 Portrait = uc2const.PORTRAIT
 Landscape = uc2const.LANDSCAPE
 
+# Alignment. Defaults are 0
+ALIGN_BASE = 0
+ALIGN_CENTER = 1
+ALIGN_TOP = 2
+ALIGN_BOTTOM = 3
+ALIGN_LEFT = 0
+ALIGN_CENTER = 1
+ALIGN_RIGHT = 2
+
 ArcArc = 0
 ArcChord = 1
 ArcPieSlice = 2
