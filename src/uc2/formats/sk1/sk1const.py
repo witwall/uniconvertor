@@ -34,6 +34,12 @@ SPOT = uc2const.COLOR_SPOT
 fallback_color = [RGB, [0.0, 0.0, 0.0], 1.0, '']
 fallback_sk1color = (RGB, 0.0, 0.0, 0.0)
 
+black_color = (CMYK, 0.0, 0.0, 0.0, 1.0)
+white_color = (CMYK, 0.0, 0.0, 0.0, 0.0)
+
+rgb_black_color = (RGB, 0.0, 0.0, 0.0)
+rgb_white_color = (RGB, 1.0, 1.0, 1.0)
+
 default_grid = (0, 0, 2.83465, 2.83465)
 default_grid_color = (RGB, 0.83, 0.87, 0.91)
 
