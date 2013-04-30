@@ -16,7 +16,6 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os
-from copy import deepcopy
 
 from uc2 import _, events, msgconst, uc2const
 from uc2.formats.pdxf import const
@@ -25,8 +24,7 @@ from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Pages, \
 SK1Page, SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, \
 SK1MaskGroup, Rectangle, Ellipse, PolyBezier, SK1Text, SK1BitmapData, SK1Image, \
 MultiGradient, EmptyPattern, SolidPattern, LinearGradient, RadialGradient, \
-ConicalGradient, HatchingPattern, ImageTilePattern, Style, \
-get_pdxf_color, Trafo, Point
+ConicalGradient, HatchingPattern, ImageTilePattern, Style, Trafo, Point
 
 class SK1_Loader:
 	name = 'SK1_Loader'
