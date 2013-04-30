@@ -27,6 +27,9 @@ ArcArc = 0
 ArcChord = 1
 ArcPieSlice = 2
 
+JoinMiter = const.JOIN_MITER
+CapButt = const.CAP_BUTT
+
 RGB = uc2const.COLOR_RGB
 CMYK = uc2const.COLOR_CMYK
 SPOT = uc2const.COLOR_SPOT
