@@ -33,25 +33,20 @@ import os, string
 from copy import deepcopy
 
 from uc2 import _
-from uc2.formats.sk1.sk1const import ArcPieSlice
+from uc2.formats.sk1 import sk1const
 
 from uc2.formats.sk1.model import SK1Document, SK1Pages, SK1Page, SK1Layer
 from uc2.formats.sk1.model import SK1Group
-from uc2.formats.sk1.model import PolyBezier, Rectangle, Ellipse
+from uc2.formats.sk1.model import PolyBezier, Rectangle, Ellipse, SK1Image
+from uc2.formats.sk1.model import EmptyPattern, Style
 
-from app.Graphics import text
-from app import Style, PropertyStack, EmptyPattern, SketchLoadError, \
-		ImageData, Image
-
+from app import PropertyStack
 
 from uc2.formats.sk1.model import Trafo, Translation
 
 doc_class = SK1Document
 pages_class = SK1Pages
 page_class = SK1Page
-
-class EmptyCompositeError(SketchLoadError):
-	pass
 
 
 # The loaders usually intercept exceptions raised while reading and
@@ -117,7 +112,8 @@ class LoaderWithComposites:
 				#may be just pass the problem?
 				#raise EmptyCompositeError
 		else:
-			raise SketchLoadError('no composite to end')
+			print 'ERROR: no composite to end'
+#			raise SketchLoadError('no composite to end')
 
 	def end_all(self):
 		while self.composite_stack:
@@ -226,8 +222,9 @@ class GenericLoader(LoaderWithComposites):
 		if issubclass(self.composite_class, doc_class) or issubclass(self.composite_class, page_class):
 			self.begin_composite(layer_class, args, kw)
 		else:
-			raise SketchLoadError('self.composite_class is %s, not a document',
-									self.composite_class)
+			print 'self.composite_class is %s, not a document', self.composite_class
+#			raise SketchLoadError('self.composite_class is %s, not a document',
+#									self.composite_class)
 
 	def bezier(self, paths=None):
 		self.append_object(PolyBezier(paths=paths,
@@ -240,12 +237,12 @@ class GenericLoader(LoaderWithComposites):
 										properties=self.get_prop_stack()))
 
 	def ellipse(self, m11, m21, m12, m22, v1, v2, start_angle=0.0,
-				end_angle=0.0, arc_type=ArcPieSlice):
+				end_angle=0.0, arc_type=sk1const.ArcPieSlice):
 		self.append_object(Ellipse(Trafo(m11, m21, m12, m22, v1, v2),
 									start_angle, end_angle, arc_type,
 									properties=self.get_prop_stack()))
-	def simple_text(self, str, trafo=None, valign=text.ALIGN_BASE,
-					halign=text.ALIGN_LEFT):
+	def simple_text(self, str, trafo=None, valign=sk1const.ALIGN_BASE,
+					halign=sk1const.ALIGN_LEFT):
 		if type(trafo) == TupleType:
 			if len(trafo) == 2:
 				trafo = apply(Translation, trafo)
@@ -261,8 +258,7 @@ class GenericLoader(LoaderWithComposites):
 				trafo = apply(Translation, trafo)
 			else:
 				raise TypeError, "trafo must be a Trafo-object or a 2-tuple"
-		image = ImageData(image)
-		self.append_object(Image(image, trafo=trafo))
+		self.append_object(SK1Image(image, trafo=trafo))
 
 	def begin_group(self, *args, **kw):
 		self.begin_composite(SK1Group, args, kw)
