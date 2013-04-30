@@ -16,7 +16,7 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import deepcopy
-import Image, sys
+import Image
 
 from uc2 import _, uc2const
 from uc2.formats.pdxf import const
@@ -98,7 +98,7 @@ class SK1ModelObject(TextModelObject):
 
 	def write_content(self, file):
 		if not self.properties is None:
-			 self.properties.write_content(file)
+			self.properties.write_content(file)
 		file.write(self.string)
 		for child in self.childs:
 			child.write_content(file)
