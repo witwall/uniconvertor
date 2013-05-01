@@ -572,7 +572,8 @@ class Style:
 			if pattern is EmptyPattern:
 				write('fe()\n')
 			elif isinstance(pattern, SolidPattern):
-				write('fp(' + pattern.color.__str__() + ')\n')
+				if not pattern.color == sk1const.black_color:
+					write('fp(' + pattern.color.__str__() + ')\n')
 			else:
 				pattern.write_content(file)
 				write('fp()\n')
@@ -583,7 +584,8 @@ class Style:
 			if pattern is EmptyPattern:
 				write('le()\n')
 			elif isinstance(pattern, SolidPattern):
-				write('lp(' + pattern.color.__str__() + ')\n')
+				if not pattern.color == sk1const.black_color:
+					write('lp(' + pattern.color.__str__() + ')\n')
 			else:
 				pattern.write_content(file)
 				write('lp()\n')
