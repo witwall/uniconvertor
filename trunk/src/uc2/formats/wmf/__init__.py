@@ -23,12 +23,16 @@ from uc2.formats.sk1 import model
 from uc2.formats.sk1.presenter import SK1_Presenter
 from uc2.formats.pdxf.presenter import PDXF_Presenter
 from uc2.formats.wmf.wmfconst import WMF_SIGNATURE
+from uc2.formats.wmf.wmf_loader import WMF_Loader
 
 
 def wmf_loader(appdata, filename, translate=True, cnf={}, **kw):
 	if kw: cnf.update(kw)
 	doc = SK1_Presenter(appdata, cnf)
+	sk1_loader = doc.loader
+	doc.loader = WMF_Loader()
 	doc.load(filename)
+	doc.loader = sk1_loader
 	if translate:
 		pdxf_doc = PDXF_Presenter(appdata, cnf)
 		pdxf_doc.doc_file = filename
