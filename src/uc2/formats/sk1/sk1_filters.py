@@ -358,9 +358,20 @@ class SK1_Loader:
 		self.paths[-1][2] = const.CURVE_CLOSED
 
 	def txt(self, text, trafo, horiz_align, vert_align, chargap, wordgap, linegap):
+		if text: text = self._decode_text(text)
 		obj = SK1Text(text, trafo, horiz_align, vert_align, chargap, wordgap, linegap)
 		self.set_style(obj)
 		self.add_object(obj)
+
+	def _decode_text(self, text):
+		output = ''
+		for word in text.split('\u')[1:]:
+				num = int(word, 16)
+				if num > 256:
+					output += ('\u' + word).decode('raw_unicode_escape')
+				else:
+					output += chr(int(num)).decode('latin1')
+		return output
 
 	def bm(self, id):
 		bmd_obj = SK1BitmapData(id)
