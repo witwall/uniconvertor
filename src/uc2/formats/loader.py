@@ -32,7 +32,6 @@ class AbstractLoader:
 
 	model = None
 
-
 	def __init__(self):pass
 
 	def load(self, presenter, path):
@@ -55,3 +54,26 @@ class AbstractLoader:
 		return self.model
 
 	def do_load(self):pass
+
+	def parsing_msg(self, val):
+		msg = _('Parsing in progress...')
+		self.send_progress_message(msg, val)
+
+	def saving_msg(self, val):
+		msg = _('Saving in progress...')
+		self.send_progress_message(msg, val)
+
+	def send_progress_message(self, msg, val):
+		events.emit(events.FILTER_INFO, msg, val)
+
+	def send_ok(self, msg):
+		events.emit(events.MESSAGES, msgconst.OK, msg)
+
+	def send_info(self, msg):
+		events.emit(events.MESSAGES, msgconst.INFO, msg)
+
+	def send_warning(self, msg):
+		events.emit(events.MESSAGES, msgconst.WARNING, msg)
+
+	def send_error(self, msg):
+		events.emit(events.MESSAGES, msgconst.ERROR, msg)
