@@ -20,19 +20,19 @@ import sys, os
 from uc2 import _, events, msgconst, uc2const
 from uc2.formats.pdxf import const
 from uc2.formats.sk1 import sk1const
+from uc2.formats.loader import AbstractLoader
 from uc2.formats.sk1.model import SK1Document, SK1Layout, SK1Grid, SK1Pages, \
 SK1Page, SK1Layer, SK1MasterLayer, SK1GuideLayer, SK1Guide, SK1Group, \
 SK1MaskGroup, Rectangle, Ellipse, PolyBezier, SK1Text, SK1BitmapData, SK1Image, \
 MultiGradient, EmptyPattern, SolidPattern, LinearGradient, RadialGradient, \
 ConicalGradient, HatchingPattern, ImageTilePattern, Style, Trafo, Point
 
-class SK1_Loader:
+class SK1_Loader(AbstractLoader):
+
 	name = 'SK1_Loader'
-	presenter = None
-	config = None
+
 	paths = []
 	options = {}
-	model = None
 	pages = None
 
 	string = ''
@@ -47,32 +47,14 @@ class SK1_Loader:
 	pattern = None
 	gradient = None
 
-	position = 0
-
-	def __init__(self):
-		pass
-
-	def load(self, presenter, path):
-		self.presenter = presenter
-		self.config = self.presenter.config
-
-		file_size = os.path.getsize(path)
-		try:
-			self.file = open(path, 'rb')
-		except:
-			errtype, value, traceback = sys.exc_info()
-			msg = _('Cannot open %s file for writing') % (path)
-			events.emit(events.MESSAGES, msgconst.ERROR, msg)
-			raise IOError(errtype, msg + '\n' + value, traceback)
-
+	def do_load(self):
 		self.file.readline()
 		self.style = Style()
-
 		while True:
 			self.line = self.file.readline()
 			if not self.line: break
 			self.line = self.line.rstrip('\r\n')
-			position = float(self.file.tell()) / float(file_size) * 0.95
+			position = float(self.file.tell()) / float(self.file_size) * 0.95
 			if position - self.position > 0.01:
 				self.position = position
 				msg = _('Parsing in process...')
@@ -85,10 +67,6 @@ class SK1_Loader:
 					print 'error>>', self.line
 					errtype, value, traceback = sys.exc_info()
 					print errtype, value, traceback
-
-		self.file.close()
-		self.position = 0
-		return self.model
 
 	def set_style(self, obj):
 		obj.properties = self.style
