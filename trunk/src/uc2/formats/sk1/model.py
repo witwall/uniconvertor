@@ -560,7 +560,7 @@ class Style:
 				setattr(self, key, value)
 
 	def __str__(self):
-		result = 'Style instance:\n'
+		result = '<uc2.formats.sk1.model.Style instance>:\n'
 		for item in self.__dict__.keys():
 			result += item + '=' + str(self.__dict__[item]) + '\n'
 		return result
