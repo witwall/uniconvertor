@@ -24,7 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
-from _sk1objs import Trafo, CreatePath, Point, Translation
+from _sk1objs import Trafo, CreatePath, Point, Translation, Scale
 
 # Document object enumeration
 DOCUMENT = 1
