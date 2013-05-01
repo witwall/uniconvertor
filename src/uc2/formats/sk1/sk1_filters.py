@@ -133,8 +133,10 @@ class SK1_Loader:
 		self.pattern = HatchingPattern(color, background, Point(dx, dy), dist, width)
 
 	def pit(self, id, trafo):
-		trafo = apply(Trafo, trafo)
-		self.pattern = ImageTilePattern(self.id_dict[id], trafo)
+		trafo = Trafo(*trafo)
+		if self.presenter.resources.has_key(id):
+			image = self.presenter.resources[id]
+			self.pattern = ImageTilePattern(image, trafo)
 
 	def fp(self, color=None):
 		if color is None:
