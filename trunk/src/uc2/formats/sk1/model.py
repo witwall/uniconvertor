@@ -851,9 +851,16 @@ class SK1Text(SK1ModelObject):
 		SK1ModelObject.__init__(self)
 
 	def update(self):
-		args = (self.text, self.trafo, self.horiz_align, self.vert_align,
+		text = self._encode_text(self.text)
+		args = (text, self.trafo, self.horiz_align, self.vert_align,
 			self.chargap, self.wordgap, self.linegap)
 		self.string = 'txt' + args.__str__() + '\n'
+
+	def _encode_text(self, text):
+		output = ''
+		for char in text:
+			output += '\u0%x' % ord(char)
+		return output
 
 
 class SK1BitmapData(SK1ModelObject):
