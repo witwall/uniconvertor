@@ -230,6 +230,10 @@ class SK1_Loader:
 	def page(self, name='', format='', size='', orientation=0):
 		if self.pages is None:
 			self.add_pages()
+		if not format and not size:
+			format = '' + self.model.layout.format
+			size = () + self.model.layout.size
+			orientation = self.model.layout.orientation
 		page = SK1Page(name, format, size, orientation)
 		self.active_page = page
 		self.active_layer = None
