@@ -22,7 +22,7 @@ PDF, PSD, CGM, WMF, EMF, XPS, VSD, PLT, HPGL , DXF, DWG, RIFF
 
 SIMPLE_LOADERS = []
 MODEL_LOADERS = [PDXF, PLT, CDR ]
-EXPERIMENTAL_LOADERS = [SK1, RIFF, CDRZ]
+EXPERIMENTAL_LOADERS = [SK1, WMF, RIFF, CDRZ]
 
 SIMPLE_SAVERS = []
 MODEL_SAVERS = [PDXF, PLT, ]
@@ -37,6 +37,7 @@ from uc2.formats.pdxf import pdxf_loader, pdxf_saver, check_pdxf
 from uc2.formats.plt import plt_loader, plt_saver, check_plt
 from uc2.formats.sk1 import sk1_loader, sk1_saver, check_sk1
 from uc2.formats.sk import SK_Loader, SK_Saver
+from uc2.formats.wmf import wmf_loader, wmf_saver, check_wmf
 
 from uc2.formats.cdr import cdr_loader, cdr_saver, check_cdr
 from uc2.formats.cdrz import cdrz_loader, check_cdrz
@@ -49,7 +50,7 @@ SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : cdr_loader, CDT : cdr_loader, CDRZ : cdrz_loader, CDTZ : cdrz_loader, CMX : None, CCX : None, CDRX : None,
 XAR : None,
 AI_PS : None, AI_PDF : None, PS : None, EPS : None, PDF : None, PSD : None,
-CGM : None, WMF : None, EMF : None, XPS : None, VSD : None,
+CGM : None, WMF : wmf_loader, EMF : None, XPS : None, VSD : None,
 PLT : plt_loader, HPGL : None, DXF : None, DWG : None,
 RIFF: riff_loader,
 }
@@ -60,7 +61,7 @@ SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : cdr_saver, CDT : None, CDRZ : None, CDTZ : None, CMX : None, CCX : None, CDRX : None,
 XAR : None,
 AI_PS : None, AI_PDF : None, PS : None, EPS : None, PDF : None, PSD : None,
-CGM : None, WMF : None, EMF : None, XPS : None, VSD : None,
+CGM : None, WMF : wmf_saver, EMF : None, XPS : None, VSD : None,
 PLT : plt_saver, HPGL : None, DXF : None, DWG : None,
 RIFF: riff_saver,
 }
@@ -71,7 +72,7 @@ SVG : None, SVGZ : None, ORA : None, XCF : None, SLA : None, FIG : None,
 CDR : check_cdr, CDT : check_cdr, CDRZ : check_cdrz, CDTZ : check_cdrz, CMX : None, CCX : None, CDRX : None,
 XAR : None,
 AI_PS : None, AI_PDF : None, PS : None, EPS : None, PDF : None, PSD : None,
-CGM : None, WMF : None, EMF : None, XPS : None, VSD : None,
+CGM : None, WMF : check_wmf, EMF : None, XPS : None, VSD : None,
 PLT : check_plt, HPGL : None, DXF : None, DWG : None,
 RIFF: check_riff,
 }
