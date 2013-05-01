@@ -400,6 +400,9 @@ class SolidPattern(Pattern):
 		else:
 			self.color = deepcopy(sk1const.fallback_sk1color)
 
+	def copy(self):
+		return SolidPattern(deepcopy(self.color))
+
 class MultiGradient:
 
 	colors = []
@@ -410,6 +413,9 @@ class MultiGradient:
 			end_color = deepcopy(sk1const.white_color)
 			colors = [(0, start_color), (1, end_color)]
 		self.colors = colors
+
+	def copy(self):
+		return MultiGradient(deepcopy(self.colors))
 
 	def write_content(self, file):
 		val = self.colors.__str__()
@@ -433,6 +439,12 @@ class LinearGradient(GradientPattern):
 		self.direction = direction
 		self.border = border
 
+	def copy(self):
+		gradient = self.gradient.copy()
+		direction = Point(self.direction.x, self.direction.y)
+		border = self.border
+		return LinearGradient(gradient, direction, border)
+
 	def write_content(self, file):
 		self.gradient.write_content(file)
 		file.write('pgl(%g,%g,%g)\n' % (round(self.direction.x, 10),
@@ -448,6 +460,12 @@ class RadialGradient(GradientPattern):
 		self.center = center
 		self.border = border
 
+	def copy(self):
+		gradient = self.gradient.copy()
+		center = Point(self.center.x, self.center.y)
+		border = self.border
+		return RadialGradient(gradient, center, border)
+
 	def write_content(self, file):
 		self.gradient.write_content(file)
 		file.write('pgr(%g,%g,%g)\n' % (self.center.x, self.center.y, self.border))
@@ -462,6 +480,12 @@ class ConicalGradient(GradientPattern):
 		self.gradient = gradient
 		self.center = center
 		self.direction = direction
+
+	def copy(self):
+		gradient = self.gradient.copy()
+		center = Point(self.center.x, self.center.y)
+		direction = Point(self.direction.x, self.direction.y)
+		return ConicalGradient(gradient, center, direction)
 
 	def write_content(self, file):
 		self.gradient.write_content(file)
@@ -483,6 +507,14 @@ class HatchingPattern(Pattern):
 		self.width = width
 		self.direction = direction
 
+	def copy(self):
+		foreground = deepcopy(self.foreground)
+		background = deepcopy(self.background)
+		spacing = self.spacing
+		width = self.width
+		direction = Point(self.direction.x, self.direction.y)
+		return HatchingPattern(foreground, background, direction, spacing, width)
+
 	def write_content(self, file):
 		color = self.foreground.__str__()
 		background = self.background.__str__()
@@ -503,6 +535,11 @@ class ImageTilePattern(Pattern):
 		self.trafo = trafo
 		self.data = data
 		self.image = self.data
+
+	def copy(self):
+		trafo = Trafo(*self.trafo.coef())
+		image = self.image.copy()
+		return ImageTilePattern(image, trafo)
 
 	def write_content(self, file):
 		if self.image and not self.id:
@@ -558,6 +595,38 @@ class Style:
 		else:
 			for key, value in kw.items():
 				setattr(self, key, value)
+
+	def copy(self):
+		style_copy = Style(self.name + '')
+		pattern = self.fill_pattern
+		if pattern is None:
+			style_copy.fill_pattern = None
+		elif pattern is EmptyPattern:
+			style_copy.fill_pattern = EmptyPattern
+		else:
+			style_copy.fill_pattern = pattern.copy()
+		pattern = self.line_pattern
+		if pattern is None:
+			style_copy.line_pattern = None
+		elif pattern is EmptyPattern:
+			style_copy.line_pattern = EmptyPattern
+		else:
+			style_copy.line_pattern = pattern.copy()
+		style_copy.fill_transform = self.fill_transform
+		style_copy.line_width = self.line_width
+		style_copy.line_join = self.line_join
+		style_copy.line_cap = self.line_cap
+		if self.line_dashes:
+			style_copy.line_dashes = deepcopy(self.line_dashes)
+		if self.line_arrow1:
+			style_copy.line_arrow1 = deepcopy(self.line_arrow1)
+		if self.line_arrow2:
+			style_copy.line_arrow2 = deepcopy(self.line_arrow2)
+		if self.font:
+			style_copy.font = '' + self.font
+		style_copy.font_size = self.font_size
+		return style_copy
+
 
 	def __str__(self):
 		result = '<uc2.formats.sk1.model.Style instance>:\n'
