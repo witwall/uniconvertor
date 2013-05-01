@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#	Copyright (C) 2011 by Igor E. Novikov
+#	Copyright (C) 2013 by Igor E. Novikov
 #	
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -33,19 +33,14 @@ def sk1_loader(appdata, filename, translate=True, cnf={}, **kw):
 		doc.traslate_to_pdxf(pdxf_doc)
 		doc.close()
 		doc = pdxf_doc
-	else:
-		doc.update()
 	return doc
 
 def sk1_saver(pdxf_doc, filename, translate=True, cnf={}, **kw):
 	if kw: cnf.update(kw)
-	if translate:
-		plt_doc = SK1_Presenter(pdxf_doc.appdata, cnf)
-		plt_doc.traslate_from_pdxf(pdxf_doc)
-		plt_doc.save(filename)
-		plt_doc.close()
-	else:
-		pdxf_doc.save(filename)
+	sk1_doc = SK1_Presenter(pdxf_doc.appdata, cnf)
+	sk1_doc.traslate_from_pdxf(pdxf_doc)
+	sk1_doc.save(filename)
+	sk1_doc.close()
 
 def check_sk1(path):
 	try:
@@ -59,6 +54,5 @@ def check_sk1(path):
 	string = file.read(5)
 
 	file.close()
-	if string == '##sK1':
-			return True
+	if string == '##sK1': return True
 	return False
