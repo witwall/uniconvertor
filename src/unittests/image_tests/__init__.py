@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#	Copyright (C) 2012 by Igor E. Novikov
+#	Copyright (C) 2013 by Igor E. Novikov
 #	
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -15,14 +15,21 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-import cms_testsuite
-import _libimg_testsuite
-import image_testsuite
+import unittest, os
+import Image
 
-suite = unittest.TestSuite()
-suite.addTest(cms_testsuite.get_suite())
-suite.addTest(_libimg_testsuite.get_suite())
-suite.addTest(image_testsuite.get_suite())
+_pkgdir = __path__[0]
 
-unittest.TextTestRunner(verbosity=2).run(suite)
+class TestImageFunctions(unittest.TestCase):
+
+	def setUp(self):
+		pass
+
+	def tearDown(self):
+		pass
+
+	def test01_create_new_image(self):
+		self.assertEqual(1, 1)
+
+	def test02_load_image(self):
+		self.assertEqual(1, 1)
