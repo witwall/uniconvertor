@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#	Copyright (C) 2012 by Igor E. Novikov
+#	Copyright (C) 2013 by Igor E. Novikov
 #	
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import cms_testsuite
-import _libimg_testsuite
-import image_testsuite
+import image_tests
 
-suite = unittest.TestSuite()
-suite.addTest(cms_testsuite.get_suite())
-suite.addTest(_libimg_testsuite.get_suite())
-suite.addTest(image_testsuite.get_suite())
+def get_suite():
+	suite = unittest.TestSuite()
+	suite.addTest(unittest.makeSuite(image_tests.TestImageFunctions))
+	return suite
 
-unittest.TextTestRunner(verbosity=2).run(suite)
+
+if __name__ == '__main__':
+	unittest.TextTestRunner(verbosity=2).run(get_suite())
