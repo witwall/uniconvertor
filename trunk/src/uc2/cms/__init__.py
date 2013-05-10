@@ -127,7 +127,7 @@ def decode_colorb(colorb, color_type):
 	result = []
 	if color_type == uc2const.COLOR_CMYK:
 		values = colorb
-	elif color_type == uc2const.COLOR_GRAY:
+	elif color_type == uc2const.COLOR_GREY:
 		values = [colorb[0], ]
 	else:
 		values = colorb[:3]
@@ -198,9 +198,9 @@ class ColorManager:
 
 	def load_grayscale_profile(self, path=''):
 		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_GRAY] = libcms.cms_open_profile_from_file(path)
+			self.handles[uc2const.COLOR_GREY] = libcms.cms_open_profile_from_file(path)
 		else:
-			self.handles[uc2const.COLOR_GRAY] = libcms.cms_create_gray_profile()
+			self.handles[uc2const.COLOR_GREY] = libcms.cms_create_gray_profile()
 
 	def load_display_profile(self, path=''):
 		if path and os.path.lexists(path):
@@ -267,22 +267,22 @@ class ColorManager:
 		return [uc2const.COLOR_LAB, res, color[2], '' + color[3]]
 
 	def get_grayscale_color(self, color):
-		if color[0] == uc2const.COLOR_GRAY:
+		if color[0] == uc2const.COLOR_GREY:
 			return deepcopy(color)
 		if color == uc2const.COLOR_SPOT:
 			color = [uc2const.COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
 
-		tr_type = color[0] + uc2const.COLOR_GRAY
+		tr_type = color[0] + uc2const.COLOR_GREY
 		if not self.transforms.has_key(tr_type):
 			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
 															color[0],
-															self.handles[uc2const.COLOR_GRAY],
-															uc2const.COLOR_GRAY)
+															self.handles[uc2const.COLOR_GREY],
+															uc2const.COLOR_GREY)
 		in_color = colorb(color)
 		out_color = colorb()
 		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		res = decode_colorb(out_color, uc2const.COLOR_GRAY)
-		return [uc2const.COLOR_GRAY, res, color[2], '' + color[3]]
+		res = decode_colorb(out_color, uc2const.COLOR_GREY)
+		return [uc2const.COLOR_GREY, res, color[2], '' + color[3]]
 
 
 	def get_display_color(self, color):

@@ -1,6 +1,7 @@
-#Wed May 01 12:55:30 EEST 2013
+#Fri May 10 12:53:07 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
+encoding//src/uc2/cms/libcms.py=utf-8
 encoding//src/uc2/formats/__init__.py=utf-8
 encoding//src/uc2/formats/cdr/const.py=utf-8
 encoding//src/uc2/formats/cdr/model.py=utf-8
@@ -41,8 +42,14 @@ encoding//src/uc2/formats/wmf/wmf_loader.py=utf-8
 encoding//src/uc2/formats/wmf/wmfconst.py=utf-8
 encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/libgeom/__init__.py=utf-8
+encoding//src/uc2/libimg/__init__.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8
 encoding//src/uc2/utils/__init__.py=utf-8
 encoding//src/uc2/utils/config.py=utf-8
 encoding//src/uc2/utils/fs.py=utf-8
 encoding//src/uc2/utils/system.py=utf-8
+encoding//src/unittests/_libimg_tests/__init__.py=utf-8
+encoding//src/unittests/_libimg_testsuite.py=utf-8
+encoding//src/unittests/all_tests.py=utf-8
+encoding//src/unittests/image_tests/__init__.py=utf-8
+encoding//src/unittests/image_testsuite.py=utf-8

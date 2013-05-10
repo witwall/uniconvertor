@@ -21,7 +21,7 @@ from uc2 import uc2const
 from uc2.formats.riff.utils import double2py_float, word2py_int, long2py_float
 from uc2.formats.cdr.const import cdrunit_to_pt, \
 								CDR_COLOR_CMYK, CDR_COLOR_BGR, CDR_COLOR_CMY, \
-								CDR_COLOR_CMYK255, CDR_COLOR_GRAY, CDR_COLOR_LAB, \
+								CDR_COLOR_CMYK255, CDR_COLOR_GREY, CDR_COLOR_LAB, \
 								CDR_COLOR_REGISTRATION, CDR_COLOR_CMYK2, CDR_COLOR_HSB, CDR_COLOR_HLS, \
 	CDR_COLOR_YIQ
 
@@ -91,7 +91,7 @@ def parse_grayscale(data):
 	Parses Grayscale color byte and returns fill style list.
 	"""
 	l = ord(data[0]) / 255.0
-	return [uc2const.COLOR_GRAY, [l, ], 1.0, '']
+	return [uc2const.COLOR_GREY, [l, ], 1.0, '']
 
 def parse_hsb(data):
 	"""
@@ -141,7 +141,7 @@ def parse_cdr_color(color_space, color_bytes):
 		return parse_cmy(color_bytes[0:3])
 	elif color_space == CDR_COLOR_BGR:
 		return parse_bgr(color_bytes[0:3])
-	elif color_space == CDR_COLOR_GRAY:
+	elif color_space == CDR_COLOR_GREY:
 		return parse_grayscale(color_bytes[0])
 	elif color_space == CDR_COLOR_LAB:
 		return parse_lab(color_bytes[0:3])
