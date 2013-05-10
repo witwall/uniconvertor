@@ -21,7 +21,6 @@ from uc2 import cms
 from uc2.formats.pdxf import const
 from uc2.formats.pdxf import methods
 
-from uc2 import utils
 from uc2.formats.pdxf.methods import PDXF_Methods
 from uc2.formats.pdxf.pdxf_config import PDXF_Config
 from uc2.formats.pdxf.pdxf_filters import PDXF_Loader, PDXF_Saver
@@ -41,7 +40,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 		self.config.load(config_file)
 		self.config.update(cnf)
 		self.appdata = appdata
-		self.doc_id = utils.generate_id()
+		self.doc_id = id(self).__str__()
 		self.loader = PDXF_Loader()
 		self.saver = PDXF_Saver()
 		self.create_cache_structure()
