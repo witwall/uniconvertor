@@ -1,4 +1,4 @@
-#Fri May 10 12:53:07 EEST 2013
+#Sun May 12 15:37:39 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/cms/libcms.py=utf-8
@@ -44,6 +44,7 @@ encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/libgeom/__init__.py=utf-8
 encoding//src/uc2/libimg/__init__.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8
+encoding//src/uc2/uc_conf.py=utf-8
 encoding//src/uc2/utils/__init__.py=utf-8
 encoding//src/uc2/utils/config.py=utf-8
 encoding//src/uc2/utils/fs.py=utf-8
