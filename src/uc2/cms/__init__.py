@@ -148,6 +148,19 @@ def get_profile_name(filepath):
 	except:pass
 	return ret
 
+def get_profile_info(filepath):
+	"""
+	Returns profile info.
+	If file is not suitable profile or doesn't exist
+	returns None. 
+	"""
+	ret = None
+	try:
+		profile = libcms.cms_open_profile_from_file(filepath)
+		ret = libcms.cms_get_profile_info(profile)
+	except:pass
+	return ret
+
 class ColorManager:
 	"""
 	The class provides color manager (CM) object.
