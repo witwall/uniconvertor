@@ -44,6 +44,7 @@ class XmlConfigParser:
 	"""
 	Represents parent class for application config.
 	"""
+	filename = ''
 
 	def update(self, cnf={}):
 		if cnf:
@@ -52,6 +53,7 @@ class XmlConfigParser:
 					setattr(self, key, cnf[key])
 
 	def load(self, filename=None):
+		self.filename = filename
 		if os.path.lexists(filename):
 			content_handler = XMLPrefReader(pref=self)
 			error_handler = ErrorHandler()
@@ -72,8 +74,8 @@ class XmlConfigParser:
 				pass
 
 	def save(self, filename=None):
-		if len(self.__dict__) == 0 or filename == None:
-			return
+		if self.filename: filename = self.filename
+		if len(self.__dict__) == 0 or filename == None: return
 
 		try:
 			file = open(filename, 'w')
@@ -90,8 +92,8 @@ class XmlConfigParser:
 		writer.startElement('preferences', {})
 		writer.characters('\n')
 		for key, value in items:
-			if defaults.has_key(key) and defaults[key] == value:
-				continue
+			if defaults.has_key(key) and defaults[key] == value: continue
+			if key == 'filename': continue
 			writer.characters('\t')
 			writer.startElement('%s' % key, {})
 
