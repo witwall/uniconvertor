@@ -135,6 +135,18 @@ def decode_colorb(colorb, color_type):
 		result.append(round(value / 255.0, 3))
 	return result
 
+def get_profile_name(filepath):
+	"""
+	Returns profile name.
+	If file is not suitable profile or doesn't exist
+	returns None. 
+	"""
+	ret = None
+	try:
+		profile = libcms.cms_open_profile_from_file(filepath)
+		ret = libcms.cms_get_profile_name(profile)
+	except:pass
+	return ret
 
 class ColorManager:
 	"""
