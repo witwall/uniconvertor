@@ -20,5 +20,10 @@ import time
 
 from streamfilter import Base64Encode, Base64Decode, SubFileDecode
 
-def generate_id():
+def generate_base64_id():
+	time.sleep(0.001)
 	return base64.b64encode(str(int(time.time()*100000)))
+
+def generate_id():
+	time.sleep(0.001)
+	return str(int(time.time()*100000))
