@@ -25,6 +25,7 @@ from uc2.formats.pdxf.methods import PDXF_Methods
 from uc2.formats.pdxf.pdxf_config import PDXF_Config
 from uc2.formats.pdxf.pdxf_filters import PDXF_Loader, PDXF_Saver
 from uc2.formats.generic import TaggedModelPresenter
+from uc2.formats.pdxf.resmngr import ResourceManager
 
 class PDXF_Presenter(TaggedModelPresenter):
 
@@ -45,6 +46,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 		self.saver = PDXF_Saver()
 		self.create_cache_structure()
 		self.methods = PDXF_Methods(self)
+		self.rm = ResourceManager(self)
 		self.new()
 
 	def create_cache_structure(self):
