@@ -74,7 +74,7 @@ class XmlConfigParser:
 				pass
 
 	def save(self, filename=None):
-		if self.filename: filename = self.filename
+		if self.filename and filename is None: filename = self.filename
 		if len(self.__dict__) == 0 or filename == None: return
 
 		try:
