@@ -18,7 +18,6 @@
 import os
 
 from uc2 import uc2const
-from uc2 import utils
 from uc2.formats.generic import BinaryModelPresenter
 from uc2.formats.cdrz.cdrz_config import CDRZ_Config
 from uc2.formats.riff import model
@@ -40,7 +39,7 @@ class CDRZ_Presenter(BinaryModelPresenter):
 		self.config.load(config_file)
 		self.config.update(cnf)
 		self.appdata = appdata
-		self.doc_id = utils.generate_id()
+		self.doc_id = id(self)
 		self.loader = CDRZ_Loader()
 		self.saver = CDRZ_Saver()
 		self.create_cache_structure()
