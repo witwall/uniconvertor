@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#	Copyright (C) 2011, 2012 by Igor E. Novikov
+#	Copyright (C) 2011-2013 by Igor E. Novikov
 #	
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -139,6 +139,12 @@ class DocumentObject(ModelObject):
 		info = ''
 		return (is_leaf, name, info)
 
+	def get_resources(self):
+		return []
+
+	def copy(self, src=None, dst=None):
+		return None
+
 
 class Document(DocumentObject):
 	"""
@@ -150,6 +156,7 @@ class Document(DocumentObject):
 	styles = {}
 	profiles = []
 	doc_origin = 1
+	resources = {}
 
 	def __init__(self, config):
 		self.cid = DOCUMENT
@@ -162,6 +169,7 @@ class Document(DocumentObject):
 									deepcopy(self.config.default_stroke),
 									deepcopy(self.config.default_text_style),
 									deepcopy(self.config.default_structural_style)]
+		self.resources = {}
 
 
 
