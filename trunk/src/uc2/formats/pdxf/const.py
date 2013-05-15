@@ -18,14 +18,22 @@
 #PDXF file structure elements
 DOC_MIME = 'application/vnd.sk1project.pdxf-graphics'
 
+DOC_FONT_DIR = 'Fonts'
+DOC_IMAGE_DIR = 'Images'
+DOC_METAINF_DIR = 'META-INF'
+DOC_PALETTE_DIR = 'Palettes'
+DOC_PREVIEW_DIR = 'Previews'
+DOC_PROFILE_DIR = 'Profiles'
+DOC_THUMBNAIL_DIR = 'Thumbnails'
+
 DOC_STRUCTURE = [
-'Fonts',
-'Images',
-'META-INF',
-'Palettes',
-'Previews',
-'Profiles',
-'Thumbnails',
+DOC_FONT_DIR,
+DOC_IMAGE_DIR,
+DOC_METAINF_DIR,
+DOC_PALETTE_DIR,
+DOC_PREVIEW_DIR,
+DOC_PROFILE_DIR,
+DOC_THUMBNAIL_DIR,
 ]
 
 DOC_ORIGIN_CENTER = 0
