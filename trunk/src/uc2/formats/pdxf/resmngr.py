@@ -75,7 +75,7 @@ class ResourceManager:
 					os.remove(filepath)
 				except:pass
 
-	def registry_file(self, filepath, place, id):
+	def registry_file(self, filepath, place, id=None):
 		ret = None
 		if os.path.isfile(filepath):
 			if id is None:
@@ -102,6 +102,6 @@ class ResourceManager:
 	def registry_preview(self, filepath, id=None):
 		return self.registry_file(filepath, const.DOC_PREVIEW_DIR, id)
 
-if __name__ == '__main__':
-	print OS_FAMILY
-	print convert_resource_path('Image/test.png')
+#if __name__ == '__main__':
+#	print OS_FAMILY
+#	print convert_resource_path('Image/test.png')
