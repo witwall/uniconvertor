@@ -1,4 +1,4 @@
-#Wed May 15 12:20:30 EEST 2013
+#Thu May 16 08:07:33 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/cms/__init__.py=utf-8
 encoding//src/uc2/cms/libcms.py=utf-8
@@ -19,6 +19,7 @@ encoding//src/uc2/formats/pdxf/model.py=utf-8
 encoding//src/uc2/formats/pdxf/pdxf_config.py=utf-8
 encoding//src/uc2/formats/pdxf/pdxf_filters.py=utf-8
 encoding//src/uc2/formats/pdxf/presenter.py=utf-8
+encoding//src/uc2/formats/pdxf/resmngr.py=utf-8
 encoding//src/uc2/formats/plt/__init__.py=utf-8
 encoding//src/uc2/formats/plt/model.py=utf-8
 encoding//src/uc2/formats/plt/plt_config.py=utf-8
@@ -26,7 +27,6 @@ encoding//src/uc2/formats/plt/plt_filters.py=utf-8
 encoding//src/uc2/formats/plt/plt_translators.py=utf-8
 encoding//src/uc2/formats/plt/pltconst.py=utf-8
 encoding//src/uc2/formats/plt/presenter.py=utf-8
-encoding//src/uc2/formats/resmngr.py=utf-8
 encoding//src/uc2/formats/riff/model.py=utf-8
 encoding//src/uc2/formats/sk/__init__.py=utf-8
 encoding//src/uc2/formats/sk1/__init__.py=utf-8
