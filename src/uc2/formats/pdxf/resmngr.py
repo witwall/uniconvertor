@@ -44,6 +44,12 @@ class ResourceManager:
 				ret = path
 		return ret
 
+	def get_resources(self):
+		res_dict = self.presenter.model.resources
+		ret = res_dict.keys()
+		ret.sort()
+		return ret
+
 	def get_resource(self, id):
 		ret = None
 		res_dict = self.presenter.model.resources
