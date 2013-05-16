@@ -35,7 +35,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 	cms = None
 
 
-	def __init__(self, appdata, cnf={}):
+	def __init__(self, appdata, cnf={}, filepath=None):
 		self.config = PDXF_Config()
 		config_file = os.path.join(appdata.app_config_dir, 'pdxf_config.xml')
 		self.config.load(config_file)
@@ -44,10 +44,13 @@ class PDXF_Presenter(TaggedModelPresenter):
 		self.doc_id = id(self).__str__()
 		self.loader = PDXF_Loader()
 		self.saver = PDXF_Saver()
-		self.create_cache_structure()
 		self.methods = PDXF_Methods(self)
 		self.rm = ResourceManager(self)
-		self.new()
+		self.create_cache_structure()
+		if filepath is None:
+			self.new()
+		else:
+			self.load(filepath)
 
 	def create_cache_structure(self):
 		doc_cache_dir = os.path.join(self.appdata.app_config_dir, 'docs_cache')

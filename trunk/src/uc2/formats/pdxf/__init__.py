@@ -26,8 +26,7 @@ PDXF_HEADER = (b'\x50\x4b\x03\x04\x14\x00\x00\x00')
 
 def pdxf_loader(appdata, filename, translate=True, cnf={}, **kw):
 	if kw: cnf.update(kw)
-	pdxf_doc = PDXF_Presenter(appdata, cnf)
-	pdxf_doc.load(filename)
+	pdxf_doc = PDXF_Presenter(appdata, cnf, filename)
 	return pdxf_doc
 
 def pdxf_saver(pdxf_doc, filename, translate=True, cnf={}, **kw):
