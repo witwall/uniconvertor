@@ -25,7 +25,7 @@ from uc2.formats.pdxf.methods import PDXF_Methods
 from uc2.formats.pdxf.pdxf_config import PDXF_Config
 from uc2.formats.pdxf.pdxf_filters import PDXF_Loader, PDXF_Saver
 from uc2.formats.generic import TaggedModelPresenter
-from uc2.formats.resmngr import ResourceManager
+from uc2.formats.pdxf.resmngr import ResourceManager
 
 class PDXF_Presenter(TaggedModelPresenter):
 
