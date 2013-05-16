@@ -160,7 +160,6 @@ class ResourceManager:
 		Copies and registers file into Previews directory.
 		If id is not provided, generates new unique id.
 		"""
-		return se
 		return self.registry_file(filepath, const.DOC_PREVIEW_DIR, id)
 
 #if __name__ == '__main__':
