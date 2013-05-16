@@ -29,12 +29,21 @@ def convert_resource_path(path):
 	return path
 
 class ResourceManager:
+	"""
+	Represents resource manager object to
+	manage files included into PDXF file archive. 
+	"""
 
 	def __init__(self, presenter):
 		self.presenter = presenter
 		self.doc_dir = presenter.doc_dir
 
 	def get_resource_path(self, id):
+		"""
+		Returns absolute path of resource file by id.
+		If requested id is not in resources or resource file is
+		absent, returns None. 
+		"""
 		ret = None
 		res_dict = self.presenter.model.resources
 		if id in res_dict.keys():
@@ -45,12 +54,22 @@ class ResourceManager:
 		return ret
 
 	def get_resources(self):
+		"""
+		Returns id list and correspondent relative resource path list.
+		If there aren't resources, returns two empty lists.
+		"""
 		res_dict = self.presenter.model.resources
-		ret = res_dict.keys()
-		ret.sort()
-		return ret
+		ids = res_dict.keys()
+		ret = []
+		for item in ids:
+			ret.append(res_dict[item])
+		return ids, ret
 
 	def get_resource(self, id):
+		"""
+		Returns relative resource path by id.
+		If there is no path for id, returns None.
+		"""
 		ret = None
 		res_dict = self.presenter.model.resources
 		if id in res_dict.keys():
@@ -58,20 +77,38 @@ class ResourceManager:
 		return ret
 
 	def copy_resources(self, rm, resources=[]):
+		"""
+		Copies resources from other resource manager storing the same id.
+		resources - list of ids
+		"""
 		for id in resources:
 			self.copy_resource(rm, id)
 
 	def copy_resource(self, rm, id):
+		"""
+		Copies resource from other resource manager by id.
+		The id is storing. If wrong id or there is no resource file
+		doesn't copy anything. 
+		"""
 		filepath = rm.get_resource_path(id)
 		if not filepath is None and os.path.isfile(filepath):
 			place = rm.get_resource(id).split('/')[0]
 			self.registry_file(filepath, place, id)
 
 	def delete_resources(self, resources=[], rmfile=False):
+		"""
+		Removes list of ids from resources.
+		If rmfile flag is true removes files physically.
+		resources - list of ids
+		"""
 		for id in resources:
 			self.delete_resource(id, rmfile)
 
 	def delete_resource(self, id, rmfile=False):
+		"""
+		Removes id from resources.
+		If rmfile flag is true removes file physically.
+		"""
 		res_dict = self.presenter.model.resources
 		filepath = self.get_resource_path(id)
 		if id in res_dict.keys():
@@ -82,6 +119,11 @@ class ResourceManager:
 				except:pass
 
 	def registry_file(self, filepath, place, id=None):
+		"""
+		Copies and registers file into specified place
+		(one of document structure directories).
+		If id is not provided, generates new unique id.
+		"""
 		ret = None
 		if os.path.isfile(filepath):
 			if id is None:
@@ -100,12 +142,25 @@ class ResourceManager:
 		return ret
 
 	def registry_profile(self, filepath, id=None):
+		"""
+		Copies and registers file into Profiles directory.
+		If id is not provided, generates new unique id.
+		"""
 		return self.registry_file(filepath, const.DOC_PROFILE_DIR, id)
 
 	def registry_image(self, filepath, id=None):
+		"""
+		Copies and registers file into Images directory.
+		If id is not provided, generates new unique id.
+		"""
 		return self.registry_file(filepath, const.DOC_IMAGE_DIR, id)
 
 	def registry_preview(self, filepath, id=None):
+		"""
+		Copies and registers file into Previews directory.
+		If id is not provided, generates new unique id.
+		"""
+		return se
 		return self.registry_file(filepath, const.DOC_PREVIEW_DIR, id)
 
 #if __name__ == '__main__':
