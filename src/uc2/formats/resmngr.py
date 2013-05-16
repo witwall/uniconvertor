@@ -21,12 +21,10 @@ from uc2.utils import generate_id
 from uc2.utils.system import WINDOWS, get_os_family
 from uc2.formats.pdxf import const
 
-OS_FAMILY = ''
+OS_FAMILY = get_os_family()
 
 def convert_resource_path(path):
-	if not OS_FAMILY:
-		OS_FAMILY = get_os_family()
-	elif OS_FAMILY == WINDOWS:
+	if OS_FAMILY == WINDOWS:
 		path = path.replace('/', '\\')
 	return path
 
@@ -103,3 +101,7 @@ class ResourceManager:
 
 	def registry_preview(self, filepath, id=None):
 		return self.registry_file(filepath, const.DOC_PREVIEW_DIR, id)
+
+if __name__ == '__main__':
+	print OS_FAMILY
+	print convert_resource_path('Image/test.png')
