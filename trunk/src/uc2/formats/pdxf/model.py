@@ -135,6 +135,7 @@ class DocumentObject(ModelObject):
 	def resolve(self):
 		is_leaf = True
 		if self.cid < PRIMITIVE_CLASS: is_leaf = False
+		if self.cid == GUIDE: is_leaf = True
 		name = CID_TO_NAME[self.cid]
 		info = ''
 		return (is_leaf, name, info)
