@@ -60,10 +60,10 @@ class ResourceManager:
 		"""
 		res_dict = self.presenter.model.resources
 		ids = res_dict.keys()
-		ret = []
+		paths = []
 		for item in ids:
-			ret.append(res_dict[item])
-		return ids, ret
+			paths.append(res_dict[item])
+		return ids, paths
 
 	def get_resource(self, id):
 		"""
