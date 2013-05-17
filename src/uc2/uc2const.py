@@ -206,6 +206,18 @@ GIF: ('gif',), PNG: ('png',), PPM: ('pbm', 'pgm', 'pgm'), XBM: ('xbm',), XPM: ('
 
 IMAGE_FORMATS = [JPG, TIF, BMP, PCX, GIF, PNG, PPM, XBM, XPM, ]
 
+MIMES = {
+	'pdxf':'application/vnd.sk1project.pdxf-graphics',
+	'tif':'image/tiff',
+	'tiff':'image/tiff',
+	'png':'image/png',
+	'eps':'image/eps',
+	'icc':'application/vnd.iccprofile',
+	'icm':'application/vnd.iccprofile',
+	'xml':'text/xml',
+	'txt':'text/plain',
+}
+
 #UNITS
 
 UNIT_MM = 'mm'
