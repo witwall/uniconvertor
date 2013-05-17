@@ -26,7 +26,7 @@ from xml.sax.xmlreader import InputSource
 from xml.sax import handler
 
 from uc2 import _
-from uc2 import events, msgconst
+from uc2 import events, msgconst, uc2const
 from uc2.formats.pdxf import model
 from uc2.formats.pdxf import const
 from uc2.formats.pdxf import methods
@@ -299,41 +299,55 @@ class PDXF_Saver:
 		self._write_manifest_entries()
 		self.file.write('</manifest>\n')
 		self._finish()
+		filename = os.path.join('META-INF', 'manifest.xml')
+		self.content.append((xml, filename))
 
 		msg = _('PDXF file manifest.xml is created')
 		events.emit(events.MESSAGES, msgconst.OK, msg)
 
 	def _write_manifest_entries(self):
-		content = []
+		metainf_content = []
+		resources = self.presenter.rm.get_resources()[1]
 
+		#Document
+		metainf_content.append((const.DOC_MIME, '/'))
+
+		#Doc MIME
+		fn = 'mimetype'
+		pt = os.path.join(self.presenter.doc_dir, fn)
+		metainf_content.append((self._get_mime(fn), fn))
+		self.content.append((pt, fn))
+
+		#content.xml
+		fn = 'content.xml'
+		pt = os.path.join(self.presenter.doc_dir, fn)
+		metainf_content.append((self._get_mime(fn), fn))
+		self.content.append((pt, fn))
+
+		#Doc directories
 		for path in const.DOC_STRUCTURE:
 			pt = os.path.join(self.presenter.doc_dir, path)
-			self.content.append((pt, path + '/'))
-			files = fs.get_files(os.path.join(self.presenter.doc_dir, path))
-			for file in files:
-				filetype = ''
-				if os.path.splitext(file)[1] == '.xml':
-					filetype = 'text/xml'
-				if not path == 'META-INF':
-					content.append((filetype, path + '/' + file))
-				pt = os.path.join(self.presenter.doc_dir, path, file)
-				self.content.append((pt, path + '/' + file))
-			if not path == 'META-INF':
-				content.append(('', path + '/'))
+			self.content.append((pt, path))
+			metainf_content.append(('', path + '/'))
+			for item in resources:
+				pt, fn = item.split('/')
+				filepath = os.path.join(self.presenter.doc_dir, pt, fn)
+				if pt == path and os.path.isfile(filepath):
+					mime = self._get_mime(fn)
+					metainf_content.append((mime, item))
+					self.content.append((filepath, fn))
 
-		pt = os.path.join(self.presenter.doc_dir, 'content.xml')
-		self.content.append((pt, 'content.xml'))
-		pt = os.path.join(self.presenter.doc_dir, 'mimetype')
-		self.content.append((pt, 'mimetype'))
-
-		main = [(const.DOC_MIME, '/')]
-		main += [('text/xml', 'content.xml')]
-		content = main + content
-
-		for item in content:
+		#Writing manifest.xml
+		for item in metainf_content:
 			tp, pt = item
 			ln = '\t<file-entry media-type="%s" full-path="%s"/>\n' % (tp, pt)
 			self.file.write(ln)
+
+	def _get_mime(self, filename):
+		ext = os.path.splitext(filename)[1][1:].lower()
+		if not ext: return 'text/plain'
+		if ext in uc2const.MIMES.keys():return uc2const.MIMES[ext]
+		return ''
 
 
 	def _pack_content(self):
