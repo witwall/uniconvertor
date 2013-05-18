@@ -158,6 +158,26 @@ def get_gray_profile_resource():
 	import gray_profile_rc
 	return gray_profile_rc.get_resource(True)
 
+def cms_create_default_profile(colorspace):
+	"""	
+	Artificial functionality. The function emulates built-in 
+	profile reading according profile resource attached to the package.
+	Returns a handle to lcms built-in profile wrapped as a Python object. 
+	The handle doesn't require to be closed after usage because
+	on object delete operation Python calls native cms_close_profile()
+	function automatically
+	"""
+	if colorspace == uc2const.COLOR_RGB:
+		return cms_create_srgb_profile()
+	elif colorspace == uc2const.COLOR_CMYK:
+		return cms_create_cmyk_profile()
+	elif colorspace == uc2const.COLOR_LAB:
+		return cms_create_lab_profile()
+	elif colorspace == uc2const.COLOR_GRAY:
+		return cms_create_gray_profile()
+	else:
+		return None
+
 def cms_create_transform(inputProfile, inMode,
 					outputProfile, outMode,
 					renderingIntent=uc2const.INTENT_PERCEPTUAL,
