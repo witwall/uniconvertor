@@ -17,6 +17,7 @@
 
 import os
 
+from uc2 import uc2const
 from uc2.utils.fs import expanduser_unicode
 from uc2.utils.config import XmlConfigParser
 
@@ -38,6 +39,10 @@ class UCData:
 	app_config = expanduser_unicode(os.path.join('~', '.config',
 												'uc2', 'preferences.cfg'))
 
+	#Check color profiles directory	
+	app_color_profile_dir = os.path.join(app_config_dir, 'profiles')
+	if not os.path.lexists(app_color_profile_dir):
+		os.makedirs(app_color_profile_dir)
 
 class UCConfig(XmlConfigParser):
 
@@ -46,6 +51,18 @@ class UCConfig(XmlConfigParser):
 	system_encoding = 'utf-8'	# default encoding (GUI uses utf-8 only)
 
 
+
+	#============== COLOR PROFILES ================
+	cms_display_profiles = {}
+	cms_rgb_profiles = {}
+	cms_cmyk_profiles = {}
+	cms_lab_profiles = {}
+	cms_gray_profiles = {}
+
+	cms_display_profile = ''
+	cms_intent = uc2const.INTENT_PERCEPTUAL
+	cms_flags = uc2const.cmsFLAGS_NOTPRECALC
+	cms_proofing = False
 
 
 
