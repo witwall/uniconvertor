@@ -178,6 +178,22 @@ def cms_create_default_profile(colorspace):
 	else:
 		return None
 
+def cms_get_default_profile_resource(colorspace):
+	"""	
+	Artificial functionality.
+	Returns temporary named file object.
+	"""
+	if colorspace == uc2const.COLOR_RGB:
+		return get_srgb_profile_resource()
+	elif colorspace == uc2const.COLOR_CMYK:
+		return get_cmyk_profile_resource()
+	elif colorspace == uc2const.COLOR_LAB:
+		return get_lab_profile_resource()
+	elif colorspace == uc2const.COLOR_GRAY:
+		return get_gray_profile_resource()
+	else:
+		return None
+
 def cms_create_transform(inputProfile, inMode,
 					outputProfile, outMode,
 					renderingIntent=uc2const.INTENT_PERCEPTUAL,
