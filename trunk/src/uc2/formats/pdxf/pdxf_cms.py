@@ -15,6 +15,8 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from uc2.cms import ColorManager, CS, libcms
 
 class PDXF_ColorManager(ColorManager):
@@ -38,6 +40,9 @@ class PDXF_ColorManager(ColorManager):
 			if path:
 				self.handles[item] = libcms.cms_open_profile_from_file(path)
 			else:
-				self.handles[item] = libcms.cms_create_default_profile(item)
+				profile_dir = self.presenter.appdata.app_color_profile_dir
+				filename = 'built-in_%s.icm' % item
+				path = os.path.join(profile_dir, filename)
+				self.handles[item] = libcms.cms_open_profile_from_file(path)
 			index += 1
 
