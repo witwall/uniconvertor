@@ -15,11 +15,12 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, shutil
 
 from uc2 import uc2const
 from uc2.utils.fs import expanduser_unicode
 from uc2.utils.config import XmlConfigParser
+from uc2.cms import CS, libcms
 
 
 
@@ -43,6 +44,13 @@ class UCData:
 	app_color_profile_dir = os.path.join(app_config_dir, 'profiles')
 	if not os.path.lexists(app_color_profile_dir):
 		os.makedirs(app_color_profile_dir)
+
+	for item in CS:
+		filename = 'built-in_%s.icm' % item
+		path = os.path.join(app_color_profile_dir, filename)
+		if not os.path.lexists(path):
+			profile = libcms.cms_get_default_profile_resource(item)
+			shutil.copy(profile.name, path)
 
 class UCConfig(XmlConfigParser):
 
