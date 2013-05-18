@@ -21,6 +21,8 @@ from copy import deepcopy
 
 import libcms
 from uc2 import uc2const
+from uc2.uc2const import COLOR_RGB, COLOR_CMYK, COLOR_LAB, COLOR_GRAY, \
+COLOR_SPOT, COLOR_DISPLAY
 
 def rgb_to_hexcolor(color):
 	"""
@@ -161,168 +163,124 @@ def get_profile_info(filepath):
 	except:pass
 	return ret
 
+CS = [COLOR_RGB, COLOR_CMYK, COLOR_LAB, COLOR_GRAY]
+
 class ColorManager:
 	"""
-	The class provides color manager (CM) object.
-	On CM object instantiation custom profiles could be defined as a 
-	5-member list of paths to files:
-	
-	[rgb_profile, cmyk_profile, lab_profile, grayscale_profile, display_profile]
-	
-	if some profile or all profiles are not provided default built-in profiles
-	will be used.
+	The class provides abstract color manager.
+	On CM object instantiation default built-in profiles
+	are used to create internal stuff.
 	"""
-	default_cms = False
-	use_cms = False
-	softproof = False
+
 	handles = {}
 	transforms = {}
 
-	def __init__(self, profiles=[], default_cms=False):
-		self.default_cms = default_cms
-		self.set_handles(profiles)
+	use_display_profile = False
+	proofing = False
 
-	def set_handles(self, profiles=[]):
+	intent = uc2const.INTENT_PERCEPTUAL
+	flags = uc2const.cmsFLAGS_NOTPRECALC
 
-		if profiles and len(profiles) == 5:
-			self.handles = {}
-			self.transforms = {}
-			self.load_rgb_profile(profiles[0])
-			self.load_cmyk_profile(profiles[1])
-			self.load_lab_profile(profiles[2])
-			self.load_grayscale_profile(profiles[3])
-			self.load_display_profile(profiles[4])
-		else:
-			if self.default_cms:
-				self.set_default_handles()
+	def __init__(self):
+		self.update()
 
-	def set_default_handles(self):
-		self.load_rgb_profile()
-		self.load_cmyk_profile()
-		self.load_lab_profile()
-		self.load_grayscale_profile()
-		self.load_display_profile()
+	def update(self):
+		"""
+		Sets color profile handles using built-in profiles
+		"""
+		self.handles = {}
+		self.clear_transforms()
+		for item in CS:
+			self.handles[item] = libcms.cms_create_default_profile(item)
 
-	def load_rgb_profile(self, path=''):
-		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_RGB] = libcms.cms_open_profile_from_file(path)
-		else:
-			self.handles[uc2const.COLOR_RGB] = libcms.cms_create_srgb_profile()
+	def clear_transforms(self):
+		self.transforms = {}
 
-	def load_cmyk_profile(self, path=''):
-		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_CMYK] = libcms.cms_open_profile_from_file(path)
-		else:
-			self.handles[uc2const.COLOR_CMYK] = libcms.cms_create_cmyk_profile()
+	def get_transform(self, cs_in, cs_out):
+		"""
+		Returns requested color transform using self.transforms dict.
+		If requested transform is not initialized, creates it.
+		"""
+		tr_type = cs_in + cs_out
+		if not self.transforms.has_key(tr_type):
+			handle_in = self.handles[cs_in]
+			handle_out = self.handles[cs_out]
+			if cs_out == COLOR_DISPLAY: cs_out = COLOR_RGB
+			tr = libcms.cms_create_transform(handle_in, cs_in,
+										handle_out, cs_out,
+										self.intent, self.flags)
+			self.transforms[tr_type] = tr
+		return self.transforms[tr_type]
 
-	def load_lab_profile(self, path=''):
-		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_LAB] = libcms.cms_open_profile_from_file(path)
-		else:
-			self.handles[uc2const.COLOR_LAB] = libcms.cms_create_lab_profile()
-
-	def load_grayscale_profile(self, path=''):
-		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_GRAY] = libcms.cms_open_profile_from_file(path)
-		else:
-			self.handles[uc2const.COLOR_GRAY] = libcms.cms_create_gray_profile()
-
-	def load_display_profile(self, path=''):
-		if path and os.path.lexists(path):
-			self.handles[uc2const.COLOR_DISPLAY] = libcms.cms_open_profile_from_file(path)
-		else:
-			self.handles[uc2const.COLOR_DISPLAY] = libcms.cms_create_display_profile()
-
-	def create_transform(self, handle_in, type_in, handle_out, type_out):
-		return libcms.cms_create_transform(handle_in, type_in, handle_out, type_out)
+	def do_transform(self, color, cs_in, cs_out):
+		"""
+		Converts color between colorspaces.
+		Return list of color values.
+		"""
+		in_color = colorb(color)
+		out_color = colorb()
+		transform = self.get_transform(cs_in, cs_out)
+		libcms.cms_do_transform(transform, in_color, out_color)
+		return decode_colorb(out_color, cs_out)
 
 	#Color management API
 	def get_rgb_color(self, color):
-		if color[0] == uc2const.COLOR_RGB:
-			return deepcopy(color)
-		if color == uc2const.COLOR_SPOT:
-			return [uc2const.COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
-
-		tr_type = color[0] + uc2const.COLOR_RGB
-		if not self.transforms.has_key(tr_type):
-			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
-															color[0],
-															self.handles[uc2const.COLOR_RGB],
-															uc2const.COLOR_RGB)
-		in_color = colorb(color)
-		out_color = colorb()
-		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		res = decode_colorb(out_color, uc2const.COLOR_RGB)
-		return [uc2const.COLOR_RGB, res, color[2], '' + color[3]]
+		"""
+		Convert color into RGB color.
+		Stores alpha channel and color name.
+		"""
+		if color[0] == COLOR_RGB: return deepcopy(color)
+		if color == COLOR_SPOT:
+			return [COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
+		res = self.do_transform(color, color[0], COLOR_RGB)
+		return [COLOR_RGB, res, color[2], '' + color[3]]
 
 	def get_cmyk_color(self, color):
-		if color[0] == uc2const.COLOR_CMYK:
-			return deepcopy(color)
-		if color == uc2const.COLOR_SPOT:
-			return [uc2const.COLOR_CMYK, [] + color[1][1], color[2], '' + color[3]]
-
-		tr_type = color[0] + uc2const.COLOR_CMYK
-		if not self.transforms.has_key(tr_type):
-			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
-															color[0],
-															self.handles[uc2const.COLOR_CMYK],
-															uc2const.COLOR_CMYK)
-		in_color = colorb(color)
-		out_color = colorb()
-		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		res = decode_colorb(out_color, uc2const.COLOR_CMYK)
-		return [uc2const.COLOR_CMYK, res, color[2], '' + color[3]]
+		"""
+		Convert color into CMYK color.
+		Stores alpha channel and color name.
+		"""
+		if color[0] == COLOR_CMYK: return deepcopy(color)
+		if color == COLOR_SPOT:
+			return [COLOR_CMYK, [] + color[1][1], color[2], '' + color[3]]
+		res = self.do_transform(color, color[0], COLOR_CMYK)
+		return [COLOR_CMYK, res, color[2], '' + color[3]]
 
 	def get_lab_color(self, color):
-		if color[0] == uc2const.COLOR_LAB:
-			return deepcopy(color)
-		if color == uc2const.COLOR_SPOT:
-			color = [uc2const.COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
-
-		tr_type = color[0] + uc2const.COLOR_LAB
-		if not self.transforms.has_key(tr_type):
-			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
-															color[0],
-															self.handles[uc2const.COLOR_LAB],
-															uc2const.COLOR_LAB)
-		in_color = colorb(color)
-		out_color = colorb()
-		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		res = decode_colorb(out_color, uc2const.COLOR_LAB)
-		return [uc2const.COLOR_LAB, res, color[2], '' + color[3]]
+		"""
+		Convert color into L*a*b* color.
+		Stores alpha channel and color name.
+		"""
+		if color[0] == COLOR_LAB: return deepcopy(color)
+		if color == COLOR_SPOT:
+			color = [COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
+		res = self.do_transform(color, color[0], COLOR_LAB)
+		return [COLOR_LAB, res, color[2], '' + color[3]]
 
 	def get_grayscale_color(self, color):
-		if color[0] == uc2const.COLOR_GRAY:
-			return deepcopy(color)
-		if color == uc2const.COLOR_SPOT:
-			color = [uc2const.COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
-
-		tr_type = color[0] + uc2const.COLOR_GRAY
-		if not self.transforms.has_key(tr_type):
-			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
-															color[0],
-															self.handles[uc2const.COLOR_GRAY],
-															uc2const.COLOR_GRAY)
-		in_color = colorb(color)
-		out_color = colorb()
-		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		res = decode_colorb(out_color, uc2const.COLOR_GRAY)
-		return [uc2const.COLOR_GRAY, res, color[2], '' + color[3]]
-
+		"""
+		Convert color into Grayscale color.
+		Stores alpha channel and color name.
+		"""
+		if color[0] == COLOR_GRAY: return deepcopy(color)
+		if color == COLOR_SPOT:
+			color = [COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
+		res = self.do_transform(color, color[0], COLOR_GRAY)
+		return [COLOR_GRAY, res, color[2], '' + color[3]]
 
 	def get_display_color(self, color):
-		color = self.get_rgb_color(color)
-		tr_type = color[0] + uc2const.COLOR_DISPLAY
-		if not self.transforms.has_key(tr_type):
-			self.transforms[tr_type] = self.create_transform(self.handles[color[0]],
-															color[0],
-															self.handles[uc2const.COLOR_DISPLAY],
-															uc2const.COLOR_RGB)
-		in_color = colorb(color)
-		out_color = colorb()
-		libcms.cms_do_transform(self.transforms[tr_type], in_color, out_color)
-		return decode_colorb(out_color, uc2const.COLOR_RGB)
-
-
+		"""
+		Calcs color display representation.
+		Returns list of RGB values.
+		"""
+		if self.proofing:
+			color = self.get_rgb_color(self.get_cmyk_color(color))
+		else:
+			color = self.get_rgb_color(color)
+		if self.use_display_profile and self.handles.has_key(COLOR_DISPLAY):
+			ret = self.do_transform(color, color[0], COLOR_DISPLAY)
+		else:
+			ret = color[1]
+		return ret
 
 
