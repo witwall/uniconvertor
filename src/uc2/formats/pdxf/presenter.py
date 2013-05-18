@@ -17,10 +17,10 @@
 
 import os
 from uc2 import uc2const
-from uc2 import cms
 from uc2.formats.pdxf import const
 from uc2.formats.pdxf import methods
 
+from uc2.formats.pdxf.pdxf_cms import PDXF_ColorManager
 from uc2.formats.pdxf.methods import PDXF_Methods
 from uc2.formats.pdxf.pdxf_config import PDXF_Config
 from uc2.formats.pdxf.pdxf_filters import PDXF_Loader, PDXF_Saver
@@ -63,7 +63,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 		mime.close()
 
 	def init_cms(self):
-		self.cms = cms.ColorManager()
+		self.cms = PDXF_ColorManager(self)
 
 	def new(self):
 		self.model = methods.create_new_doc(self.config)
