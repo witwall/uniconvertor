@@ -174,11 +174,13 @@ class ColorManager:
 
 	handles = {}
 	transforms = {}
+	proof_transforms = {}
 
 	use_display_profile = False
 	proofing = False
 
-	intent = uc2const.INTENT_PERCEPTUAL
+	rgb_intent = uc2const.INTENT_RELATIVE_COLORIMETRIC
+	cmyk_intent = uc2const.INTENT_PERCEPTUAL
 	flags = uc2const.cmsFLAGS_NOTPRECALC
 
 	def __init__(self):
@@ -195,22 +197,47 @@ class ColorManager:
 
 	def clear_transforms(self):
 		self.transforms = {}
+		self.proof_transforms = {}
 
 	def get_transform(self, cs_in, cs_out):
 		"""
 		Returns requested color transform using self.transforms dict.
-		If requested transform is not initialized, creates it.
+		If requested transform is not initialized yet, creates it.
 		"""
 		tr_type = cs_in + cs_out
+		intent = self.rgb_intent
+		if cs_out == COLOR_CMYK:intent = self.cmyk_intent
 		if not self.transforms.has_key(tr_type):
 			handle_in = self.handles[cs_in]
 			handle_out = self.handles[cs_out]
 			if cs_out == COLOR_DISPLAY: cs_out = COLOR_RGB
 			tr = libcms.cms_create_transform(handle_in, cs_in,
 										handle_out, cs_out,
-										self.intent, self.flags)
+										intent, self.flags)
 			self.transforms[tr_type] = tr
 		return self.transforms[tr_type]
+
+
+	def get_proof_transform(self, cs_in):
+		"""
+		Returns requested proof transform using self.proof_transforms dict.
+		If requested transform is not initialized yet, creates it.
+		"""
+		tr_type = cs_in
+		if not self.proof_transforms.has_key(tr_type):
+			handle_in = self.handles[cs_in]
+			if self.use_display_profile and self.handles.has_key(COLOR_DISPLAY):
+				handle_out = self.handles[COLOR_DISPLAY]
+			else:
+				handle_out = self.handles[COLOR_RGB]
+			handle_proof = self.handles[COLOR_CMYK]
+			tr = libcms.cms_create_proofing_transform(handle_in, cs_in,
+										handle_out, COLOR_RGB,
+										handle_proof,
+										self.cmyk_intent,
+										self.rgb_intent, self.flags)
+			self.proof_transforms[tr_type] = tr
+		return self.proof_transforms[tr_type]
 
 	def do_transform(self, color, cs_in, cs_out):
 		"""
@@ -222,6 +249,17 @@ class ColorManager:
 		transform = self.get_transform(cs_in, cs_out)
 		libcms.cms_do_transform(transform, in_color, out_color)
 		return decode_colorb(out_color, cs_out)
+
+	def do_proof_transform(self, color, cs_in):
+		"""
+		Does color proof transform.
+		Return list of color values.
+		"""
+		in_color = colorb(color)
+		out_color = colorb()
+		transform = self.get_proof_transform(cs_in)
+		libcms.cms_do_transform(transform, in_color, out_color)
+		return decode_colorb(out_color, COLOR_RGB)
 
 	#Color management API
 	def get_rgb_color(self, color):
@@ -270,17 +308,23 @@ class ColorManager:
 
 	def get_display_color(self, color):
 		"""
-		Calcs color display representation.
+		Calcs display color representation.
 		Returns list of RGB values.
 		"""
-		if self.proofing:
-			color = self.get_rgb_color(self.get_cmyk_color(color))
-		else:
-			color = self.get_rgb_color(color)
+		cs_in = color[0]
+		cs_out = COLOR_RGB
 		if self.use_display_profile and self.handles.has_key(COLOR_DISPLAY):
-			ret = self.do_transform(color, color[0], COLOR_DISPLAY)
+			cs_out = COLOR_DISPLAY
+		if self.proofing:
+			if cs_in == COLOR_CMYK:
+				ret = self.do_transform(color, cs_in, cs_out)
+			else:
+				ret = self.do_proof_transform(color, cs_in)
 		else:
-			ret = color[1]
+			if cs_in == cs_out:
+				ret = color[1]
+			else:
+				ret = self.do_transform(color, cs_in, cs_out)
 		return ret
 
 
