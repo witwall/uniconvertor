@@ -1,4 +1,4 @@
-#Sat May 18 17:49:53 EEST 2013
+#Tue May 21 15:15:25 EEST 2013
 eclipse.preferences.version=1
 encoding//src/uc2/__init__.py=utf-8
 encoding//src/uc2/application.py=utf-8
@@ -57,5 +57,6 @@ encoding//src/uc2/utils/system.py=utf-8
 encoding//src/unittests/_libimg_tests/__init__.py=utf-8
 encoding//src/unittests/_libimg_testsuite.py=utf-8
 encoding//src/unittests/all_tests.py=utf-8
+encoding//src/unittests/cms_testsuite.py=utf-8
 encoding//src/unittests/image_tests/__init__.py=utf-8
 encoding//src/unittests/image_testsuite.py=utf-8
