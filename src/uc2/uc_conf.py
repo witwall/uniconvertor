@@ -61,6 +61,7 @@ class UCConfig(XmlConfigParser):
 
 
 	#============== COLOR PROFILES ================
+	cms_use = True
 	cms_display_profiles = {}
 	cms_rgb_profiles = {}
 	cms_cmyk_profiles = {}
