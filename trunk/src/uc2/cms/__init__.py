@@ -355,9 +355,7 @@ class ColorManager:
 										self.cmyk_intent,
 										self.rgb_intent, self.flags)
 			if self.gamutcheck:
-				r, g, b = self.alarm_codes
-				r = int(r * 255);g = int(g * 255);b = int(b * 255)
-				libcms.cms_set_alarm_codes(r, g, b)
+				libcms.cms_set_alarm_codes(*self.alarm_codes)
 			self.proof_transforms[tr_type] = tr
 		return self.proof_transforms[tr_type]
 
