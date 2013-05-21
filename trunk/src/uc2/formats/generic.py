@@ -42,7 +42,7 @@ class ModelObject:
 
 	def update(self): pass
 
-	def do_update(self, presenter):
+	def do_update(self, presenter=None):
 		for child in self.childs:
 			child.parent = self
 			child.config = self.config
