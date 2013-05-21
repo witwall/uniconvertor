@@ -137,6 +137,9 @@ def lab_to_rgb(color):
 	Converts CIE-L*ab value to RGB.
 	"""
 	L, a, b = color
+	#L: 0..100
+	#a:  -128..127
+	#b:  -128..127
 	L = L * 100.0
 	a = a * 255.0 - 128.0
 	b = b * 255.0 - 128.0
@@ -290,6 +293,9 @@ class ColorManager:
 	use_cms = True
 	use_display_profile = False
 	proofing = False
+	gamutcheck = False
+	alarm_codes = (0.0, 1.0, 1.0)
+	proof_for_spot = False
 
 	rgb_intent = uc2const.INTENT_RELATIVE_COLORIMETRIC
 	cmyk_intent = uc2const.INTENT_PERCEPTUAL
@@ -348,6 +354,10 @@ class ColorManager:
 										handle_proof,
 										self.cmyk_intent,
 										self.rgb_intent, self.flags)
+			if self.gamutcheck:
+				r, g, b = self.alarm_codes
+				r = int(r * 255);g = int(g * 255);b = int(b * 255)
+				libcms.cms_set_alarm_codes(r, g, b)
 			self.proof_transforms[tr_type] = tr
 		return self.proof_transforms[tr_type]
 
@@ -428,6 +438,12 @@ class ColorManager:
 		if not self.use_cms:
 			return self.get_rgb_color(color)[1]
 
+		if color == COLOR_SPOT:
+			if self.proof_for_spot:
+				color = [COLOR_CMYK, [] + color[1][1], color[2], '' + color[3]]
+			else:
+				color = [COLOR_RGB, [] + color[1][0], color[2], '' + color[3]]
+
 		cs_in = color[0]
 		cs_out = COLOR_RGB
 		if self.use_display_profile and self.handles.has_key(COLOR_DISPLAY):
@@ -435,11 +451,26 @@ class ColorManager:
 		if self.proofing:
 			if cs_in == COLOR_CMYK:
 				ret = self.do_transform(color, cs_in, cs_out)
+			elif cs_in == COLOR_SPOT:
+				if self.proof_for_spot:
+					color = self.get_cmyk_color(color)
+				else:
+					color = self.get_rgb_color(color)
+				if color[0] == cs_out:
+					ret = color[1]
+				else:
+					ret = self.do_transform(color, color[0], cs_out)
 			else:
 				ret = self.do_proof_transform(color, cs_in)
 		else:
 			if cs_in == cs_out:
 				ret = color[1]
+			elif cs_in == COLOR_SPOT:
+				color = self.get_rgb_color(color)
+				if color[0] == cs_out:
+					ret = color[1]
+				else:
+					ret = self.do_transform(color, color[0], cs_out)
 			else:
 				ret = self.do_transform(color, cs_in, cs_out)
 		return ret
