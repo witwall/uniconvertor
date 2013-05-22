@@ -108,15 +108,22 @@ def get_cmyk_profile_resource():
 def cms_create_display_profile():
 	"""	
 	Artificial functionality. The function emulates built-in display
-	profile reading sRGB profile resource attached to the package.
+	profile reading profile resource attached to the package.
 	Returns a handle to lcms built-in display profile wrapped as a Python object. 
 	The handle doesn't require to be closed after usage because
 	on object delete operation Python calls native cms_close_profile()
 	function automatically
 	"""
-	import srgb_profile_rc
-	profile = srgb_profile_rc.get_resource(True)
+	import display_profile_rc
+	profile = display_profile_rc.get_resource(True)
 	return cms_open_profile_from_file(profile.name)
+	
+def get_display_profile_resource():
+	"""
+	Returns named temporary file object of built-in display profile.
+	"""
+	import display_profile_rc
+	return display_profile_rc.get_resource(True)
 
 def cms_create_lab_profile():
 	"""	
@@ -175,6 +182,8 @@ def cms_create_default_profile(colorspace):
 		return cms_create_lab_profile()
 	elif colorspace == uc2const.COLOR_GRAY:
 		return cms_create_gray_profile()
+	elif colorspace == uc2const.COLOR_DISPLAY:
+		return cms_create_display_profile()
 	else:
 		return None
 
@@ -191,6 +200,8 @@ def cms_get_default_profile_resource(colorspace):
 		return get_lab_profile_resource()
 	elif colorspace == uc2const.COLOR_GRAY:
 		return get_gray_profile_resource()
+	elif colorspace == uc2const.COLOR_DISPLAY:
+		return get_display_profile_resource()
 	else:
 		return None
 
