@@ -72,6 +72,7 @@ if __name__ == "__main__":
 	src_path = 'src'
 	include_path = '/usr/include'
 	modules = []
+	scripts = ['src/uniconvertor', ]
 
 	filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
 	files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
@@ -198,7 +199,7 @@ Export filters:
 
 			package_dir=libutils.get_package_dirs(),
 
-			scripts=['src/uniconvertor'],
+			scripts=scripts,
 
 			ext_modules=modules)
 
@@ -226,38 +227,11 @@ if DEBIAN:
 	print '\n'
 	print 'DEBIAN PACKAGE BUILD'
 	print '===================='
-	import string, platform
-	version = (string.split(sys.version)[0])[0:3]
-
-	arch, bin = platform.architecture()
-	if arch == '64bit':
-		arch = 'amd64'
+	builder = libutils.DEB_Builder('uniconvertor',
+								VERSION,
+								['uc2', ],
+								scripts)
+	if builder.build():
+		print 'Deb package is created successfully'
 	else:
-		arch = 'i386'
-
-	target = 'build/deb-root/usr/lib/python' + version + '/dist-packages'
-
-	if os.path.lexists(os.path.join('build', 'deb-root')):
-		os.system('rm -rf build/deb-root')
-	os.makedirs(os.path.join('build', 'deb-root', 'DEBIAN'))
-
-	os.system("cat DEBIAN/control |sed 's/<PLATFORM>/" + arch + "/g'|sed 's/<VERSION>/" + VERSION + "/g'> build/deb-root/DEBIAN/control")
-
-	os.makedirs(target)
-	os.makedirs('build/deb-root/usr/bin')
-	os.makedirs('build/deb-root/usr/share/applications')
-	os.makedirs('build/deb-root/usr/share/pixmaps')
-
-	os.system('cp -R build/lib.linux-' + platform.machine() + '-' + version + '/skencil ' + target)
-	os.system('cp src/skencil.desktop build/deb-root/usr/share/applications')
-	os.system('cp src/skencil.png build/deb-root/usr/share/pixmaps')
-	os.system('cp src/skencil.xpm build/deb-root/usr/share/pixmaps')
-	os.system('cp src/skencil build/deb-root/usr/bin')
-	os.system('chmod +x build/deb-root/usr/bin/skencil')
-
-	if os.path.lexists('dist'):
-		os.system('rm -rf dist/*.deb')
-	else:
-		os.makedirs('dist')
-
-	os.system('dpkg --build build/deb-root/ dist/python-skencil-' + VERSION + '_' + arch + '.deb')
+		print 'BUILD FAILED!'
