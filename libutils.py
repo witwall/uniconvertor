@@ -129,6 +129,7 @@ def generate_locales():
 ############################################################
 
 def clear_build():
+	os.system('rm -f MANIFEST')
 	os.system('rm -rf build')
 
 def make_source_list(path, file_list=[]):
@@ -188,14 +189,6 @@ def compile_sources():
 	compileall.compile_dir('build')
 
 
-#	import string, platform, shutil
-#	version = (string.split(sys.version)[0])[0:3]
-#
-#	shutil.copy('build/lib.linux-' + platform.machine() + '-' + version + '/uc2/libcairo/_libcairo.so', 'src/uc2/libcairo/')
-#	print '\n _libcairo.so has been copied to src/ directory'
-
-#	os.system('rm -rf build')
-
 def copy_modules(modules):
 	import string, platform, shutil
 
@@ -216,6 +209,89 @@ def copy_modules(modules):
 # DEB package builder
 #
 ############################################################
+
+class DEB_Builder:
+
+	name = None
+	version = None
+	pkg_dirs = []
+	scripts = []
+
+	py_version = ''
+	arch = ''
+	machine = ''
+	build_dir = 'build/deb-root'
+	src = ''
+	dst = ''
+	bin_dir = ''
+	pixmaps_dir = ''
+	package_name = ''
+
+	def __init__(self, name, version, pkg_dirs, scripts=[]):
+		self.name = name
+		self.version = version
+		self.pkg_dirs = pkg_dirs
+		self.scripts = scripts
+
+		import string, platform
+		self.py_version = (string.split(sys.version)[0])[0:3]
+
+		arch, bin = platform.architecture()
+		if arch == '64bit':
+			self.arch = 'amd64'
+		else:
+			self.arch = 'i386'
+
+		self.machine = platform.machine()
+
+		self.src = 'build/lib.linux-%s-%s' % (self.machine, self.py_version)
+
+		self.dst = '%s/usr/lib/python%s/dist-packages' % (self.build_dir, self.py_version)
+		self.bin_dir = '%s/usr/bin' % self.build_dir
+
+
+		self.package_name = 'python-%s-%s_%s.deb' % (self.name, self.version, self.arch)
+
+	def clear_build(self):
+		if os.path.lexists(self.build_dir):
+			os.system('rm -rf ' + self.build_dir)
+		if os.path.lexists('dist'):
+			os.system('rm -rf dist/*.deb')
+		else:
+			os.makedirs('dist')
+
+	def write_control(self):
+		cmd = 'cat debian/control'
+		cmd += "|sed 's/<PLATFORM>/" + self.arch + "/g'"
+		cmd += "|sed 's/<VERSION>/" + self.version + "/g'"
+		cmd += "> build/deb-root/DEBIAN/control"
+		os.system(cmd)
+
+	def copy_build(self):
+		for dir in self.pkg_dirs:
+			os.system('cp -R %s %s' % (self.src + '/' + dir, self.dst))
+
+	def copy_scripts(self):
+		if self.scripts: os.makedirs(self.bin_dir)
+		for item in self.scripts:
+			os.system('cp %s %s' % (item, self.bin_dir))
+
+	def make_package(self):
+		os.system('dpkg --build %s/ dist/%s' % (self.build_dir, self.package_name))
+
+	def build(self):
+		if not os.path.isdir('build'):
+			print 'There is no project build! Run "setup.py build" and try again.'
+			return False
+		self.clear_build()
+		os.makedirs('build/deb-root/DEBIAN')
+		self.write_control()
+		os.makedirs(self.dst)
+		self.copy_build()
+		self.copy_scripts()
+		self.make_package()
+		return True
+
 
 if __name__ == '__main__':
 	packages = get_source_structure()
