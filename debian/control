@@ -7,11 +7,11 @@ Section: python
 Priority: extra
 Description: Universal vector graphics translator
  .
- UniConvertor is a multiplatform universal vector graphics translator.
- It uses PDXF model to convert one format to another.
- sK1 Team (http://sk1project.org), Copyright (C) 2007-2013 by Igor E. Novikov
- -----------------------------------
- Import filters: 
+  UniConvertor is a multiplatform universal vector graphics translator.  
+  It uses PDXF model to convert one format to another.  
+  sK1 Team (http://sk1project.org), Copyright (C) 2007-2013 by Igor E. Novikov  
+  -----------------------------------  
+  Import filters:  
     * CorelDRAW ver.7-X3,X4 (CDR/CDT/CCX/CDRX/CMX)
     * Adobe Illustrator up to 9 ver. (AI postscript based)
     * Postscript (PS)
@@ -28,8 +28,8 @@ Description: Universal vector graphics translator
     * Embroidery file format (Brother) (PES)
     * Embroidery file format (Melco) (EXP)
     * Design format (Pfaff home) (PCS)
- -----------------------------------
- Export filters: 
+  -----------------------------------
+  Export filters: 
     * AI - Postscript based Adobe Illustrator 5.0 format
     * SVG - Scalable Vector Graphics
     * SK - Sketch/Skencil format
@@ -37,7 +37,7 @@ Description: Universal vector graphics translator
     * CGM - Computer Graphics Metafile
     * WMF - Windows Metafile
     * PDF - Portable Document Format
-    * PS  - PostScript
+    * PS - PostScript
     * PLT - HPGL for cutting plotter files
  .
 
