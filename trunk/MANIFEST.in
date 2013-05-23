@@ -1,0 +1,11 @@
+include LICENSE
+include libutils.py
+include MANIFEST.in
+include GPLv3.txt
+
+recursive-include src/.. *.*
+recursive-include src/uc2/utils/streamfilter *.c
+recursive-include src/uc2/formats/sk1/sk1objs *.c
+recursive-include src/uc2/libcairo *.c
+recursive-include src/uc2/libimg *.c
+recursive-include src/uc2/cms *.c
