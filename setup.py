@@ -39,110 +39,13 @@
 
 import os, sys
 
+import libutils
+from libutils import make_source_list
 
-COPY = False
+UPDATE_MODULES = False
 DEBIAN = False
 LCMS2 = False
 VERSION = '2.0'
-
-############################################################
-#
-# Routines for build procedures
-#
-############################################################
-
-#Return directory list for provided path
-def get_dirs(path='.'):
-	list = []
-	if path:
-		if os.path.isdir(path):
-			try:
-				names = os.listdir(path)
-			except os.error:
-				return []
-		names.sort()
-		for name in names:
-			if os.path.isdir(os.path.join(path, name)):
-				list.append(name)
-		return list
-
-#Return full  directory names list for provided path	
-def get_dirs_withpath(path='.'):
-	list = []
-	names = []
-	if os.path.isdir(path):
-		try:
-			names = os.listdir(path)
-		except os.error:
-			return names
-	names.sort()
-	for name in names:
-		if os.path.isdir(os.path.join(path, name)) and not name == '.svn':
-			list.append(os.path.join(path, name))
-	return list
-
-#Return file list for provided path
-def get_files(path='.', ext='*'):
-	list = []
-	if path:
-		if os.path.isdir(path):
-			try:
-				names = os.listdir(path)
-			except os.error:
-				return []
-		names.sort()
-		for name in names:
-			if not os.path.isdir(os.path.join(path, name)):
-				if ext == '*':
-					list.append(name)
-				elif '.' + ext == name[-1 * (len(ext) + 1):]:
-					list.append(name)
-	return list
-
-#Return full file names list for provided path
-def get_files_withpath(path='.', ext='*'):
-	import glob
-	list = glob.glob(os.path.join(path, "*." + ext))
-	list.sort()
-	result = []
-	for file in list:
-		if os.path.isfile(file):
-			result.append(file)
-	return result
-
-#Return recursive directories list for provided path
-def get_dirs_tree(path='.'):
-	tree = get_dirs_withpath(path)
-	res = [] + tree
-	for node in tree:
-		subtree = get_dirs_tree(node)
-		res += subtree
-	return res
-
-#Return recursive files list for provided path
-def get_files_tree(path='.', ext='*'):
-	tree = []
-	dirs = [path, ]
-	dirs += get_dirs_tree(path)
-	for dir in dirs:
-		list = get_files_withpath(dir, ext)
-		list.sort()
-		tree += list
-	return tree
-
-#Generates *.mo files Resources/Messages
-def generate_locales():
-	print 'LOCALES BUILD'
-	files = get_files('po', 'po')
-	if len(files):
-		for file in files:
-			lang = file.split('.')[0]
-			po_file = os.path.join('po', file)
-			mo_file = os.path.join('src', 'Resources', 'Messages', lang, 'LC_MESSAGES', 'skencil.mo')
-			if not os.path.lexists(os.path.join('src', 'Resources', 'Messages', lang, 'LC_MESSAGES')):
-				os.makedirs(os.path.join('src', 'share', 'Messages', lang, 'LC_MESSAGES'))
-			print po_file, '==>', mo_file
-			os.system('msgfmt -o ' + mo_file + ' ' + po_file)
 
 ############################################################
 #
@@ -152,8 +55,8 @@ def generate_locales():
 
 if __name__ == "__main__":
 
-	if len(sys.argv) > 1 and sys.argv[1] == 'build&copy':
-		COPY = True
+	if len(sys.argv) > 1 and sys.argv[1] == 'build_update':
+		UPDATE_MODULES = True
 		sys.argv[1] = 'build'
 
 	if len(sys.argv) > 1 and sys.argv[1] == 'bdist_deb':
@@ -166,63 +69,66 @@ if __name__ == "__main__":
 
 	from distutils.core import setup, Extension
 
-	src_path = 'src/'
+	src_path = 'src'
+	include_path = '/usr/include'
+	modules = []
 
-	filter_src = src_path + 'uc2/utils/streamfilter/'
+	filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
+	files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
+			'subfilefilter.c', 'base64filter.c', 'nullfilter.c',
+			'stringfilter.c', 'binfile.c', 'hexfilter.c']
+	files = make_source_list(filter_src, files)
 	filter_module = Extension('uc2.utils.streamfilter',
-			define_macros=[('MAJOR_VERSION', '1'),
-						('MINOR_VERSION', '0')],
-			sources=[filter_src + 'streamfilter.c', filter_src + 'filterobj.c',
-					filter_src + 'linefilter.c', filter_src + 'subfilefilter.c',
-					filter_src + 'base64filter.c', filter_src + 'nullfilter.c',
-					filter_src + 'stringfilter.c', filter_src + 'binfile.c',
-					filter_src + 'hexfilter.c'])
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files)
+	modules.append(filter_module)
 
- 	sk1objs_src = src_path + 'uc2/formats/sk1/sk1objs/'
+ 	sk1objs_src = os.path.join(src_path, 'uc2', 'formats', 'sk1', 'sk1objs')
+ 	files = ['_sketchmodule.c', 'skpoint.c', 'skcolor.c', 'sktrafo.c',
+			'skrect.c', 'skfm.c', 'curvefunc.c', 'curveobject.c', 'curvelow.c',
+			'curvemisc.c', 'skaux.c', 'skimage.c', ]
+ 	files = make_source_list(sk1objs_src, files)
 	sk1objs_module = Extension('uc2.formats.sk1._sk1objs',
-			define_macros=[('MAJOR_VERSION', '1'),
-						('MINOR_VERSION', '0')],
-			sources=[sk1objs_src + '_sketchmodule.c', sk1objs_src + 'skpoint.c',
-					sk1objs_src + 'skcolor.c', sk1objs_src + 'sktrafo.c',
-					sk1objs_src + 'skrect.c', sk1objs_src + 'skfm.c',
-					sk1objs_src + 'curvefunc.c', sk1objs_src + 'curveobject.c',
-					sk1objs_src + 'curvelow.c', sk1objs_src + 'curvemisc.c',
-					sk1objs_src + 'skaux.c', sk1objs_src + 'skimage.c', ])
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files)
+	modules.append(sk1objs_module)
 
-	cairo_src = src_path + 'uc2/libcairo/'
-	cairo_include_dirs = ['/usr/include/cairo', '/usr/include/pycairo']
+	cairo_src = os.path.join(src_path, 'uc2', 'libcairo')
+	files = make_source_list(cairo_src, ['_libcairo.c', ])
+	include_dirs = make_source_list(include_path, ['cairo', 'pycairo'])
 	cairo_module = Extension('uc2.libcairo._libcairo',
-			define_macros=[('MAJOR_VERSION', '1'),
-						('MINOR_VERSION', '0')],
-			sources=[cairo_src + '_libcairo.c', ],
-			include_dirs=cairo_include_dirs,
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files, include_dirs=include_dirs,
 			libraries=['cairo'])
+	modules.append(cairo_module)
 
-	libimg_src = src_path + 'uc2/libimg/'
-	libimg_include_dirs = ['/usr/include/ImageMagick', ]
+	libimg_src = os.path.join(src_path, 'uc2', 'libimg')
+	files = make_source_list(libimg_src, ['_libimg.c', ])
+	include_dirs = make_source_list(include_path, ['ImageMagick', ])
 	libimg_module = Extension('uc2.libimg._libimg',
-			define_macros=[('MAJOR_VERSION', '1'),
-						('MINOR_VERSION', '0')],
-			sources=[libimg_src + '_libimg.c', ],
-			include_dirs=libimg_include_dirs,
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files, include_dirs=include_dirs,
 			libraries=['MagickWand'])
+	modules.append(libimg_module)
 
  	if LCMS2:
-	 	pycms_src = src_path + 'uc2/cms/'
+	 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
+	 	files = make_source_list(pycms_src, ['_cms2.c', ])
 		pycms_module = Extension('uc2.cms._cms',
-				define_macros=[('MAJOR_VERSION', '1'),
-							('MINOR_VERSION', '0')],
-				sources=[pycms_src + '_cms2.c'],
+				define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+				sources=files,
 				libraries=['lcms2'],
 				extra_compile_args=["-Wall"])
+		modules.append(pycms_module)
  	else:
-	 	pycms_src = src_path + 'uc2/cms/'
+	 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
+	 	files = make_source_list(pycms_src, ['_cms.c', ])
 		pycms_module = Extension('uc2.cms._cms',
-				define_macros=[('MAJOR_VERSION', '1'),
-							('MINOR_VERSION', '0')],
-				sources=[pycms_src + '_cms.c'],
+				define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+				sources=files,
 				libraries=['lcms'],
 				extra_compile_args=["-Wall"])
+		modules.append(pycms_module)
 
 
 	setup (name='uniconvertor',
@@ -288,38 +194,18 @@ Export filters:
 			"Topic :: Multimedia :: Graphics :: Graphics Conversion",
 			],
 
-			packages=['uc2',
-				'uc2.cms',
-				'uc2.formats',
-				'uc2.formats.cdr',
-				'uc2.formats.cdrx',
-				'uc2.formats.cdrz',
-				'uc2.formats.cmx',
-				'uc2.formats.pdxf',
-				'uc2.formats.plt',
-				'uc2.formats.riff',
-				'uc2.formats.sk',
-				'uc2.formats.sk1',
-				'uc2.libcairo',
-				'uc2.libgeom',
-				'uc2.libimg',
-				'uc2.utils',
-			],
+			packages=libutils.get_source_structure(),
 
-			package_dir={'uc2': 'src/uc2',
-			},
+			package_dir=libutils.get_package_dirs(),
 
 			scripts=['src/uniconvertor'],
 
-			ext_modules=[cairo_module, pycms_module, libimg_module,
-						filter_module, sk1objs_module])
+			ext_modules=modules)
 
 #################################################
 # .py source compiling
 #################################################
-if sys.argv[1] == 'build':
-	import compileall
-	compileall.compile_dir('build/')
+libutils.compile_sources()
 
 
 ##############################################
@@ -329,14 +215,7 @@ if sys.argv[1] == 'build':
 # into package directory
 ##############################################	
 
-if COPY:
-	import string, platform, shutil
-	version = (string.split(sys.version)[0])[0:3]
-
-	shutil.copy('build/lib.linux-' + platform.machine() + '-' + version + '/uc2/libcairo/_libcairo.so', 'src/uc2/libcairo/')
-	print '\n _libcairo.so has been copied to src/ directory'
-
-	os.system('rm -rf build')
+if UPDATE_MODULES: libutils.copy_modules(modules)
 
 
 #################################################
@@ -344,7 +223,8 @@ if COPY:
 #################################################
 
 if DEBIAN:
-	print '\nDEBIAN PACKAGE BUILD'
+	print '\n'
+	print 'DEBIAN PACKAGE BUILD'
 	print '===================='
 	import string, platform
 	version = (string.split(sys.version)[0])[0:3]
