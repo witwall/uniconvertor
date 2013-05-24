@@ -283,8 +283,7 @@ class DEB_Builder:
 	version = None
 	pkg_dirs = []
 	scripts = []
-	pixpams = []
-	desktop_files = []
+	data_files = []
 
 	package_name = ''
 	installed_size = 0
@@ -299,13 +298,12 @@ class DEB_Builder:
 	apps_dir = ''
 
 	def __init__(self, name='', version='', pkg_dirs=[], scripts=[],
-				pixpams=[], desktop_files=[]):
+				data_files=[]):
 		self.name = name
 		self.version = version
 		self.pkg_dirs = pkg_dirs
 		self.scripts = scripts
-		self.pixmaps = pixpams
-		self.desktop_files = desktop_files
+		self.data_files = data_files
 
 		import string, platform
 		self.py_version = (string.split(sys.version)[0])[0:3]
@@ -322,8 +320,6 @@ class DEB_Builder:
 
 		self.dst = '%s/usr/lib/python%s/dist-packages' % (self.build_dir, self.py_version)
 		self.bin_dir = '%s/usr/bin' % self.build_dir
-		self.pixmaps_dir = '%s/usr/share/pixmaps' % self.build_dir
-		self.apps_dir = '%s/usr/share/applications' % self.build_dir
 
 		self.package_name = 'python-%s-%s_%s.deb' % (self.name, self.version, self.arch)
 
@@ -390,6 +386,11 @@ class DEB_Builder:
 			if os.system('cp %s %s' % (item, path)):
 				raise IOError('Cannot copying %s -> %s' % (item, path))
 
+	def copy_data_files(self):
+		for item in self.data_files:
+			path, files = item
+			self.copy_files(self.build_dir + path, files)
+
 	def make_package(self):
 		self.info('%s package.' % self.package_name, MK_CODE)
 		if os.system('dpkg --build %s/ dist/%s' % (self.build_dir, self.package_name)):
@@ -406,8 +407,7 @@ class DEB_Builder:
 			self._make_dir(self.dst)
 			self.copy_build()
 			self.copy_scripts()
-			self.copy_files(self.pixmaps_dir, self.pixmaps)
-			self.copy_files(self.apps_dir, self.desktop_files)
+			self.copy_data_files()
 			self.installed_size = str(int(get_size(self.build_dir) / 1024))
 			self.write_control()
 			self.make_package()
