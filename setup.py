@@ -68,6 +68,11 @@ if __name__ == "__main__":
 	include_path = '/usr/include'
 	modules = []
 	scripts = ['src/uniconvertor', ]
+	data_files = []
+#	data_files=[
+#			('/usr/share/applications',['src/sk1.desktop',]),
+#			('/usr/share/pixmaps',['src/sk1.png','src/sk1.xpm',]),
+#			],
 
 	if os.path.isfile(os.path.join(include_path, 'lcms2.h')):LCMS2 = True
 	elif os.path.isfile(os.path.join(include_path, 'lcms.h')):LCMS2 = False
@@ -199,6 +204,7 @@ Export filters:
 
 			packages=libutils.get_source_structure(),
 			package_dir=libutils.get_package_dirs(),
+			data_files=data_files,
 			scripts=scripts,
 			ext_modules=modules)
 
@@ -224,6 +230,7 @@ if DEBIAN:
 	bld = DEB_Builder(name=NAME,
 					version=VERSION,
 					pkg_dirs=libutils.get_package_dirs().keys(),
-					scripts=scripts)
+					scripts=scripts,
+					data_files=data_files)
 	bld.build()
 	libutils.clear_build()
