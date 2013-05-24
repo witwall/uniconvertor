@@ -68,11 +68,10 @@ if __name__ == "__main__":
 	include_path = '/usr/include'
 	modules = []
 	scripts = ['src/uniconvertor', ]
-	data_files = []
-#	data_files=[
-#			('/usr/share/applications',['src/sk1.desktop',]),
-#			('/usr/share/pixmaps',['src/sk1.png','src/sk1.xpm',]),
-#			],
+	data_files = [
+('/usr/share/mime/application/', ['src/application-vnd.sk1project.pdxf-graphics.xml', ]),
+('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
+				]
 
 	if os.path.isfile(os.path.join(include_path, 'lcms2.h')):LCMS2 = True
 	elif os.path.isfile(os.path.join(include_path, 'lcms.h')):LCMS2 = False
