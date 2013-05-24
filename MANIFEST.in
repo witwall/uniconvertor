@@ -2,6 +2,7 @@ include LICENSE
 include libutils.py
 include MANIFEST.in
 include GPLv3.txt
+include debian/control
 
 recursive-include src/.. *.*
 recursive-include src/uc2/utils/streamfilter *.c
