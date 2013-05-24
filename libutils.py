@@ -347,7 +347,8 @@ class DEB_Builder:
 			self._make_dir('dist')
 
 	def write_control(self):
-		self._make_dir('build/deb-root/DEBIAN')
+		deb_folder = 'build/deb-root/DEBIAN'
+		self._make_dir(deb_folder)
 		cmd = 'cat debian/control'
 		cmd += "|sed 's/<PLATFORM>/" + self.arch + "/g'"
 		cmd += "|sed 's/<VERSION>/" + self.version + "/g'"
@@ -356,6 +357,13 @@ class DEB_Builder:
 		self.info('Writing Debian control file.', CP_CODE)
 		if os.system(cmd):
 			raise IOError('Error while writing Debian control file.')
+		files = ['debian/postinst', 'debian/postrm',
+				'debian/preinst', 'debian/prerm']
+		for file in files:
+			if os.path.isfile(file):
+				self.info('%s ->%s' % (file, deb_folder), CP_CODE)
+				if os.system('cp %s %s' % (file, deb_folder)):
+					raise IOError('Error while copying %s -> %s' % (file, deb_folder))
 
 	def copy_build(self):
 		for dir in self.pkg_dirs:
