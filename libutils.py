@@ -379,8 +379,8 @@ class DEB_Builder:
 					raise IOError('Cannot set executable flag for %s' % path)
 
 	def copy_files(self, path, files):
-		if files: self._make_dir(path)
-		else:return
+		if files and not os.path.isdir(path): self._make_dir(path)
+		if not files:return
 		for item in files:
 			self.info('%s -> %s' % (item, path), CP_CODE)
 			if os.system('cp %s %s' % (item, path)):
