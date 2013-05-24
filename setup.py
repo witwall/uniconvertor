@@ -2,7 +2,7 @@
 #
 # Setup script for UniConvertor 2.x
 #
-# Copyright (C) 2011, 2012 Igor E. Novikov
+# Copyright (C) 2013 Igor E. Novikov
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,32 +19,31 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
 #
 
-# Usage: 
-# --------------------------------------------------------------------------
-#  to build package:   python setup.py build
-#  to install package:   python setup.py install
-# --------------------------------------------------------------------------
-#  to create source distribution:   python setup.py sdist
-# --------------------------------------------------------------------------
-#  to create binary RPM distribution:  python setup.py bdist_rpm
-# --------------------------------------------------------------------------
-#  to create localization .mo files: python setup.py build_locales (Linux only)
-# --------------------------------------------------------------------------
-#  to build against LCMS2 use flag --with-lcms2. For example:
-#  python setup.py bdist_rpm --with-lcms2
-# --------------------------------------------------------------------------
-#
-#  help on available distribution formats: python setup.py bdist --help-formats
-#
+"""
+Usage: 
+--------------------------------------------------------------------------
+ to build package:   python setup.py build
+ to install package:   python setup.py install
+--------------------------------------------------------------------------
+ to create source distribution:   python setup.py sdist
+--------------------------------------------------------------------------
+ to create binary RPM distribution:  python setup.py bdist_rpm
+--------------------------------------------------------------------------
+ to create binary DEB distribution:  python setup.py bdist_deb
+--------------------------------------------------------------------------
+
+ help on available distribution formats: python setup.py bdist --help-formats
+"""
 
 import os, sys
 
 import libutils
-from libutils import make_source_list
+from libutils import make_source_list, DEB_Builder
 
 UPDATE_MODULES = False
 DEBIAN = False
 LCMS2 = False
+NAME = 'uniconvertor'
 VERSION = '2.0'
 
 ############################################################
@@ -63,16 +62,19 @@ if __name__ == "__main__":
 		DEBIAN = True
 		sys.argv[1] = 'build'
 
-	if len(sys.argv) > 2 and sys.argv[2] == '--with-lcms2':
-		sys.argv.remove('--with-lcms2')
-		LCMS2 = True
-
 	from distutils.core import setup, Extension
 
 	src_path = 'src'
 	include_path = '/usr/include'
 	modules = []
 	scripts = ['src/uniconvertor', ]
+
+	if os.path.isfile(os.path.join(include_path, 'lcms2.h')):LCMS2 = True
+	elif os.path.isfile(os.path.join(include_path, 'lcms.h')):LCMS2 = False
+	else:
+		msg = 'LittleCMS header file is not found! '
+		print 'ERROR>>> %s' % msg
+		sys.exit()
 
 	filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
 	files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
@@ -132,7 +134,7 @@ if __name__ == "__main__":
 		modules.append(pycms_module)
 
 
-	setup (name='uniconvertor',
+	setup (name=NAME,
 			version=VERSION,
 			description='Universal vector graphics translator',
 			author='Igor E. Novikov',
@@ -148,7 +150,7 @@ It uses sK1 model to convert one format to another.
 
 sK1 Project (http://sk1project.org),
 Copyright (C) 2007-2013 by Igor E. Novikov
-------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Import filters: 
     * CorelDRAW ver.7-X3,X4 (CDR/CDT/CCX/CDRX/CMX)
@@ -167,7 +169,7 @@ Import filters:
     * Embroidery file format (Brother) (PES)
     * Embroidery file format (Melco) (EXP)
     * Design format (Pfaff home) (PCS)
-------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Export filters: 
     * AI - Postscript based Adobe Illustrator 5.0 format
@@ -180,7 +182,7 @@ Export filters:
     * PS  - PostScript
     * PLT - HPGL for cutting plotter files
     
-------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 			''',
 		classifiers=[
 			'Development Status :: 6 - Mature',
@@ -196,11 +198,8 @@ Export filters:
 			],
 
 			packages=libutils.get_source_structure(),
-
 			package_dir=libutils.get_package_dirs(),
-
 			scripts=scripts,
-
 			ext_modules=modules)
 
 #################################################
@@ -211,27 +210,20 @@ libutils.compile_sources()
 
 ##############################################
 # This section for developing purpose only
-# Command 'python setup.py build&copy' allows
+# Command 'python setup.py build_update' allows
 # automating build and native extension copying
 # into package directory
-##############################################	
-
+##############################################
 if UPDATE_MODULES: libutils.copy_modules(modules)
 
 
 #################################################
 # Implementation of bdist_deb command
 #################################################
-
 if DEBIAN:
-	print '\n'
-	print 'DEBIAN PACKAGE BUILD'
-	print '===================='
-	builder = libutils.DEB_Builder('uniconvertor',
-								VERSION,
-								['uc2', ],
-								scripts)
-	if builder.build():
-		print 'Deb package is created successfully'
-	else:
-		print 'BUILD FAILED!'
+	bld = DEB_Builder(name=NAME,
+					version=VERSION,
+					pkg_dirs=libutils.get_package_dirs().keys(),
+					scripts=scripts)
+	bld.build()
+	libutils.clear_build()
