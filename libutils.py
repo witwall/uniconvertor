@@ -361,7 +361,7 @@ class DEB_Builder:
 				'debian/preinst', 'debian/prerm']
 		for file in files:
 			if os.path.isfile(file):
-				self.info('%s ->%s' % (file, deb_folder), CP_CODE)
+				self.info('%s -> %s' % (file, deb_folder), CP_CODE)
 				if os.system('cp %s %s' % (file, deb_folder)):
 					raise IOError('Error while copying %s -> %s' % (file, deb_folder))
 
