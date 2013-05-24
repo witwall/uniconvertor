@@ -109,14 +109,14 @@ if __name__ == "__main__":
 			libraries=['cairo'])
 	modules.append(cairo_module)
 
-	libimg_src = os.path.join(src_path, 'uc2', 'libimg')
-	files = make_source_list(libimg_src, ['_libimg.c', ])
-	include_dirs = make_source_list(include_path, ['ImageMagick', ])
-	libimg_module = Extension('uc2.libimg._libimg',
-			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-			sources=files, include_dirs=include_dirs,
-			libraries=['MagickWand'])
-	modules.append(libimg_module)
+#	libimg_src = os.path.join(src_path, 'uc2', 'libimg')
+#	files = make_source_list(libimg_src, ['_libimg.c', ])
+#	include_dirs = make_source_list(include_path, ['ImageMagick', ])
+#	libimg_module = Extension('uc2.libimg._libimg',
+#			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+#			sources=files, include_dirs=include_dirs,
+#			libraries=['MagickWand'])
+#	modules.append(libimg_module)
 
  	if LCMS2:
 	 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
@@ -232,4 +232,5 @@ if DEBIAN:
 					scripts=scripts,
 					data_files=data_files)
 	bld.build()
-	libutils.clear_build()
+
+libutils.clear_build()
