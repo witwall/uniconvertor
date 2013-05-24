@@ -4,7 +4,6 @@ include MANIFEST.in
 include GPLv3.txt
 
 recursive-include debian *
-recursive-include src/.. *.*
 recursive-include src/uc2/utils/streamfilter *.c
 recursive-include src/uc2/formats/sk1/sk1objs *.c
 recursive-include src/uc2/libcairo *.c
