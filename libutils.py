@@ -25,12 +25,14 @@ import os, sys
 
 ############################################################
 #
-# Routines for build procedures
+# File system routines
 #
 ############################################################
 
-#Return directory list for provided path
 def get_dirs(path='.'):
+	"""
+	Return directory list for provided path
+	"""
 	list = []
 	if path:
 		if os.path.isdir(path):
@@ -44,8 +46,10 @@ def get_dirs(path='.'):
 				list.append(name)
 		return list
 
-#Return full  directory names list for provided path	
 def get_dirs_withpath(path='.'):
+	"""
+	Return full  directory names list for provided path
+	"""
 	list = []
 	names = []
 	if os.path.isdir(path):
@@ -59,8 +63,10 @@ def get_dirs_withpath(path='.'):
 			list.append(os.path.join(path, name))
 	return list
 
-#Return file list for provided path
 def get_files(path='.', ext='*'):
+	"""
+	Returns file list for provided path
+	"""
 	list = []
 	if path:
 		if os.path.isdir(path):
@@ -77,8 +83,10 @@ def get_files(path='.', ext='*'):
 					list.append(name)
 	return list
 
-#Return full file names list for provided path
 def get_files_withpath(path='.', ext='*'):
+	"""
+	Returns full file names list for provided path
+	"""
 	import glob
 	list = glob.glob(os.path.join(path, "*." + ext))
 	list.sort()
@@ -88,8 +96,10 @@ def get_files_withpath(path='.', ext='*'):
 			result.append(file)
 	return result
 
-#Return recursive directories list for provided path
 def get_dirs_tree(path='.'):
+	"""
+	Returns recursive directories list for provided path
+	"""
 	tree = get_dirs_withpath(path)
 	res = [] + tree
 	for node in tree:
@@ -97,8 +107,10 @@ def get_dirs_tree(path='.'):
 		res += subtree
 	return res
 
-#Return recursive files list for provided path
 def get_files_tree(path='.', ext='*'):
+	"""
+	Returns recursive files list for provided path
+	"""
 	tree = []
 	dirs = [path, ]
 	dirs += get_dirs_tree(path)
@@ -108,8 +120,10 @@ def get_files_tree(path='.', ext='*'):
 		tree += list
 	return tree
 
-#Generates *.mo files Resources/Messages
 def generate_locales():
+	"""
+	Generates *.mo files Resources/Messages
+	"""
 	print 'LOCALES BUILD'
 	files = get_files('po', 'po')
 	if len(files):
@@ -129,10 +143,16 @@ def generate_locales():
 ############################################################
 
 def clear_build():
+	"""
+	Clears build result.
+	"""
 	os.system('rm -f MANIFEST')
 	os.system('rm -rf build')
 
 def make_source_list(path, file_list=[]):
+	"""
+	Returns list of paths for provided file list.
+	"""
 	ret = []
 	for item in file_list:
 		ret.append(os.path.join(path, item))
@@ -141,12 +161,18 @@ def make_source_list(path, file_list=[]):
 INIT_FILE = '__init__.py'
 
 def is_package(dir):
+	"""
+	Checks is provided directory a python package.
+	"""
 	if os.path.isdir(dir):
 		marker = os.path.join(dir, INIT_FILE)
 		if os.path.isfile(marker): return True
 	return False
 
 def get_packages(path):
+	"""
+	Collects recursively python packages.
+	"""
 	packages = []
 	items = []
 	if os.path.isdir(path):
@@ -163,6 +189,9 @@ def get_packages(path):
 	return packages
 
 def get_package_dirs(path='src'):
+	"""
+	Collects root packages.
+	"""
 	dirs = {}
 	items = []
 	if os.path.isdir(path):
@@ -178,6 +207,9 @@ def get_package_dirs(path='src'):
 
 
 def get_source_structure(path='src'):
+	"""
+	Returns recursive list of python packages. 
+	"""
 	pkgs = []
 	for item in get_packages(path):
 		res = item.replace('\\', '.').replace('/', '.').replace(path + '.', '')
@@ -185,11 +217,20 @@ def get_source_structure(path='src'):
 	return pkgs
 
 def compile_sources():
+	"""
+	Compiles python sources in build/ directory.
+	"""
 	import compileall
 	compileall.compile_dir('build')
 
 
 def copy_modules(modules):
+	"""
+	Copies native modules into src/
+	The routine implements build_update command
+	functionality and executed after "setup.py build" command.
+	Works on Linux only.
+	"""
 	import string, platform, shutil
 
 	version = (string.split(sys.version)[0])[0:3]
@@ -210,13 +251,43 @@ def copy_modules(modules):
 #
 ############################################################
 
+def get_size(start_path='.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
+RM_CODE = 'REMOVING'
+MK_CODE = 'CREATING'
+CP_CODE = 'COPYING '
+ER_CODE = 'ERROR'
+INFO_CODE = ''
+
 class DEB_Builder:
+	"""
+	Represents deb package build object.
+	The object implements "setup.py bdist_deb" command.
+	Works after regular "setup.py build" command and 
+	constructs deb package using build result in build/ directory.
+	Arguments:
+	
+	name - package names
+	version - package version
+	pkg_dirs - list of root python packages
+	scripts - list of executable scripts
+	"""
 
 	name = None
 	version = None
 	pkg_dirs = []
 	scripts = []
+	pixpams = []
+	desktop_files = []
 
+	package_name = ''
+	installed_size = 0
 	py_version = ''
 	arch = ''
 	machine = ''
@@ -225,13 +296,16 @@ class DEB_Builder:
 	dst = ''
 	bin_dir = ''
 	pixmaps_dir = ''
-	package_name = ''
+	apps_dir = ''
 
-	def __init__(self, name, version, pkg_dirs, scripts=[]):
+	def __init__(self, name='', version='', pkg_dirs=[], scripts=[],
+				pixpams=[], desktop_files=[]):
 		self.name = name
 		self.version = version
 		self.pkg_dirs = pkg_dirs
 		self.scripts = scripts
+		self.pixmaps = pixpams
+		self.desktop_files = desktop_files
 
 		import string, platform
 		self.py_version = (string.split(sys.version)[0])[0:3]
@@ -248,52 +322,102 @@ class DEB_Builder:
 
 		self.dst = '%s/usr/lib/python%s/dist-packages' % (self.build_dir, self.py_version)
 		self.bin_dir = '%s/usr/bin' % self.build_dir
-
+		self.pixmaps_dir = '%s/usr/share/pixmaps' % self.build_dir
+		self.apps_dir = '%s/usr/share/applications' % self.build_dir
 
 		self.package_name = 'python-%s-%s_%s.deb' % (self.name, self.version, self.arch)
 
+	def info(self, msg, code=''):
+		if code == ER_CODE: ret = '%s>>> %s' % (code, msg)
+		elif not code: ret = msg
+		else: ret = '%s: %s' % (code, msg)
+		print ret
+
+	def _make_dir(self, path):
+		self.info('%s directory.' % path, MK_CODE)
+		try: os.makedirs(path)
+		except: raise IOError('Error while creating %s directory.') % path
+
 	def clear_build(self):
 		if os.path.lexists(self.build_dir):
-			os.system('rm -rf ' + self.build_dir)
+			self.info('%s directory.' % self.build_dir, RM_CODE)
+			if os.system('rm -rf ' + self.build_dir):
+				raise IOError('Error while removing %s directory.' % self.build_dir)
 		if os.path.lexists('dist'):
-			os.system('rm -rf dist/*.deb')
+			self.info('Cleaning dist/ directory.', RM_CODE)
+			if os.system('rm -rf dist/*.deb'):
+				raise IOError('Error while cleaning dist/ directory.')
 		else:
-			os.makedirs('dist')
+			self._make_dir('dist')
 
 	def write_control(self):
+		self._make_dir('build/deb-root/DEBIAN')
 		cmd = 'cat debian/control'
 		cmd += "|sed 's/<PLATFORM>/" + self.arch + "/g'"
 		cmd += "|sed 's/<VERSION>/" + self.version + "/g'"
+		cmd += "|sed 's/<SIZE>/" + self.installed_size + "/g'"
 		cmd += "> build/deb-root/DEBIAN/control"
-		os.system(cmd)
+		self.info('Writing Debian control file.', CP_CODE)
+		if os.system(cmd):
+			raise IOError('Error while writing Debian control file.')
 
 	def copy_build(self):
 		for dir in self.pkg_dirs:
-			os.system('cp -R %s %s' % (self.src + '/' + dir, self.dst))
+			src = self.src + '/' + dir
+			self.info('%s -> %s' % (src, self.dst), CP_CODE)
+			if os.system('cp -R %s %s' % (src, self.dst)):
+				raise IOError('Error while copying %s -> %s' % (src, self.dst))
 
 	def copy_scripts(self):
-		if self.scripts: os.makedirs(self.bin_dir)
+		if self.scripts: self._make_dir(self.bin_dir)
+		else:return
 		for item in self.scripts:
-			os.system('cp %s %s' % (item, self.bin_dir))
+			self.info('%s -> %s' % (item, self.bin_dir), CP_CODE)
+			if os.system('cp %s %s' % (item, self.bin_dir)):
+				raise IOError('Cannot copying %s -> %s' % (item, self.bin_dir))
+			filename = os.path.basename(item)
+			path = os.path.join(self.bin_dir, filename)
+			if os.path.isfile(path):
+				self.info('%s as executable' % path, MK_CODE)
+				if os.system('chmod +x %s' % path):
+					raise IOError('Cannot set executable flag for %s' % path)
+
+	def copy_files(self, path, files):
+		if files: self._make_dir(path)
+		else:return
+		for item in files:
+			self.info('%s -> %s' % (item, path), CP_CODE)
+			if os.system('cp %s %s' % (item, path)):
+				raise IOError('Cannot copying %s -> %s' % (item, path))
 
 	def make_package(self):
-		os.system('dpkg --build %s/ dist/%s' % (self.build_dir, self.package_name))
+		self.info('%s package.' % self.package_name, MK_CODE)
+		if os.system('dpkg --build %s/ dist/%s' % (self.build_dir, self.package_name)):
+			raise IOError('Cannot create package %s' % self.package_name)
 
 	def build(self):
-		if not os.path.isdir('build'):
-			print 'There is no project build! Run "setup.py build" and try again.'
-			return False
-		self.clear_build()
-		os.makedirs('build/deb-root/DEBIAN')
-		self.write_control()
-		os.makedirs(self.dst)
-		self.copy_build()
-		self.copy_scripts()
-		self.make_package()
-		return True
-
+		line = '=' * 30
+		self.info(line + '\n' + 'DEB PACKAGE BUILD' + '\n' + line)
+		try:
+			if not os.path.isdir('build'):
+				raise IOError('There is no project build! '
+							'Run "setup.py build" and try again.')
+			self.clear_build()
+			self._make_dir(self.dst)
+			self.copy_build()
+			self.copy_scripts()
+			self.copy_files(self.pixmaps_dir, self.pixmaps)
+			self.copy_files(self.apps_dir, self.desktop_files)
+			self.installed_size = str(int(get_size(self.build_dir) / 1024))
+			self.write_control()
+			self.make_package()
+		except IOError as e:
+			self.info(e, ER_CODE)
+			self.info(line + '\n' + 'BUILD FAILED!')
+			return 1
+		self.info(line + '\n' + 'BUILD SUCCESSFUL!')
+		return 0
 
 if __name__ == '__main__':
-	packages = get_source_structure()
-	for item in packages:
-		print item
+	packages = get_package_dirs()
+	print packages
