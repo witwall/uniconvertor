@@ -69,7 +69,7 @@ if __name__ == "__main__":
 	modules = []
 	scripts = ['src/uniconvertor', ]
 	data_files = [
-('/usr/share/mime/application/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
+('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
 ('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
 				]
 
