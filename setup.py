@@ -46,6 +46,15 @@ LCMS2 = False
 NAME = 'uniconvertor'
 VERSION = '2.0'
 
+src_path = 'src'
+include_path = '/usr/include'
+modules = []
+scripts = ['src/uniconvertor', ]
+data_files = [
+('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
+('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
+]
+
 ############################################################
 #
 # Main build procedure
@@ -67,23 +76,14 @@ if __name__ == "__main__":
 		DEB_PACKAGE = True
 		sys.argv[1] = 'build'
 
-	from distutils.core import setup, Extension
-
-	src_path = 'src'
-	include_path = '/usr/include'
-	modules = []
-	scripts = ['src/uniconvertor', ]
-	data_files = [
-('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
-('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
-				]
-
 	if os.path.isfile(os.path.join(include_path, 'lcms2.h')):LCMS2 = True
 	elif os.path.isfile(os.path.join(include_path, 'lcms.h')):LCMS2 = False
 	else:
 		msg = 'LittleCMS header file is not found! '
 		print 'ERROR>>> %s' % msg
 		sys.exit()
+
+	from distutils.core import setup, Extension
 
 	filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
 	files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
