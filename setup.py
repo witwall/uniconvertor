@@ -155,42 +155,17 @@ if __name__ == "__main__":
 			download_url='http://sk1project.org/modules.php?name=Products&product=uniconvertor',
 			long_description='''
 UniConvertor is a multiplatform universal vector graphics translator.
-It uses sK1 model to convert one format to another.
+Uses PDXF model to convert one format to another. 
 
 sK1 Project (http://sk1project.org),
 Copyright (C) 2007-2013 by Igor E. Novikov
 --------------------------------------------------------------------------------
-
-Import filters: 
-    * CorelDRAW ver.7-X3,X4 (CDR/CDT/CCX/CDRX/CMX)
-    * Adobe Illustrator up to 9 ver. (AI postscript based)
-    * Postscript (PS)
-    * Encapsulated Postscript (EPS)
-    * Computer Graphics Metafile (CGM)
-    * Windows Metafile (WMF)
-    * XFIG
-    * Scalable Vector Graphics (SVG)
-    * Skencil/Sketch/sK1 (SK and SK1)
-    * Acorn Draw (AFF)
-    * HPGL for cutting plotter files (PLT)
-    * Autocad Drawing Exchange Format (DXF)
-    * Design format (Tajima) (DST)
-    * Embroidery file format (Brother) (PES)
-    * Embroidery file format (Melco) (EXP)
-    * Design format (Pfaff home) (PCS)
+Supported input formats:  
+ PDXF, CDR, CDT, CCX, CDRX, CMX, AI, PS, EPS, CGM, WMF, XFIG, SVG, SK, SK1, 
+ AFF, PLT, DXF, DST, PES, EXP, PCS
 --------------------------------------------------------------------------------
-
-Export filters: 
-    * AI - Postscript based Adobe Illustrator 5.0 format
-    * SVG - Scalable Vector Graphics
-    * SK - Sketch/Skencil format
-    * SK1 - sK1 format
-    * CGM - Computer Graphics Metafile
-    * WMF - Windows Metafile
-    * PDF - Portable Document Format
-    * PS  - PostScript
-    * PLT - HPGL for cutting plotter files
-    
+Supported output formats: 
+ PDXF, AI, SVG, SK, SK1, CGM, WMF, PDF, PS, PLT    
 --------------------------------------------------------------------------------
 			''',
 		classifiers=[
