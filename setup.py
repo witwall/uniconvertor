@@ -32,7 +32,7 @@ Usage:
  to create binary DEB distribution:  python setup.py bdist_deb
 --------------------------------------------------------------------------
 
- help on available distribution formats: python setup.py bdist --help-formats
+help on available distribution formats: python setup.py bdist --help-formats
 """
 
 import os, sys
@@ -40,120 +40,34 @@ import os, sys
 import libutils
 from libutils import make_source_list, DEB_Builder
 
+#Flags
 UPDATE_MODULES = False
 DEB_PACKAGE = False
-LCMS2 = False
+
+#Package description
 NAME = 'uniconvertor'
 VERSION = '2.0'
-
-src_path = 'src'
-include_path = '/usr/include'
-modules = []
-scripts = ['src/uniconvertor', ]
-data_files = [
-('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
-('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
+DESCRIPTION = 'Universal vector graphics translator'
+AUTHOR = 'Igor E. Novikov'
+AUTHOR_EMAIL = 'igor.e.novikov@gmail.com'
+MAINTAINER = AUTHOR
+MAINTAINER_EMAIL = AUTHOR_EMAIL
+LICENSE = 'GPL v3'
+URL = 'http://sk1project.org'
+DOWNLOAD_URL = 'http://sk1project.org/modules.php?name=Products&product=uniconvertor'
+CLASSIFIERS = [
+'Development Status :: 6 - Mature',
+'Environment :: Console',
+'Intended Audience :: End Users/Desktop',
+'License :: OSI Approved :: LGPL v2',
+'License :: OSI Approved :: GPL v2',
+'Operating System :: POSIX',
+'Operating System :: MacOS :: MacOS X',
+'Programming Language :: Python',
+'Programming Language :: C',
+"Topic :: Multimedia :: Graphics :: Graphics Conversion",
 ]
-
-############################################################
-#
-# Main build procedure
-#
-############################################################
-
-if __name__ == "__main__":
-
-	if len(sys.argv) == 1:
-		print 'Please specify build options!'
-		print __doc__
-		sys.exit(0)
-
-	if len(sys.argv) > 1 and sys.argv[1] == 'build_update':
-		UPDATE_MODULES = True
-		sys.argv[1] = 'build'
-
-	if len(sys.argv) > 1 and sys.argv[1] == 'bdist_deb':
-		DEB_PACKAGE = True
-		sys.argv[1] = 'build'
-
-	if os.path.isfile(os.path.join(include_path, 'lcms2.h')):LCMS2 = True
-	elif os.path.isfile(os.path.join(include_path, 'lcms.h')):LCMS2 = False
-	else:
-		msg = 'LittleCMS header file is not found! '
-		print 'ERROR>>> %s' % msg
-		sys.exit()
-
-	from distutils.core import setup, Extension
-
-	filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
-	files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
-			'subfilefilter.c', 'base64filter.c', 'nullfilter.c',
-			'stringfilter.c', 'binfile.c', 'hexfilter.c']
-	files = make_source_list(filter_src, files)
-	filter_module = Extension('uc2.utils.streamfilter',
-			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-			sources=files)
-	modules.append(filter_module)
-
- 	sk1objs_src = os.path.join(src_path, 'uc2', 'formats', 'sk1', 'sk1objs')
- 	files = ['_sketchmodule.c', 'skpoint.c', 'skcolor.c', 'sktrafo.c',
-			'skrect.c', 'skfm.c', 'curvefunc.c', 'curveobject.c', 'curvelow.c',
-			'curvemisc.c', 'skaux.c', 'skimage.c', ]
- 	files = make_source_list(sk1objs_src, files)
-	sk1objs_module = Extension('uc2.formats.sk1._sk1objs',
-			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-			sources=files)
-	modules.append(sk1objs_module)
-
-	cairo_src = os.path.join(src_path, 'uc2', 'libcairo')
-	files = make_source_list(cairo_src, ['_libcairo.c', ])
-	include_dirs = make_source_list(include_path, ['cairo', 'pycairo'])
-	cairo_module = Extension('uc2.libcairo._libcairo',
-			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-			sources=files, include_dirs=include_dirs,
-			libraries=['cairo'])
-	modules.append(cairo_module)
-
-#	libimg_src = os.path.join(src_path, 'uc2', 'libimg')
-#	files = make_source_list(libimg_src, ['_libimg.c', ])
-#	include_dirs = make_source_list(include_path, ['ImageMagick', ])
-#	libimg_module = Extension('uc2.libimg._libimg',
-#			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-#			sources=files, include_dirs=include_dirs,
-#			libraries=['MagickWand'])
-#	modules.append(libimg_module)
-
- 	if LCMS2:
-	 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
-	 	files = make_source_list(pycms_src, ['_cms2.c', ])
-		pycms_module = Extension('uc2.cms._cms',
-				define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-				sources=files,
-				libraries=['lcms2'],
-				extra_compile_args=["-Wall"])
-		modules.append(pycms_module)
- 	else:
-	 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
-	 	files = make_source_list(pycms_src, ['_cms.c', ])
-		pycms_module = Extension('uc2.cms._cms',
-				define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-				sources=files,
-				libraries=['lcms'],
-				extra_compile_args=["-Wall"])
-		modules.append(pycms_module)
-
-
-	setup (name=NAME,
-			version=VERSION,
-			description='Universal vector graphics translator',
-			author='Igor E. Novikov',
-			author_email='igor.e.novikov@gmail.com',
-			maintainer='Igor E. Novikov',
-			maintainer_email='igor.e.novikov@gmail.com',
-			license='GPL v3',
-			url='http://sk1project.org',
-			download_url='http://sk1project.org/modules.php?name=Products&product=uniconvertor',
-			long_description='''
+LONG_DESCRIPTION = '''
 UniConvertor is a multiplatform universal vector graphics translator.
 Uses PDXF model to convert one format to another. 
 
@@ -167,25 +81,136 @@ Supported input formats:
 Supported output formats: 
  PDXF, AI, SVG, SK, SK1, CGM, WMF, PDF, PS, PLT    
 --------------------------------------------------------------------------------
-			''',
-		classifiers=[
-			'Development Status :: 6 - Mature',
-			'Environment :: Console',
-			'Intended Audience :: End Users/Desktop',
-			'License :: OSI Approved :: LGPL v2',
-			'License :: OSI Approved :: GPL v2',
-			'Operating System :: POSIX',
-			'Operating System :: MacOS :: MacOS X',
-			'Programming Language :: Python',
-			'Programming Language :: C',
-			"Topic :: Multimedia :: Graphics :: Graphics Conversion",
-			],
+'''
+LONG_DEB_DESCRIPTION = ''' .
+ UniConvertor is a multiplatform universal vector graphics translator.
+ Uses PDXF model to convert one format to another. 
+ . 
+ sK1 Team (http://sk1project.org), Copyright (C) 2007-2013 by Igor E. Novikov 
+ .
+ Supported input formats:  
+ PDXF, CDR, CDT, CCX, CDRX, CMX, AI, PS, EPS, CGM, WMF, XFIG, SVG, SK, SK1, 
+ AFF, PLT, DXF, DST, PES, EXP, PCS
+ .
+ Supported output formats: 
+ PDXF, AI, SVG, SK, SK1, CGM, WMF, PDF, PS, PLT
+ .
+'''
 
-			packages=libutils.get_source_structure(),
-			package_dir=libutils.get_package_dirs(),
-			data_files=data_files,
-			scripts=scripts,
-			ext_modules=modules)
+#Build data
+src_path = 'src'
+include_path = '/usr/include'
+modules = []
+scripts = ['src/uniconvertor', ]
+deb_scripts = ['debian/postinst', 'debian/postrm']
+data_files = [
+('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
+('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
+]
+deb_depends = 'libmagickwand2, python (>=2.4), python (<<3.0), '
+deb_depends += 'python-imaging, python-cairo'
+
+############################################################
+#
+# Main build procedure
+#
+############################################################
+
+if len(sys.argv) == 1:
+	print 'Please specify build options!'
+	print __doc__
+	sys.exit(0)
+
+if len(sys.argv) > 1 and sys.argv[1] == 'build_update':
+	UPDATE_MODULES = True
+	sys.argv[1] = 'build'
+
+if len(sys.argv) > 1 and sys.argv[1] == 'bdist_deb':
+	DEB_PACKAGE = True
+	sys.argv[1] = 'build'
+
+from distutils.core import setup, Extension
+
+filter_src = os.path.join(src_path, 'uc2', 'utils', 'streamfilter')
+files = ['streamfilter.c', 'filterobj.c', 'linefilter.c',
+		'subfilefilter.c', 'base64filter.c', 'nullfilter.c',
+		'stringfilter.c', 'binfile.c', 'hexfilter.c']
+files = make_source_list(filter_src, files)
+filter_module = Extension('uc2.utils.streamfilter',
+		define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+		sources=files)
+modules.append(filter_module)
+
+sk1objs_src = os.path.join(src_path, 'uc2', 'formats', 'sk1', 'sk1objs')
+files = ['_sketchmodule.c', 'skpoint.c', 'skcolor.c', 'sktrafo.c',
+	'skrect.c', 'skfm.c', 'curvefunc.c', 'curveobject.c', 'curvelow.c',
+	'curvemisc.c', 'skaux.c', 'skimage.c', ]
+files = make_source_list(sk1objs_src, files)
+sk1objs_module = Extension('uc2.formats.sk1._sk1objs',
+		define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+		sources=files)
+modules.append(sk1objs_module)
+
+cairo_src = os.path.join(src_path, 'uc2', 'libcairo')
+files = make_source_list(cairo_src, ['_libcairo.c', ])
+include_dirs = make_source_list(include_path, ['cairo', 'pycairo'])
+cairo_module = Extension('uc2.libcairo._libcairo',
+		define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+		sources=files, include_dirs=include_dirs,
+		libraries=['cairo'])
+modules.append(cairo_module)
+
+#libimg_src = os.path.join(src_path, 'uc2', 'libimg')
+#files = make_source_list(libimg_src, ['_libimg.c', ])
+#include_dirs = make_source_list(include_path, ['ImageMagick', ])
+#libimg_module = Extension('uc2.libimg._libimg',
+#		define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+#		sources=files, include_dirs=include_dirs,
+#		libraries=['MagickWand'])
+#modules.append(libimg_module)
+
+if os.path.isfile(os.path.join(include_path, 'lcms2.h')):
+ 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
+ 	files = make_source_list(pycms_src, ['_cms2.c', ])
+	pycms_module = Extension('uc2.cms._cms',
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files,
+			libraries=['lcms2'],
+			extra_compile_args=["-Wall"])
+	modules.append(pycms_module)
+	deb_depends = 'liblcms2, ' + deb_depends
+elif os.path.isfile(os.path.join(include_path, 'lcms.h')):
+ 	pycms_src = os.path.join(src_path, 'uc2', 'cms')
+ 	files = make_source_list(pycms_src, ['_cms.c', ])
+	pycms_module = Extension('uc2.cms._cms',
+			define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+			sources=files,
+			libraries=['lcms'],
+			extra_compile_args=["-Wall"])
+	modules.append(pycms_module)
+	deb_depends = 'liblcms1, ' + deb_depends
+else:
+	msg = 'LittleCMS header file is not found! '
+	print 'ERROR>>> %s' % msg
+	sys.exit()
+
+setup(name=NAME,
+	version=VERSION,
+	description=DESCRIPTION,
+	author=AUTHOR,
+	author_email=AUTHOR_EMAIL,
+	maintainer=MAINTAINER,
+	maintainer_email=MAINTAINER_EMAIL,
+	license=LICENSE,
+	url=URL,
+	download_url=DOWNLOAD_URL,
+	long_description=LONG_DESCRIPTION,
+	classifiers=CLASSIFIERS,
+	packages=libutils.get_source_structure(),
+	package_dir=libutils.get_package_dirs(),
+	data_files=data_files,
+	scripts=scripts,
+	ext_modules=modules)
 
 #################################################
 # .py source compiling
@@ -206,9 +231,13 @@ if UPDATE_MODULES: libutils.copy_modules(modules)
 # Implementation of bdist_deb command
 #################################################
 if DEB_PACKAGE:
-	deb_scripts = ['debian/postinst', 'debian/postrm']
 	bld = DEB_Builder(name=NAME,
 					version=VERSION,
+					maintainer='%s <%s>' % (AUTHOR, AUTHOR_EMAIL),
+					depends=deb_depends,
+					homepage=URL,
+					description=DESCRIPTION,
+					long_description=LONG_DEB_DESCRIPTION,
 					pkg_dirs=libutils.get_package_dirs().keys(),
 					scripts=scripts,
 					data_files=data_files,
