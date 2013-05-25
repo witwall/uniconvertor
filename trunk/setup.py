@@ -58,7 +58,7 @@ MAINTAINER = AUTHOR
 MAINTAINER_EMAIL = AUTHOR_EMAIL
 LICENSE = 'GPL v3'
 URL = 'http://sk1project.org'
-DOWNLOAD_URL = 'http://sk1project.org/modules.php?name=Products&product=uniconvertor'
+DOWNLOAD_URL = URL
 CLASSIFIERS = [
 'Development Status :: 6 - Mature',
 'Environment :: Console',
