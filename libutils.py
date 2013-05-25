@@ -277,6 +277,8 @@ class DEB_Builder:
 	version - package version
 	pkg_dirs - list of root python packages
 	scripts - list of executable scripts
+	data_files - list of data files and appropriate destination directories. 
+	deb_scripts - list of Debian package scripts.
 	"""
 
 	name = None
@@ -284,6 +286,7 @@ class DEB_Builder:
 	pkg_dirs = []
 	scripts = []
 	data_files = []
+	deb_scripts = []
 
 	package_name = ''
 	installed_size = 0
@@ -298,12 +301,13 @@ class DEB_Builder:
 	apps_dir = ''
 
 	def __init__(self, name='', version='', pkg_dirs=[], scripts=[],
-				data_files=[]):
+				data_files=[], deb_scripts=[]):
 		self.name = name
 		self.version = version
 		self.pkg_dirs = pkg_dirs
 		self.scripts = scripts
 		self.data_files = data_files
+		self.deb_scripts = deb_scripts
 
 		import string, platform
 		self.py_version = (string.split(sys.version)[0])[0:3]
@@ -357,9 +361,7 @@ class DEB_Builder:
 		self.info('Writing Debian control file.', CP_CODE)
 		if os.system(cmd):
 			raise IOError('Error while writing Debian control file.')
-		files = ['debian/postinst', 'debian/postrm',
-				'debian/preinst', 'debian/prerm']
-		for file in files:
+		for file in self.deb_scripts:
 			if os.path.isfile(file):
 				self.info('%s -> %s' % (file, deb_folder), CP_CODE)
 				if os.system('cp %s %s' % (file, deb_folder)):
