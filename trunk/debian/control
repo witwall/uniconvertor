@@ -9,7 +9,7 @@ Priority: extra
 Description: Universal vector graphics translator
  .
  UniConvertor is a multiplatform universal vector graphics translator.
- It uses PDXF model to convert one format to another. 
+ Uses PDXF model to convert one format to another. 
  . 
  sK1 Team (http://sk1project.org), Copyright (C) 2007-2013 by Igor E. Novikov 
  .
