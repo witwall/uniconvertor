@@ -483,7 +483,3 @@ class DEB_Builder:
 			return 1
 		self.info(line + '\n' + 'BUILD SUCCESSFUL!')
 		return 0
-
-if __name__ == '__main__':
-	packages = get_package_dirs()
-	print packages
