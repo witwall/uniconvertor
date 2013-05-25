@@ -140,6 +140,14 @@ def generate_locales():
 #
 ############################################################
 
+def get_resources():
+	dirs = get_dirs_tree('src/pdesign/share')
+	res_dirs = []
+	for item in dirs:
+		res_dirs.append(os.path.join(item[4:], '*.*'))
+	res_dirs.append('pdesign/share/*.*')
+	return res_dirs
+
 def clear_build():
 	"""
 	Clears build result.
@@ -290,6 +298,7 @@ class DEB_Builder:
 
 	name = None
 	pkg_dirs = []
+	package_data = {}
 	scripts = []
 	data_files = []
 	deb_scripts = []
@@ -328,6 +337,7 @@ class DEB_Builder:
 				description='',
 				long_description='',
 				pkg_dirs=[],
+				package_data={},
 				scripts=[],
 				data_files=[],
 				deb_scripts=[]):
@@ -344,6 +354,7 @@ class DEB_Builder:
 		self.long_description = long_description
 
 		self.pkg_dirs = pkg_dirs
+		self.package_data = package_data
 		self.scripts = scripts
 		self.data_files = data_files
 		self.deb_scripts = deb_scripts
@@ -447,7 +458,9 @@ class DEB_Builder:
 		if files and not os.path.isdir(path): self._make_dir(path)
 		if not files:return
 		for item in files:
-			self.info('%s -> %s' % (item, path), CP_CODE)
+			msg = '%s -> %s' % (item, path)
+			if len(msg) > 80:msg = '%s -> \n%s%s' % (item, ' '*10, path)
+			self.info(msg, CP_CODE)
 			if os.system('cp %s %s' % (item, path)):
 				raise IOError('Cannot copying %s -> %s' % (item, path))
 
@@ -455,6 +468,33 @@ class DEB_Builder:
 		for item in self.data_files:
 			path, files = item
 			self.copy_files(self.build_dir + path, files)
+
+	def copy_package_data_files(self):
+		files = []
+		pkgs = self.package_data.keys()
+		for pkg in pkgs:
+			items = self.package_data[pkg]
+			for item in items:
+				path = 'src/' + item
+				if os.path.basename(path) == '*.*':
+					flist = []
+					dir = os.path.join(self.dst, os.path.dirname(item))
+					fldir = os.path.dirname(path)
+					fls = os.listdir(fldir)
+					for fl in fls:
+						flpath = os.path.join(fldir, fl)
+						if os.path.isfile(flpath):
+							flist.append(flpath)
+					files.append([dir, flist])
+				else:
+					if os.path.isfile(path):
+						dir = os.path.join(self.dst, os.path.dirname(item))
+						files.append([dir, [path, ]])
+
+		for item in files:
+			path, files = item
+			self.copy_files(path, files)
+
 
 	def make_package(self):
 		self.info('%s package.' % self.package_name, MK_CODE)
@@ -474,6 +514,7 @@ class DEB_Builder:
 			self.copy_scripts(self.bin_dir, self.scripts)
 			self.copy_scripts(self.deb_dir, self.deb_scripts)
 			self.copy_data_files()
+			self.copy_package_data_files()
 			self.installed_size = str(int(get_size(self.build_dir) / 1024))
 			self.write_control()
 			self.make_package()
@@ -483,3 +524,4 @@ class DEB_Builder:
 			return 1
 		self.info(line + '\n' + 'BUILD SUCCESSFUL!')
 		return 0
+
