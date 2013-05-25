@@ -2,6 +2,9 @@ include LICENSE
 include libutils.py
 include MANIFEST.in
 include GPLv3.txt
+include src/sk1project.keys
+include src/sk1project.mime
+include src/vnd.sk1project.pdxf-graphics.xml
 
 recursive-include debian *
 recursive-include src/uc2/utils/streamfilter *.c
