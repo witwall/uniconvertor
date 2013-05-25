@@ -44,7 +44,11 @@ from libutils import make_source_list, DEB_Builder
 UPDATE_MODULES = False
 DEB_PACKAGE = False
 
-#Package description
+############################################################
+#
+# Package description
+#
+############################################################
 NAME = 'uniconvertor'
 VERSION = '2.0'
 DESCRIPTION = 'Universal vector graphics translator'
@@ -60,7 +64,7 @@ CLASSIFIERS = [
 'Environment :: Console',
 'Intended Audience :: End Users/Desktop',
 'License :: OSI Approved :: LGPL v2',
-'License :: OSI Approved :: GPL v2',
+'License :: OSI Approved :: GPL v3',
 'Operating System :: POSIX',
 'Operating System :: MacOS :: MacOS X',
 'Programming Language :: Python',
@@ -97,7 +101,11 @@ LONG_DEB_DESCRIPTION = ''' .
  .
 '''
 
-#Build data
+############################################################
+#
+# Build data
+#
+############################################################
 src_path = 'src'
 include_path = '/usr/include'
 modules = []
