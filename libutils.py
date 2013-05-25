@@ -275,6 +275,15 @@ class DEB_Builder:
 	
 	name - package names
 	version - package version
+	arch - system achitecture (amd64, i386, all), if not provided will be
+			detected automatically
+	maintainer - package maintainer (John Smith <js@email.x>)
+	depends - comma separated string of dependencies
+	section - package section (default 'python')
+	priority - package priority for users (default 'optional')
+	homepage - project homepage
+	description - short package description
+	long_description - long description as defined by Debian rules
 	pkg_dirs - list of root python packages
 	scripts - list of executable scripts
 	data_files - list of data files and appropriate destination directories. 
@@ -282,41 +291,76 @@ class DEB_Builder:
 	"""
 
 	name = None
-	version = None
 	pkg_dirs = []
 	scripts = []
 	data_files = []
 	deb_scripts = []
 
-	package_name = ''
-	installed_size = 0
-	py_version = ''
+	package = ''
+	version = None
 	arch = ''
+	maintainer = ''
+	installed_size = 0
+	depends = ''
+	section = 'python'
+	priority = 'optional'
+	homepage = ''
+	description = ''
+	long_description = ''
+
+	package_name = ''
+	py_version = ''
 	machine = ''
 	build_dir = 'build/deb-root'
+	deb_dir = 'build/deb-root/DEBIAN'
 	src = ''
 	dst = ''
 	bin_dir = ''
 	pixmaps_dir = ''
 	apps_dir = ''
 
-	def __init__(self, name='', version='', pkg_dirs=[], scripts=[],
-				data_files=[], deb_scripts=[]):
+	def __init__(self, name='',
+				version='',
+				arch='',
+				maintainer='',
+				depends='',
+				section='',
+				priority='',
+				homepage='',
+				description='',
+				long_description='',
+				pkg_dirs=[],
+				scripts=[],
+				data_files=[],
+				deb_scripts=[]):
+
 		self.name = name
 		self.version = version
+		self.arch = arch
+		self.maintainer = maintainer
+		self.depends = depends
+		if section:self.section = section
+		if priority:self.priority = priority
+		self.homepage = homepage
+		self.description = description
+		self.long_description = long_description
+
 		self.pkg_dirs = pkg_dirs
 		self.scripts = scripts
 		self.data_files = data_files
 		self.deb_scripts = deb_scripts
 
+		self.package = 'python-%s' % self.name
+
 		import string, platform
 		self.py_version = (string.split(sys.version)[0])[0:3]
 
-		arch, bin = platform.architecture()
-		if arch == '64bit':
-			self.arch = 'amd64'
-		else:
-			self.arch = 'i386'
+		if not self.arch:
+			arch, bin = platform.architecture()
+			if arch == '64bit':
+				self.arch = 'amd64'
+			else:
+				self.arch = 'i386'
 
 		self.machine = platform.machine()
 
@@ -327,6 +371,7 @@ class DEB_Builder:
 
 		self.package_name = 'python-%s-%s_%s.deb' % (self.name, self.version, self.arch)
 
+
 	def info(self, msg, code=''):
 		if code == ER_CODE: ret = '%s>>> %s' % (code, msg)
 		elif not code: ret = msg
@@ -334,9 +379,10 @@ class DEB_Builder:
 		print ret
 
 	def _make_dir(self, path):
-		self.info('%s directory.' % path, MK_CODE)
-		try: os.makedirs(path)
-		except: raise IOError('Error while creating %s directory.') % path
+		if not os.path.lexists(path):
+			self.info('%s directory.' % path, MK_CODE)
+			try: os.makedirs(path)
+			except: raise IOError('Error while creating %s directory.') % path
 
 	def clear_build(self):
 		if os.path.lexists(self.build_dir):
@@ -351,21 +397,32 @@ class DEB_Builder:
 			self._make_dir('dist')
 
 	def write_control(self):
-		deb_folder = 'build/deb-root/DEBIAN'
-		self._make_dir(deb_folder)
-		cmd = 'cat debian/control'
-		cmd += "|sed 's/<PLATFORM>/" + self.arch + "/g'"
-		cmd += "|sed 's/<VERSION>/" + self.version + "/g'"
-		cmd += "|sed 's/<SIZE>/" + self.installed_size + "/g'"
-		cmd += "> build/deb-root/DEBIAN/control"
-		self.info('Writing Debian control file.', CP_CODE)
-		if os.system(cmd):
+		self._make_dir(self.deb_dir)
+		control_list = [
+		['Package', self.package],
+		['Version', self.version],
+		['Architecture', self.arch],
+		['Maintainer', self.maintainer],
+		['Installed-Size', self.installed_size],
+		['Depends', self.depends],
+		['Section', self.section],
+		['Priority', self.priority],
+		['Homepage', self.homepage],
+		['Description', self.description],
+		['', self.long_description],
+		]
+		path = os.path.join(self.deb_dir, 'control')
+		self.info('Writing Debian control file.', MK_CODE)
+		try:
+			control = open(path, 'w')
+			for item in control_list:
+				name, val = item
+				if val:
+					if name: control.write('%s: %s\n' % (name, val))
+					else: control.write('%s\n' % val)
+			control.close()
+		except:
 			raise IOError('Error while writing Debian control file.')
-		for file in self.deb_scripts:
-			if os.path.isfile(file):
-				self.info('%s -> %s' % (file, deb_folder), CP_CODE)
-				if os.system('cp %s %s' % (file, deb_folder)):
-					raise IOError('Error while copying %s -> %s' % (file, deb_folder))
 
 	def copy_build(self):
 		for dir in self.pkg_dirs:
@@ -374,15 +431,15 @@ class DEB_Builder:
 			if os.system('cp -R %s %s' % (src, self.dst)):
 				raise IOError('Error while copying %s -> %s' % (src, self.dst))
 
-	def copy_scripts(self):
-		if self.scripts: self._make_dir(self.bin_dir)
+	def copy_scripts(self, dir, scripts):
+		if scripts: self._make_dir(dir)
 		else:return
-		for item in self.scripts:
-			self.info('%s -> %s' % (item, self.bin_dir), CP_CODE)
-			if os.system('cp %s %s' % (item, self.bin_dir)):
-				raise IOError('Cannot copying %s -> %s' % (item, self.bin_dir))
+		for item in scripts:
+			self.info('%s -> %s' % (item, dir), CP_CODE)
+			if os.system('cp %s %s' % (item, dir)):
+				raise IOError('Cannot copying %s -> %s' % (item, dir))
 			filename = os.path.basename(item)
-			path = os.path.join(self.bin_dir, filename)
+			path = os.path.join(dir, filename)
 			if os.path.isfile(path):
 				self.info('%s as executable' % path, MK_CODE)
 				if os.system('chmod +x %s' % path):
@@ -416,7 +473,8 @@ class DEB_Builder:
 			self.clear_build()
 			self._make_dir(self.dst)
 			self.copy_build()
-			self.copy_scripts()
+			self.copy_scripts(self.bin_dir, self.scripts)
+			self.copy_scripts(self.deb_dir, self.deb_scripts)
 			self.copy_data_files()
 			self.installed_size = str(int(get_size(self.build_dir) / 1024))
 			self.write_control()
