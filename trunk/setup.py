@@ -54,6 +54,11 @@ VERSION = '2.0'
 
 if __name__ == "__main__":
 
+	if len(sys.argv) == 1:
+		print 'Please specify build options!'
+		print __doc__
+		sys.exit(0)
+
 	if len(sys.argv) > 1 and sys.argv[1] == 'build_update':
 		UPDATE_MODULES = True
 		sys.argv[1] = 'build'
