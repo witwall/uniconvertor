@@ -90,7 +90,8 @@ LONG_DEB_DESCRIPTION = ''' .
  UniConvertor is a multiplatform universal vector graphics translator.
  Uses PDXF model to convert one format to another. 
  . 
- sK1 Team (http://sk1project.org), Copyright (C) 2007-2013 by Igor E. Novikov 
+ sK1 Project (http://sk1project.org),
+ Copyright (C) 2007-2013 by Igor E. Novikov 
  .
  Supported input formats:  
  PDXF, CDR, CDT, CCX, CDRX, CMX, AI, PS, EPS, CGM, WMF, XFIG, SVG, SK, SK1, 
