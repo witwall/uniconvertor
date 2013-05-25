@@ -41,7 +41,7 @@ import libutils
 from libutils import make_source_list, DEB_Builder
 
 UPDATE_MODULES = False
-DEBIAN = False
+DEB_PACKAGE = False
 LCMS2 = False
 NAME = 'uniconvertor'
 VERSION = '2.0'
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 		sys.argv[1] = 'build'
 
 	if len(sys.argv) > 1 and sys.argv[1] == 'bdist_deb':
-		DEBIAN = True
+		DEB_PACKAGE = True
 		sys.argv[1] = 'build'
 
 	from distutils.core import setup, Extension
@@ -230,12 +230,14 @@ if UPDATE_MODULES: libutils.copy_modules(modules)
 #################################################
 # Implementation of bdist_deb command
 #################################################
-if DEBIAN:
+if DEB_PACKAGE:
+	deb_scripts = ['debian/postinst', 'debian/postrm']
 	bld = DEB_Builder(name=NAME,
 					version=VERSION,
 					pkg_dirs=libutils.get_package_dirs().keys(),
 					scripts=scripts,
-					data_files=data_files)
+					data_files=data_files,
+					deb_scripts=deb_scripts)
 	bld.build()
 
 libutils.clear_build()
