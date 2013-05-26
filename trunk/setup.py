@@ -247,7 +247,7 @@ if DEB_PACKAGE:
 					homepage=URL,
 					description=DESCRIPTION,
 					long_description=LONG_DEB_DESCRIPTION,
-					pkg_dirs=libutils.get_package_dirs().keys(),
+					package_dirs=libutils.get_package_dirs(),
 					scripts=scripts,
 					data_files=data_files,
 					deb_scripts=deb_scripts)
