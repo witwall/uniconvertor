@@ -140,12 +140,15 @@ def generate_locales():
 #
 ############################################################
 
-def get_resources():
-	dirs = get_dirs_tree('src/pdesign/share')
+def get_resources(pkg_path, path):
+	path = os.path.normpath(path)
+	pkg_path = os.path.normpath(pkg_path)
+	size = len(pkg_path) + 1
+	dirs = get_dirs_tree(path)
+	dirs.append(path)
 	res_dirs = []
 	for item in dirs:
-		res_dirs.append(os.path.join(item[4:], '*.*'))
-	res_dirs.append('pdesign/share/*.*')
+		res_dirs.append(os.path.join(item[size:], '*.*'))
 	return res_dirs
 
 def clear_build():
@@ -290,14 +293,14 @@ class DEB_Builder:
 	homepage - project homepage
 	description - short package description
 	long_description - long description as defined by Debian rules
-	pkg_dirs - list of root python packages
+	package_dirs - list of root python packages
 	scripts - list of executable scripts
 	data_files - list of data files and appropriate destination directories. 
 	deb_scripts - list of Debian package scripts.
 	"""
 
 	name = None
-	pkg_dirs = []
+	package_dirs = {}
 	package_data = {}
 	scripts = []
 	data_files = []
@@ -336,7 +339,7 @@ class DEB_Builder:
 				homepage='',
 				description='',
 				long_description='',
-				pkg_dirs=[],
+				package_dirs=[],
 				package_data={},
 				scripts=[],
 				data_files=[],
@@ -353,7 +356,7 @@ class DEB_Builder:
 		self.description = description
 		self.long_description = long_description
 
-		self.pkg_dirs = pkg_dirs
+		self.package_dirs = package_dirs
 		self.package_data = package_data
 		self.scripts = scripts
 		self.data_files = data_files
@@ -434,8 +437,9 @@ class DEB_Builder:
 			raise IOError('Error while writing Debian control file.')
 
 	def copy_build(self):
-		for dir in self.pkg_dirs:
-			src = self.src + '/' + dir
+		for pkg in self.package_dirs.keys():
+			dir = self.package_dirs[pkg]
+			src = self.src + '/' + pkg
 			self.info('%s -> %s' % (src, self.dst), CP_CODE)
 			if os.system('cp -R %s %s' % (src, self.dst)):
 				raise IOError('Error while copying %s -> %s' % (src, self.dst))
@@ -475,7 +479,7 @@ class DEB_Builder:
 		for pkg in pkgs:
 			items = self.package_data[pkg]
 			for item in items:
-				path = 'src/' + item
+				path = os.path.join(self.package_dirs[pkg], item)
 				if os.path.basename(path) == '*.*':
 					flist = []
 					dir = os.path.join(self.dst, os.path.dirname(item))
@@ -490,11 +494,9 @@ class DEB_Builder:
 					if os.path.isfile(path):
 						dir = os.path.join(self.dst, os.path.dirname(item))
 						files.append([dir, [path, ]])
-
 		for item in files:
 			path, files = item
 			self.copy_files(path, files)
-
 
 	def make_package(self):
 		self.info('%s package.' % self.package_name, MK_CODE)
@@ -514,7 +516,6 @@ class DEB_Builder:
 			self.copy_scripts(self.bin_dir, self.scripts)
 			self.copy_scripts(self.deb_dir, self.deb_scripts)
 			self.copy_data_files()
-			self.copy_package_data_files()
 			self.installed_size = str(int(get_size(self.build_dir) / 1024))
 			self.write_control()
 			self.make_package()
