@@ -43,6 +43,7 @@ from libutils import make_source_list, DEB_Builder
 #Flags
 UPDATE_MODULES = False
 DEB_PACKAGE = False
+CLEAR_BUILD = True
 
 ############################################################
 #
@@ -129,6 +130,9 @@ if len(sys.argv) == 1:
 	print 'Please specify build options!'
 	print __doc__
 	sys.exit(0)
+
+if len(sys.argv) > 1 and sys.argv[1] == 'build':
+	CLEAR_BUILD = False
 
 if len(sys.argv) > 1 and sys.argv[1] == 'build_update':
 	UPDATE_MODULES = True
@@ -253,4 +257,4 @@ if DEB_PACKAGE:
 					deb_scripts=deb_scripts)
 	bld.build()
 
-libutils.clear_build()
+if CLEAR_BUILD: libutils.clear_build()
