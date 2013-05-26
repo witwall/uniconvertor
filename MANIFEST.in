@@ -7,8 +7,8 @@ include src/sk1project.mime
 include src/vnd.sk1project.pdxf-graphics.xml
 
 recursive-include debian *
-recursive-include src/uc2/utils/streamfilter *.c
-recursive-include src/uc2/formats/sk1/sk1objs *.c
+recursive-include src/uc2/utils/streamfilter *.*
+recursive-include src/uc2/formats/sk1/sk1objs *.*
 recursive-include src/uc2/libcairo *.c
 recursive-include src/uc2/libimg *.c
 recursive-include src/uc2/cms *.c
