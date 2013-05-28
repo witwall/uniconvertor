@@ -54,6 +54,12 @@ def get_resource(file=True):
 		filename = resource_file.name
 		resource_file.close()
 		return filename
+		
+def save_resource(path):
+	file = open(path,'wb')
+	file.write(base64.b32decode(RESOURCE))
+	file.close()
+
 """
 
 
@@ -61,7 +67,7 @@ if len(sys.argv) == 1:
 	print 'RESOURCE COMPILER: No input file!'
 	print usage
 	sys.exit(1)
-	
+
 if sys.argv[1] == '--help':
 	print usage
 	sys.exit(0)
@@ -75,7 +81,7 @@ else:
 if not os.path.lexists(input_file):
 	print 'RESOURCE COMPILER: Input file not found!'
 	sys.exit(1)
-	
+
 file = open(input_file, 'rb')
 content = file.read()
 file.close()
