@@ -34,23 +34,25 @@ class UCData:
 	doc_icon = None
 	version = '2.0'
 
-	app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
-	if not os.path.lexists(app_config_dir):
-		os.makedirs(app_config_dir)
-	app_config = expanduser_unicode(os.path.join('~', '.config',
-												'uc2', 'preferences.cfg'))
+	def __init__(self):
 
-	#Check color profiles directory	
-	app_color_profile_dir = os.path.join(app_config_dir, 'profiles')
-	if not os.path.lexists(app_color_profile_dir):
-		os.makedirs(app_color_profile_dir)
+		self.app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
+		if not os.path.lexists(self.app_config_dir):
+			os.makedirs(self.app_config_dir)
+		self.app_config = expanduser_unicode(os.path.join('~', '.config',
+													'uc2', 'preferences.cfg'))
 
-	for item in uc2const.COLORSPACES + [uc2const.COLOR_DISPLAY, ]:
-		filename = 'built-in_%s.icm' % item
-		path = os.path.join(app_color_profile_dir, filename)
-		if not os.path.lexists(path):
-			profile = libcms.cms_get_default_profile_resource(item)
-			shutil.copy(profile.name, path)
+		#Check color profiles directory	
+		self.app_color_profile_dir = os.path.join(self.app_config_dir, 'profiles')
+		if not os.path.lexists(self.app_color_profile_dir):
+			os.makedirs(self.app_color_profile_dir)
+
+		for item in uc2const.COLORSPACES + [uc2const.COLOR_DISPLAY, ]:
+			filename = 'built-in_%s.icm' % item
+			path = os.path.join(self.app_color_profile_dir, filename)
+			if not os.path.lexists(path):
+				profile = libcms.cms_get_default_profile_resource(item)
+				shutil.copy(profile.name, path)
 
 class UCConfig(XmlConfigParser):
 
