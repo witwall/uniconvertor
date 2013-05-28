@@ -51,8 +51,7 @@ class UCData:
 			filename = 'built-in_%s.icm' % item
 			path = os.path.join(self.app_color_profile_dir, filename)
 			if not os.path.lexists(path):
-				profile = libcms.cms_get_default_profile_resource(item)
-				shutil.copy(profile.name, path)
+				libcms.cms_save_default_profile(path, item)
 
 class UCConfig(XmlConfigParser):
 
