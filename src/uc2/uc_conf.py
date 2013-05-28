@@ -33,14 +33,14 @@ class UCData:
 	app_icon = None
 	doc_icon = None
 	version = '2.0'
+	app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
 
 	def __init__(self):
 
-		self.app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
 		if not os.path.lexists(self.app_config_dir):
 			os.makedirs(self.app_config_dir)
-		self.app_config = expanduser_unicode(os.path.join('~', '.config',
-													'uc2', 'preferences.cfg'))
+
+		self.app_config = os.path.join(self.app_config_dir, 'preferences.cfg')
 
 		#Check color profiles directory	
 		self.app_color_profile_dir = os.path.join(self.app_config_dir, 'profiles')
