@@ -85,6 +85,13 @@ def get_srgb_profile_resource():
 	import srgb_profile_rc
 	return srgb_profile_rc.get_resource(True)
 
+def save_srgb_profile(path):
+	"""
+	Saves content of built-in sRGB profile.
+	"""
+	import srgb_profile_rc
+	srgb_profile_rc.save_resource(path)
+
 def cms_create_cmyk_profile():
 	"""	
 	Artificial functionality. The function emulates built-in CMYK
@@ -105,6 +112,13 @@ def get_cmyk_profile_resource():
 	import cmyk_profile_rc
 	return cmyk_profile_rc.get_resource(True)
 
+def save_cmyk_profile(path):
+	"""
+	Saves content of built-in CMYK profile.
+	"""
+	import cmyk_profile_rc
+	cmyk_profile_rc.save_resource(path)
+
 def cms_create_display_profile():
 	"""	
 	Artificial functionality. The function emulates built-in display
@@ -124,6 +138,13 @@ def get_display_profile_resource():
 	"""
 	import display_profile_rc
 	return display_profile_rc.get_resource(True)
+	
+def save_display_profile(path):
+	"""
+	Saves content of built-in display profile.
+	"""
+	import display_profile_rc
+	display_profile_rc.save_resource(path)
 
 def cms_create_lab_profile():
 	"""	
@@ -145,6 +166,13 @@ def get_lab_profile_resource():
 	import lab_profile_rc
 	return lab_profile_rc.get_resource(True)
 
+def save_lab_profile(path):
+	"""
+	Saves content of built-in Lab profile.
+	"""
+	import lab_profile_rc
+	lab_profile_rc.save_resource(path)
+
 def cms_create_gray_profile():
 	"""	
 	Artificial functionality. The function emulates built-in Gray
@@ -164,6 +192,13 @@ def get_gray_profile_resource():
 	"""
 	import gray_profile_rc
 	return gray_profile_rc.get_resource(True)
+
+def save_gray_profile(path):
+	"""
+	Saves content of built-in Gray profile.
+	"""
+	import gray_profile_rc
+	gray_profile_rc.save_resource(path)
 
 def cms_create_default_profile(colorspace):
 	"""	
@@ -204,6 +239,22 @@ def cms_get_default_profile_resource(colorspace):
 		return get_display_profile_resource()
 	else:
 		return None
+
+def cms_save_default_profile(path, colorspace):
+	"""	
+	Artificial functionality.
+	Saves content of built-in specified profile.
+	"""
+	if colorspace == uc2const.COLOR_RGB:
+		save_srgb_profile(path)
+	elif colorspace == uc2const.COLOR_CMYK:
+		save_cmyk_profile(path)
+	elif colorspace == uc2const.COLOR_LAB:
+		save_lab_profile(path)
+	elif colorspace == uc2const.COLOR_GRAY:
+		save_gray_profile(path)
+	elif colorspace == uc2const.COLOR_DISPLAY:
+		save_display_profile(path)
 
 def cms_create_transform(inputProfile, inMode,
 					outputProfile, outMode,

@@ -20,3 +20,8 @@ def get_resource(file=True):
 		filename = resource_file.name
 		resource_file.close()
 		return filename
+		
+def save_resource(path):
+	file = open(path,'wb')
+	file.write(base64.b32decode(RESOURCE))
+	file.close()
