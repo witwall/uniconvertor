@@ -8,11 +8,13 @@ values - list of according float values (0.0-1.0).
 alpha - opacity value (0.0-1.0)
 name - string color name
 
-Complete example: ['CMYK', [0.0, 0.0, 0.0, 0.9], 1.0, '90% Black']
+Complete example: ['CMYK', [0.0, 0.0, 0.0, 0.9], 1.0, '90% Black','palette']
 
 For spot color:
-['SPOT', [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0],'palette'], 1.0, 'Black']
+['SPOT', [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]], 1.0, 'Black','palette']
 i.e. values list contains RGB and CMYK values
+
+'palette' - this field is optional and used to identify palette
 
 -------------------------------------------------------------------------------
 
