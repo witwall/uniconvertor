@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #	Copyright (C) 2012 by Igor E. Novikov
-#	
+#
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
 #	the Free Software Foundation, either version 3 of the License, or
 #	(at your option) any later version.
-#	
+#
 #	This program is distributed in the hope that it will be useful,
 #	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #	GNU General Public License for more details.
-#	
+#
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -78,13 +78,12 @@ class XmlConfigParser:
 		if len(self.__dict__) == 0 or filename == None: return
 
 		try:
-			file = open(filename, 'w')
-		except (IOError, os.error), value:
-			sys.stderr('cannot write preferences into %s: %s' % (filename,
-																 value[1]))
+			fileobj = open(filename, 'w')
+		except:
+			print 'ERROR>>> cannot write preferences into %s' % filename
 			return
 
-		writer = XMLGenerator(out=file, encoding=self.system_encoding)
+		writer = XMLGenerator(out=fileobj, encoding=self.system_encoding)
 		writer.startDocument()
 		defaults = XmlConfigParser.__dict__
 		items = self.__dict__.items()
@@ -107,7 +106,7 @@ class XmlConfigParser:
 			writer.characters('\n')
 		writer.endElement('preferences')
 		writer.endDocument()
-		file.close
+		fileobj.close
 
 class XMLPrefReader(handler.ContentHandler):
 	"""Handler for xml file reading"""
