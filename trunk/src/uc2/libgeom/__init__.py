@@ -424,25 +424,26 @@ def get_polygon_path(corners_num, angle1, angle2, coef1, coef2):
 	return [path, ]
 
 def get_text_path(text, width, style, attributes):
+	paths = []
 
-	libcairo.CTX.set_matrix(libcairo.DIRECT_MATRIX)
-	libcairo.CTX.new_path()
-	libcairo.CTX.move_to(0, 0)
-
-	libcairo.PCCTX.update_layout(libcairo.PANGO_LAYOUT)
-
-	if width == const.TEXTBLOCK_WIDTH:
-		libcairo.PANGO_LAYOUT.set_width(const.TEXTBLOCK_WIDTH)
-	else:
-		libcairo.PANGO_LAYOUT.set_width(int(width * 1000))
-
-	libcairo.PANGO_LAYOUT.set_justify(True)
-	libcairo.PANGO_LAYOUT.set_text(text)
-
-	libcairo.PCCTX.layout_path(libcairo.PANGO_LAYOUT)
-	cairo_path = libcairo.CTX.copy_path()
-	libcairo.apply_cmatrix(cairo_path, libcairo.PANGO_MATRIX)
-	paths = libcairo.get_path_from_cpath(cairo_path)
+#	libcairo.CTX.set_matrix(libcairo.DIRECT_MATRIX)
+#	libcairo.CTX.new_path()
+#	libcairo.CTX.move_to(0, 0)
+#
+#	libcairo.PCCTX.update_layout(libcairo.PANGO_LAYOUT)
+#
+#	if width == const.TEXTBLOCK_WIDTH:
+#		libcairo.PANGO_LAYOUT.set_width(const.TEXTBLOCK_WIDTH)
+#	else:
+#		libcairo.PANGO_LAYOUT.set_width(int(width * 1000))
+#
+#	libcairo.PANGO_LAYOUT.set_justify(True)
+#	libcairo.PANGO_LAYOUT.set_text(text)
+#
+#	libcairo.PCCTX.layout_path(libcairo.PANGO_LAYOUT)
+#	cairo_path = libcairo.CTX.copy_path()
+#	libcairo.apply_cmatrix(cairo_path, libcairo.PANGO_MATRIX)
+#	paths = libcairo.get_path_from_cpath(cairo_path)
 
 	return paths
 
