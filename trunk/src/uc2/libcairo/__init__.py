@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #	Copyright (C) 2011 by Igor E. Novikov
-#	
+#
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
 #	the Free Software Foundation, either version 3 of the License, or
 #	(at your option) any later version.
-#	
+#
 #	This program is distributed in the hope that it will be useful,
 #	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #	GNU General Public License for more details.
-#	
+#
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -193,7 +193,7 @@ def convert_bbox_to_cpath(bbox):
 	CTX.close_path()
 	return CTX.copy_path()
 
-def is_point_in_path(point, trafo, object, stroke_width=5.0, fill_flag=True):
+def is_point_in_path(point, trafo, obj, stroke_width=5.0, fill_flag=True):
 	dx, dy = point
 	trafo = [] + trafo
 	trafo[4] -= dx
@@ -202,7 +202,7 @@ def is_point_in_path(point, trafo, object, stroke_width=5.0, fill_flag=True):
 	CTX.set_tolerance(3.0)
 	CTX.set_source_rgb(1, 1, 1)
 	CTX.paint()
-	_draw_object(object, trafo, stroke_width, fill_flag)
+	_draw_object(obj, trafo, stroke_width, fill_flag)
 	pixel = _libcairo.get_pixel(SURFACE)
 	CTX.set_tolerance(0.1)
 	if pixel[0] == pixel[1] == pixel[2] == 255:
@@ -210,31 +210,31 @@ def is_point_in_path(point, trafo, object, stroke_width=5.0, fill_flag=True):
 	else:
 		return True
 
-def _draw_object(object, trafo, stroke_width, fill_flag):
-	if object.childs:
-		for child in object.childs:
+def _draw_object(obj, trafo, stroke_width, fill_flag):
+	if obj.childs:
+		for child in obj.childs:
 			_draw_object(child, trafo, stroke_width, fill_flag)
 	else:
 		fill_anyway = False
-		path = object.cache_cpath
+		path = obj.cache_cpath
 
-		if object.cid in [205, 206]:
-			path = convert_bbox_to_cpath(object.cache_bbox)
+		if obj.cid in [205, 206]:
+			path = convert_bbox_to_cpath(obj.cache_bbox)
 			fill_anyway = True
-		if object.cid == 204 and len(object.paths) > 100:
-			path = convert_bbox_to_cpath(object.cache_bbox)
+		if obj.cid == 204 and len(obj.paths) > 100:
+			path = convert_bbox_to_cpath(obj.cache_bbox)
 			fill_anyway = True
 
 		CTX.set_matrix(get_matrix_from_trafo(trafo))
 		CTX.set_source_rgb(0, 0, 0)
 		CTX.new_path()
 		CTX.append_path(path)
-		if fill_flag and object.style[0]:
+		if fill_flag and obj.style[0]:
 			CTX.fill_preserve()
 		if fill_anyway:
 			CTX.fill_preserve()
-		if object.style[1]:
-			stroke = object.style[1]
+		if obj.style[1]:
+			stroke = obj.style[1]
 			width = stroke[1] * trafo[0]
 			stroke_width /= trafo[0]
 			if width < stroke_width: width = stroke_width
