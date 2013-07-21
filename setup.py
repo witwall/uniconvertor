@@ -118,7 +118,7 @@ data_files = [
 ('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
 ]
 deb_depends = 'libmagickwand2, python (>=2.4), python (<<3.0), '
-deb_depends += 'python-imaging, python-cairo'
+deb_depends += 'python-imaging, python-cairo, python-gtk2'
 
 ############################################################
 #
