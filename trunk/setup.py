@@ -117,7 +117,7 @@ data_files = [
 ('/usr/share/mime/packages/', ['src/vnd.sk1project.pdxf-graphics.xml', ]),
 ('/usr/share/mime-info/', ['src/sk1project.keys', 'src/sk1project.mime'])
 ]
-deb_depends = 'libmagickwand5, python (>=2.4), python (<<3.0), '
+deb_depends = 'python (>=2.4), python (<<3.0), '
 deb_depends += 'python-imaging, python-cairo, python-gtk2'
 
 ############################################################
