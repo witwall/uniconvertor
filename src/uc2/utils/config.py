@@ -69,7 +69,7 @@ class XmlConfigParser:
 				xml_reader.setEntityResolver(entity_resolver)
 				xml_reader.setDTDHandler(dtd_handler)
 				xml_reader.parse(input_source)
-				input.close
+				input.close()
 			except:
 				pass
 
