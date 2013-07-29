@@ -71,7 +71,9 @@ class XmlConfigParser:
 				xml_reader.parse(input_source)
 				input.close()
 			except:
-				pass
+				print 'ERROR>>> cannot read preferences from %s' % filename
+				print sys.exc_info()[1].__str__()
+				print sys.exc_info()[2].__str__()
 
 	def save(self, filename=None):
 		if self.filename and filename is None: filename = self.filename
