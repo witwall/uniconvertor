@@ -60,16 +60,16 @@ class XmlConfigParser:
 			entity_resolver = EntityResolver()
 			dtd_handler = DTDHandler()
 			try:
-				input = open(filename, "r")
+				input_file = open(filename, "r")
 				input_source = InputSource()
-				input_source.setByteStream(input)
+				input_source.setByteStream(input_file)
 				xml_reader = xml.sax.make_parser()
 				xml_reader.setContentHandler(content_handler)
 				xml_reader.setErrorHandler(error_handler)
 				xml_reader.setEntityResolver(entity_resolver)
 				xml_reader.setDTDHandler(dtd_handler)
 				xml_reader.parse(input_source)
-				input.close()
+				input_file.close()
 			except:
 				print 'ERROR>>> cannot read preferences from %s' % filename
 				print sys.exc_info()[1].__str__()
