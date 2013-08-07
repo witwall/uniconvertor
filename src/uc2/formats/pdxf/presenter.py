@@ -17,6 +17,7 @@
 
 import os
 from uc2 import uc2const
+from uc2.utils import generate_id
 from uc2.formats.pdxf import const
 from uc2.formats.pdxf import methods
 
@@ -41,7 +42,7 @@ class PDXF_Presenter(TaggedModelPresenter):
 		self.config.load(config_file)
 		self.config.update(cnf)
 		self.appdata = appdata
-		self.doc_id = id(self).__str__()
+		self.doc_id = generate_id()
 		self.loader = PDXF_Loader()
 		self.saver = PDXF_Saver()
 		self.methods = PDXF_Methods(self)
