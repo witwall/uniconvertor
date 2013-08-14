@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #	Copyright (C) 2011 by Igor E. Novikov
-#	
+#
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
 #	the Free Software Foundation, either version 3 of the License, or
 #	(at your option) any later version.
-#	
+#
 #	This program is distributed in the hope that it will be useful,
 #	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #	GNU General Public License for more details.
-#	
+#
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -26,6 +26,18 @@ COLOR_SPOT, COLOR_DISPLAY
 
 
 CS = [COLOR_RGB, COLOR_CMYK, COLOR_LAB, COLOR_GRAY]
+
+def val_100(vals):
+	ret = []
+	for item in vals:
+		ret.append(int(100 * item))
+	return ret
+
+def val_255(vals):
+	ret = []
+	for item in vals:
+		ret.append(int(255 * item))
+	return ret
 
 def rgb_to_hexcolor(color):
 	"""
@@ -178,7 +190,7 @@ def rgb_to_linear(c):
 def rgb_to_lab(color):
 	R, G, B = color
 
-	#RGB -> linear sRGB 
+	#RGB -> linear sRGB
 	R = rgb_to_linear(R)
 	G = rgb_to_linear(G)
 	B = rgb_to_linear(B)
@@ -251,6 +263,38 @@ def decode_colorb(colorb, color_type):
 	for value in values:
 		result.append(round(value / 255.0, 3))
 	return result
+
+def verbose_color(color):
+	if not color: return 'No color'
+	cs = color[0]
+	val = [] + color[1]
+	alpha = color[2]
+	ret = ''
+	if cs == COLOR_CMYK:
+		c, m, y, k = val_100(val)
+		ret = 'C-%d%% M-%d%% Y-%d%% K-%d%%' % (c, m, y, k)
+		if alpha < 1.0: ret += ' A-%d' % val_100([alpha, ])[0]
+	elif cs == COLOR_RGB:
+		r, g, b = val_255(val)
+		ret = 'R-%d G-%d B-%d' % val_255(r, g, b)
+		if alpha < 1.0: ret += ' A-%d' % val_255([alpha, ])[0]
+	elif cs == COLOR_GRAY:
+		g = val_255(val)[0]
+		ret = 'Gray-%d' % g
+		if alpha < 1.0: ret += ' Alpha-%d' % val_255([alpha, ])[0]
+	elif cs == COLOR_LAB:
+		L, a, b = val
+		L = L * 100.0
+		a = a * 255.0 - 128.0
+		b = b * 255.0 - 128.0
+		ret = 'L-%d a-%d b-%d'
+		if alpha < 1.0: ret += ' Alpha-%d' % val_255([alpha, ])[0]
+	elif cs == COLOR_SPOT:
+		ret = color[3]
+	else:
+		return '???'
+
+	return ret
 
 def get_profile_name(filepath):
 	"""
