@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #	Copyright (C) 2012 by Igor E. Novikov
-#	
+#
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
 #	the Free Software Foundation, either version 3 of the License, or
 #	(at your option) any later version.
-#	
+#
 #	This program is distributed in the hope that it will be useful,
 #	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #	GNU General Public License for more details.
-#	
+#
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -220,43 +220,60 @@ MIMES = {
 
 #UNITS
 
+SYSTEM_DPI = 72.0
+
 UNIT_MM = 'mm'
 UNIT_CM = 'cm'
 UNIT_PT = 'pt'
 UNIT_IN = 'in'
+UNIT_PX = 'px'
 
 
 in_to_pt = 72.0
 cm_to_pt = in_to_pt / 2.54
-mm_to_pt = cm_to_pt / 10.0 #2,8346456693
+mm_to_pt = cm_to_pt / 10.0#2,8346456693
 m_to_pt	 = 100.0 * cm_to_pt
+px_to_pt = in_to_pt / SYSTEM_DPI
 
 pt_to_in = 1.0 / 72.0
 pt_to_cm = 2.54 * pt_to_in
 pt_to_mm = pt_to_cm * 10.0
 pt_to_m	 = pt_to_cm / 100.0
+pt_to_px = pt_to_in * SYSTEM_DPI
 
 unit_dict = {UNIT_PT: 1.0,
+			UNIT_PX: px_to_pt,
 			UNIT_IN: in_to_pt,
 			UNIT_CM: cm_to_pt,
 			UNIT_MM: mm_to_pt}
 
 point_dict = {UNIT_PT: 1.0,
+			UNIT_PX: pt_to_px,
 			UNIT_IN: pt_to_in,
 			UNIT_CM: pt_to_cm,
 			UNIT_MM: pt_to_mm}
 
-unit_names = [UNIT_CM, UNIT_MM, UNIT_PT, UNIT_IN, ]
+unit_names = [UNIT_CM, UNIT_MM, UNIT_PT, UNIT_PX, UNIT_IN, ]
 
 unit_full_names = {
 UNIT_PT: _('points'),
+UNIT_PX: _('pixels'),
 UNIT_IN: _('inches'),
 UNIT_CM: _('centimeters'),
 UNIT_MM: _('millimeters')
 }
 
+unit_short_names = {
+UNIT_PT: _('pt'),
+UNIT_PX: _('px'),
+UNIT_IN: _('in'),
+UNIT_CM: _('cm'),
+UNIT_MM: _('mm')
+}
+
 unit_by_name = {
 _('points'):UNIT_PT,
+_('pixels'):UNIT_PX,
 _('inches'): UNIT_IN,
 _('centimeters'): UNIT_CM,
 _('millimeters'): UNIT_MM
