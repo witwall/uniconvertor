@@ -276,7 +276,7 @@ def verbose_color(color):
 		if alpha < 1.0: ret += ' A-%d' % val_100([alpha, ])[0]
 	elif cs == COLOR_RGB:
 		r, g, b = val_255(val)
-		ret = 'R-%d G-%d B-%d' % val_255(r, g, b)
+		ret = 'R-%d G-%d B-%d' % (r, g, b)
 		if alpha < 1.0: ret += ' A-%d' % val_255([alpha, ])[0]
 	elif cs == COLOR_GRAY:
 		g = val_255(val)[0]
@@ -287,7 +287,7 @@ def verbose_color(color):
 		L = L * 100.0
 		a = a * 255.0 - 128.0
 		b = b * 255.0 - 128.0
-		ret = 'L-%d a-%d b-%d'
+		ret = 'L-%d a-%d b-%d' % (L, a, b)
 		if alpha < 1.0: ret += ' Alpha-%d' % val_255([alpha, ])[0]
 	elif cs == COLOR_SPOT:
 		ret = color[3]
