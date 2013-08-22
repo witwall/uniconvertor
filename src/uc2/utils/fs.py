@@ -167,6 +167,11 @@ def expanduser_unicode(path):
 	path = os.path.expanduser(path.encode(sys.getfilesystemencoding()))
 	return path.decode(sys.getfilesystemencoding())
 
+def path_unicode(path):
+	return path.decode(sys.getfilesystemencoding())
+
+def path_system(path):
+	return path.encode(sys.getfilesystemencoding())
 
 def get_system_fontdirs():
 	"""
