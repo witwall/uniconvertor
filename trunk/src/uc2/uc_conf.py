@@ -18,7 +18,6 @@
 import os
 
 from uc2 import uc2const
-from uc2.utils.fs import expanduser_unicode
 from uc2.utils.config import XmlConfigParser
 from uc2.cms import libcms
 
@@ -33,7 +32,7 @@ class UCData:
 	app_icon = None
 	doc_icon = None
 	version = '2.0'
-	app_config_dir = expanduser_unicode(os.path.join('~', '.config', 'uc2'))
+	app_config_dir = os.path.expanduser(os.path.join('~', '.config', 'uc2'))
 
 	def __init__(self):
 
