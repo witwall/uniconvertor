@@ -23,6 +23,8 @@ from xml.sax.xmlreader import InputSource
 from xml.sax import handler
 from xml.sax.saxutils import XMLGenerator
 
+from uc2.utils.fs import path_system, path_unicode
+
 IDENT = '\t'
 
 def encode_quotes(line):
@@ -98,7 +100,7 @@ class XmlConfigParser:
 			writer.characters('\t')
 			writer.startElement('%s' % key, {})
 
-			str_value = value.__str__()
+			str_value = path_unicode(value.__str__())
 			if isinstance(value, str):
 				str_value = "'%s'" % (escape_quote(str_value))
 
@@ -123,7 +125,7 @@ class XMLPrefReader(handler.ContentHandler):
 	def endElement(self, name):
 		if name != 'preferences':
 			try:
-				line = 'self.value=' + self.value
+				line = path_system('self.value=' + self.value)
 				code = compile(line, '<string>', 'exec')
 				exec code
 				self.pref.__dict__[self.key] = self.value
