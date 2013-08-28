@@ -4,17 +4,17 @@
 #	to LittleCMS library.
 #
 #	Copyright (C) 2012 by Igor E. Novikov
-#	
+#
 #	This program is free software: you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
 #	the Free Software Foundation, either version 3 of the License, or
 #	(at your option) any later version.
-#	
+#
 #	This program is distributed in the hope that it will be useful,
 #	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #	GNU General Public License for more details.
-#	
+#
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,6 +27,13 @@ from uc2 import uc2const
 
 class CmsError(Exception):
 	pass
+
+def get_version():
+	"""
+	Retuns LCMS version.
+	"""
+	ver = str(_cms.getVersion())
+	return ver[0] + '.' + ver[1:]
 
 def COLORB():
 	"""
@@ -131,14 +138,14 @@ def cms_create_display_profile():
 	import display_profile_rc
 	profile = display_profile_rc.get_resource(True)
 	return cms_open_profile_from_file(profile.name)
-	
+
 def get_display_profile_resource():
 	"""
 	Returns named temporary file object of built-in display profile.
 	"""
 	import display_profile_rc
 	return display_profile_rc.get_resource(True)
-	
+
 def save_display_profile(path):
 	"""
 	Saves content of built-in display profile.
@@ -392,7 +399,7 @@ def cms_close_profile(profile):
 #def cmsDoBitmapTransform(hTransform, inImage, inMode, outMode):
 #	"""
 #	The method provides PIL images support for color management.
-#	
+#
 #	hTransform - a valid lcms transformation handle
 #	inImage - a valid PIL image object
 #	inMode, outMode -  - predefined string constant (i.e. TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8) or valid PIL mode
@@ -401,37 +408,37 @@ def cms_close_profile(profile):
 #	"""
 #	if not inImage.mode == inMode:
 #		raise CmsError, "incorrect inMode"
-#	
-#	if not inImage.mode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]: 
+#
+#	if not inImage.mode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]:
 #		raise CmsError, "unsupported image type: %s"%inImage.mode
-#	
-#	if not inMode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]: 
+#
+#	if not inMode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]:
 #		raise CmsError, "unsupported inMode type: %s"%inMode
-#	
-#	if not outMode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]: 
+#
+#	if not outMode in [TYPE_RGB_8, TYPE_RGBA_8, TYPE_CMYK_8]:
 #		raise CmsError, "unsupported outMode type: %s"%outMode
-#	
+#
 #	w, h = inImage.size
 #	inImage.load()
 #	outImage=Image.new(outMode, (w, h))
-#	
+#
 #	_cms.transformBitmap(hTransform, inImage.im, outImage.im, w, h)
-#	
+#
 #	return outImage
 
 ##############################################################
 #              Pixels API
 ##############################################################
-#  Best color management performance can be achieved for plane 
+#  Best color management performance can be achieved for plane
 #  pixel arrays (i.e. for unsigned char* on native side)
-#  Also pixel arrays can be used for Cairo and ImageMagick 
+#  Also pixel arrays can be used for Cairo and ImageMagick
 #  integration.
 ##############################################################
 
 #def getPixelsFromImage(image):
 #	"""
 #	Creates pixel array using provided image. Accepts any valid PIL image.
-#	
+#
 #	image - any valid PIL image.
 #	Returns pixel array handle wrapped as a python object.
 #	"""
@@ -448,7 +455,7 @@ def cms_close_profile(profile):
 #def getImageFromPixels(pixels, mode, width, height):
 #	"""
 #	Creates new image using provided pixel array.
-#	
+#
 #	pixels - pixel array wrapped as a python object.
 #	mode - pixel array appropriate PIL mode.
 #	width, height - pixel array appropriate image size.
@@ -468,7 +475,7 @@ def cms_close_profile(profile):
 #	"""
 #	Transforms pixel array using provided lcms transform handle.
 #	Supports TYPE_RGB_8, TYPE_RGBA_8, and TYPE_CMYK_8 transforms only.
-#	
+#
 #	hTransform - valid lcms transform handle
 #	pixels - pixel array wrapped as a python object.
 #	width - pixel array width.
