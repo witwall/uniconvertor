@@ -32,6 +32,7 @@ class UCData:
 	app_icon = None
 	doc_icon = None
 	version = '2.0'
+	revision = 'rev.340'
 	app_config_dir = os.path.expanduser(os.path.join('~', '.config', 'uc2'))
 
 	def __init__(self):
