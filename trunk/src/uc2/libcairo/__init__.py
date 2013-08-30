@@ -112,7 +112,7 @@ def apply_trafo(cairo_path, trafo, copy=False):
 def multiply_trafo(trafo1, trafo2):
 	matrix1 = get_matrix_from_trafo(trafo1)
 	matrix2 = get_matrix_from_trafo(trafo2)
-	matrix = matrix1 * matrix2
+	matrix = matrix1.multiply(matrix2)
 	return _libcairo.get_trafo(matrix)
 
 def normalize_bbox(bbox):
