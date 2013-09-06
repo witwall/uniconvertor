@@ -184,6 +184,10 @@ class PDXF_Methods:
 	def get_guide_layer(self):
 		return self.model.childs[4]
 
+	def set_rect_corners(self, obj, corners):
+		obj.corners = corners
+		obj.update()
+
 	def set_polygon_corners_num(self, obj, num):
 		obj.corners_num = num
 		obj.update()
