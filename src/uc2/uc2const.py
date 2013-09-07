@@ -224,6 +224,7 @@ SYSTEM_DPI = 72.0
 
 UNIT_MM = 'mm'
 UNIT_CM = 'cm'
+UNIT_M = 'm'
 UNIT_PT = 'pt'
 UNIT_IN = 'in'
 UNIT_PX = 'px'
@@ -244,21 +245,31 @@ pt_to_px = pt_to_in * SYSTEM_DPI
 unit_dict = {UNIT_PT: 1.0,
 			UNIT_PX: px_to_pt,
 			UNIT_IN: in_to_pt,
+			UNIT_M: m_to_pt,
 			UNIT_CM: cm_to_pt,
 			UNIT_MM: mm_to_pt}
 
 point_dict = {UNIT_PT: 1.0,
 			UNIT_PX: pt_to_px,
 			UNIT_IN: pt_to_in,
+			UNIT_M: pt_to_m,
 			UNIT_CM: pt_to_cm,
 			UNIT_MM: pt_to_mm}
 
-unit_names = [UNIT_CM, UNIT_MM, UNIT_PT, UNIT_PX, UNIT_IN, ]
+unit_accuracy = {UNIT_PT: 1,
+			UNIT_PX: 1,
+			UNIT_IN: 3,
+			UNIT_M: 4,
+			UNIT_CM: 3,
+			UNIT_MM: 2}
+
+unit_names = [UNIT_M, UNIT_CM, UNIT_MM, UNIT_PT, UNIT_PX, UNIT_IN, ]
 
 unit_full_names = {
 UNIT_PT: _('points'),
 UNIT_PX: _('pixels'),
 UNIT_IN: _('inches'),
+UNIT_M: _('meters'),
 UNIT_CM: _('centimeters'),
 UNIT_MM: _('millimeters')
 }
@@ -267,6 +278,7 @@ unit_short_names = {
 UNIT_PT: _('pt'),
 UNIT_PX: _('px'),
 UNIT_IN: _('in'),
+UNIT_M: _('m'),
 UNIT_CM: _('cm'),
 UNIT_MM: _('mm')
 }
@@ -275,6 +287,7 @@ unit_by_name = {
 _('points'):UNIT_PT,
 _('pixels'):UNIT_PX,
 _('inches'): UNIT_IN,
+_('meters'): UNIT_M,
 _('centimeters'): UNIT_CM,
 _('millimeters'): UNIT_MM
 }
