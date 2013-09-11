@@ -193,10 +193,10 @@ class Pages(DocumentObject):
 		self.page_counter = 0
 		self.parent = parent
 		self.config = config
-		format = '' + self.config.page_format
-		size = deepcopy(uc2const.PAGE_FORMATS[format])
+		fmt = '' + self.config.page_format
+		size = deepcopy(uc2const.PAGE_FORMATS[fmt])
 		orient = config.page_orientation
-		self.page_format = [format, size, orient]
+		self.page_format = [fmt, size, orient]
 
 
 
@@ -234,10 +234,10 @@ class Page(StructuralObject):
 		else:
 			self.name = name
 		if parent is None:
-			format = '' + self.config.page_format
-			size = deepcopy(uc2const.PAGE_FORMATS[format])
+			fmt = '' + self.config.page_format
+			size = deepcopy(uc2const.PAGE_FORMATS[fmt])
 			orient = config.page_orientation
-			self.page_format = [format, size, orient]
+			self.page_format = [fmt, size, orient]
 		else:
 			self.page_format = deepcopy(parent.page_format)
 
@@ -466,7 +466,7 @@ class Group(SelectableObject):
 		return (self, None, [] + self.cache_bbox, childs_snapshots)
 
 	def set_trafo_snapshot(self, snapshot):
-		handle, trafo, self.cache_bbox, childs_snapshots = snapshot
+		self.cache_bbox, childs_snapshots = snapshot[2:]
 		for item in childs_snapshots:
 			item[0].set_trafo_snapshot(item)
 
@@ -556,7 +556,7 @@ class PrimitiveObject(SelectableObject):
 			libgeom.copy_cpath(self.cache_cpath))
 
 	def set_trafo_snapshot(self, snapshot):
-		handle, self.trafo, self.cache_bbox, self.cache_cpath = snapshot
+		self.trafo, self.cache_bbox, self.cache_cpath = snapshot[1:]
 
 
 class Rectangle(PrimitiveObject):
