@@ -603,13 +603,14 @@ class Circle(PrimitiveObject):
 	cid = CIRCLE
 	angle1 = 0.0
 	angle2 = 0.0
-	type = const.ARC_CHORD
+	circle_type = const.ARC_CHORD
+	initial_trafo = []
 
 	def __init__(self, config, parent=None,
 				rect=[] + const.STUB_RECT,
 				angel1=0.0,
 				angel2=0.0,
-				type=const.ARC_CHORD,
+				circle_type=const.ARC_CHORD,
 				style=[] + const.EMPTY_STYLE,
 				):
 		self.cid = CIRCLE
@@ -618,7 +619,8 @@ class Circle(PrimitiveObject):
 		self.angle1 = angel1
 		self.angle2 = angel2
 		self.trafo = [rect[2], 0.0, 0.0, rect[3], rect[0], rect[1]]
-		self.type = type
+		self.initial_trafo = [] + self.trafo
+		self.circle_type = circle_type
 		self.style = style
 
 	def copy(self):
@@ -626,12 +628,12 @@ class Circle(PrimitiveObject):
 		circle.trafo = [] + self.trafo
 		circle.angle1 = self.angle1
 		circle.angle2 = self.angle2
-		circle.type = self.type
+		circle.circle_type = self.circle_type
 		circle.style = deepcopy(self.style)
 		return circle
 
 	def get_initial_paths(self):
-		return libgeom.get_circle_path(self.angle1, self.angle2, type)
+		return libgeom.get_circle_path(self.angle1, self.angle2, self.circle_type)
 
 
 class Polygon(PrimitiveObject):
