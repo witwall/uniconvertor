@@ -372,11 +372,11 @@ def get_rect_path(start, width, height, corners):
 	path.append(const.CURVE_CLOSED)
 	return [path, ]
 
-def get_circle_path(angle1, angle2, type):
+def get_circle_path(angle1, angle2, circle_type):
 	paths = []
 	if angle1 == angle2:
 		paths += const.STUB_CIRCLE
-		if type:
+		if circle_type:
 			return paths
 		else:
 			paths[0][2] = const.CURVE_OPENED
@@ -387,10 +387,10 @@ def get_circle_path(angle1, angle2, type):
 	libcairo.CTX.arc(0.5, 0.5, 0.5, angle1, angle2)
 	cairo_path = libcairo.CTX.copy_path()
 	paths = libcairo._libcairo.get_path_from_cpath(cairo_path)
-	if type:
+	if circle_type:
 		start_point = [] + paths[0][0]
 		paths[0][2] = const.CURVE_CLOSED
-		if type == const.ARC_PIE_SLICE:
+		if circle_type == const.ARC_PIE_SLICE:
 			paths[0][1].append([0.5, 0.5])
 		paths[0][1].append(start_point)
 	return paths
