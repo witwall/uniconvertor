@@ -626,6 +626,7 @@ class Circle(PrimitiveObject):
 	def copy(self):
 		circle = Circle(self.config)
 		circle.trafo = [] + self.trafo
+		circle.initial_trafo = [] + self.initial_trafo
 		circle.angle1 = self.angle1
 		circle.angle2 = self.angle2
 		circle.circle_type = self.circle_type
