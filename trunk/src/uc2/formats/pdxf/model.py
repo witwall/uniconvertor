@@ -604,7 +604,7 @@ class Circle(PrimitiveObject):
 	angle1 = 0.0
 	angle2 = 0.0
 	circle_type = const.ARC_CHORD
-	initial_trafo = []
+	initial_trafo = const.NORMAL_TRAFO
 
 	def __init__(self, config, parent=None,
 				rect=[] + const.STUB_RECT,
