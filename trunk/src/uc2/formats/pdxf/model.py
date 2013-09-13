@@ -608,16 +608,16 @@ class Circle(PrimitiveObject):
 
 	def __init__(self, config, parent=None,
 				rect=[] + const.STUB_RECT,
-				angel1=0.0,
-				angel2=0.0,
+				angle1=0.0,
+				angle2=0.0,
 				circle_type=const.ARC_CHORD,
 				style=[] + const.EMPTY_STYLE,
 				):
 		self.cid = CIRCLE
 		self.parent = parent
 		self.config = config
-		self.angle1 = angel1
-		self.angle2 = angel2
+		self.angle1 = angle1
+		self.angle2 = angle2
 		self.trafo = [rect[2], 0.0, 0.0, rect[3], rect[0], rect[1]]
 		self.initial_trafo = [] + self.trafo
 		self.circle_type = circle_type
