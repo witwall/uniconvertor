@@ -191,3 +191,9 @@ class PDXF_Methods:
 	def set_polygon_corners_num(self, obj, num):
 		obj.corners_num = num
 		obj.update()
+
+	def set_circle_properties(self, obj, circle_type, angle1, angle2):
+		obj.circle_type = circle_type
+		obj.angle1 = angle1
+		obj.angle2 = angle2
+		obj.update()
