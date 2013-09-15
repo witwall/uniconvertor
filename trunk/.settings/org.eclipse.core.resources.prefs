@@ -69,6 +69,7 @@ encoding//src/uc2/formats/wmf/wmfconst.py=utf-8
 encoding//src/uc2/libcairo/__init__.py=utf-8
 encoding//src/uc2/libgeom/__init__.py=utf-8
 encoding//src/uc2/libimg/__init__.py=utf-8
+encoding//src/uc2/libtrace/__init__.py=utf-8
 encoding//src/uc2/msgconst.py=utf-8
 encoding//src/uc2/uc2const.py=utf-8
 encoding//src/uc2/uc_conf.py=utf-8
