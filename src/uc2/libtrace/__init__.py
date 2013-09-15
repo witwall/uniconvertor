@@ -18,4 +18,4 @@
 import _libtrace
 
 def get_version():
-	return _libtrace.get_libtrace_version()
+	return _libtrace.get_libtrace_version().split(' ')[1]
