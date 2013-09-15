@@ -175,6 +175,14 @@ cairo_module = Extension('uc2.libcairo._libcairo',
 		libraries=['cairo'])
 modules.append(cairo_module)
 
+trace_src = os.path.join(src_path, 'uc2', 'libtrace')
+files = make_source_list(trace_src, ['_libtrace.c', ])
+trace_module = Extension('uc2.libtrace._libtrace',
+		define_macros=[('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
+		sources=files,
+		libraries=['potrace'])
+modules.append(trace_module)
+
 #libimg_src = os.path.join(src_path, 'uc2', 'libimg')
 #files = make_source_list(libimg_src, ['_libimg.c', ])
 #include_dirs = make_source_list(include_path, ['ImageMagick', ])
