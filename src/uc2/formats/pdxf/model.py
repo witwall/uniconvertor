@@ -646,6 +646,7 @@ class Polygon(PrimitiveObject):
 	angle2 = 0.0
 	coef1 = 1.0
 	coef2 = 1.0
+	initial_trafo = const.NORMAL_TRAFO
 
 	def __init__(self, config, parent=None,
 				rect=[] + const.STUB_RECT,
@@ -667,11 +668,13 @@ class Polygon(PrimitiveObject):
 		self.coef1 = coef1
 		self.coef2 = coef2
 		self.trafo = [rect[2], 0.0, 0.0, rect[3], rect[0], rect[1]]
+		self.initial_trafo = [] + self.trafo
 		self.style = style
 
 	def copy(self):
 		polygon = Polygon(self.config)
 		polygon.trafo = [] + self.trafo
+		polygon.initial_trafo = [] + self.initial_trafo
 		polygon.corners_num = self.corners_num
 		polygon.angle1 = self.angle1
 		polygon.angle2 = self.angle2
