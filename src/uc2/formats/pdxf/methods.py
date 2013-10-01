@@ -96,11 +96,11 @@ class PDXF_Methods:
 
 	def set_default_page_size(self, width, height):
 		parent = self.model.childs[0]
-		format = _('Custom size')
+		fmt = _('Custom size')
 		size = (width, height)
 		orient = uc2const.PORTRAIT
 		if width > height:orient = uc2const.LANDSCAPE
-		parent.page_format = [format, size, orient]
+		parent.page_format = [fmt, size, orient]
 
 	def set_default_page_format(self, page_format):
 		parent = self.model.childs[0]
