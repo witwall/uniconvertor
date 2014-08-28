@@ -68,6 +68,7 @@ CLASSIFIERS = [
 'License :: OSI Approved :: GPL v3',
 'Operating System :: POSIX',
 'Operating System :: MacOS :: MacOS X',
+'Operating System :: Microsoft :: Windows',
 'Programming Language :: Python',
 'Programming Language :: C',
 "Topic :: Multimedia :: Graphics :: Graphics Conversion",
