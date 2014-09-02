@@ -1,7 +1,4 @@
-include LICENSE
-include libutils.py
-include MANIFEST.in
-include GPLv3.txt
+include LICENSE libutils.py MANIFEST.in GPLv3.txt README.txt
 include src/sk1project.keys
 include src/sk1project.mime
 include src/vnd.sk1project.pdxf-graphics.xml
