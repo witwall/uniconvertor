@@ -55,6 +55,7 @@ encoding//src/uc2/formats/riff/utils.py=utf-8
 encoding//src/uc2/formats/sk/__init__.py=utf-8
 encoding//src/uc2/formats/sk1/__init__.py=utf-8
 encoding//src/uc2/formats/sk1/load.py=utf-8
+encoding//src/uc2/formats/sk1/methods.py=utf-8
 encoding//src/uc2/formats/sk1/model.py=utf-8
 encoding//src/uc2/formats/sk1/presenter.py=utf-8
 encoding//src/uc2/formats/sk1/sk1_config.py=utf-8
