@@ -16,7 +16,7 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import deepcopy
-from PIL import Image
+import Image
 
 from uc2 import _, uc2const
 from uc2.formats.pdxf import const
@@ -24,7 +24,7 @@ from uc2.formats.sk1 import sk1const
 from uc2.utils import Base64Encode, Base64Decode, SubFileDecode
 from uc2.formats.generic import TextModelObject
 
-from _sk1objs import Trafo, CreatePath, Point, Translation, Scale
+from _sk1objs import Trafo, CreatePath, Point
 
 # Document object enumeration
 DOCUMENT = 1
@@ -96,14 +96,14 @@ class SK1ModelObject(TextModelObject):
 			result += self.end_string
 		return result
 
-	def write_content(self, file):
+	def write_content(self, fileobj):
 		if not self.properties is None:
-			self.properties.write_content(file)
-		file.write(self.string)
+			self.properties.write_content(fileobj)
+		fileobj.write(self.string)
 		for child in self.childs:
-			child.write_content(file)
+			child.write_content(fileobj)
 		if self.end_string:
-			file.write(self.end_string)
+			fileobj.write(self.end_string)
 
 #--- STRUCTURAL OBJECTS
 
@@ -199,9 +199,9 @@ class SK1Pages(SK1ModelObject):
 	def __init__(self):
 		SK1ModelObject.__init__(self)
 
-	def write_content(self, file):
+	def write_content(self, fileobj):
 		for child in self.childs:
-			child.write_content(file)
+			child.write_content(fileobj)
 
 class SK1Page(SK1ModelObject):
 	"""
@@ -420,9 +420,9 @@ class MultiGradient:
 	def copy(self):
 		return MultiGradient(deepcopy(self.colors))
 
-	def write_content(self, file):
+	def write_content(self, fileobj):
 		val = self.colors.__str__()
-		write = file.write
+		write = fileobj.write
 		write('gl(' + val + ')\n')
 
 def CreateSimpleGradient(start_color, end_color):
@@ -448,9 +448,9 @@ class LinearGradient(GradientPattern):
 		border = self.border
 		return LinearGradient(gradient, direction, border)
 
-	def write_content(self, file):
-		self.gradient.write_content(file)
-		file.write('pgl(%g,%g,%g)\n' % (round(self.direction.x, 10),
+	def write_content(self, fileobj):
+		self.gradient.write_content(fileobj)
+		fileobj.write('pgl(%g,%g,%g)\n' % (round(self.direction.x, 10),
 							round(self.direction.y, 10), self.border))
 
 class RadialGradient(GradientPattern):
@@ -469,9 +469,9 @@ class RadialGradient(GradientPattern):
 		border = self.border
 		return RadialGradient(gradient, center, border)
 
-	def write_content(self, file):
-		self.gradient.write_content(file)
-		file.write('pgr(%g,%g,%g)\n' % (self.center.x, self.center.y, self.border))
+	def write_content(self, fileobj):
+		self.gradient.write_content(fileobj)
+		fileobj.write('pgr(%g,%g,%g)\n' % (self.center.x, self.center.y, self.border))
 
 class ConicalGradient(GradientPattern):
 
@@ -490,9 +490,9 @@ class ConicalGradient(GradientPattern):
 		direction = Point(self.direction.x, self.direction.y)
 		return ConicalGradient(gradient, center, direction)
 
-	def write_content(self, file):
-		self.gradient.write_content(file)
-		file.write('pgc(%g,%g,%g,%g)\n' % (tuple(self.center) + (round(self.direction.x, 10),
+	def write_content(self, fileobj):
+		self.gradient.write_content(fileobj)
+		fileobj.write('pgc(%g,%g,%g,%g)\n' % (tuple(self.center) + (round(self.direction.x, 10),
 											round(self.direction.y, 10))))
 
 class HatchingPattern(Pattern):
@@ -637,8 +637,8 @@ class Style:
 			result += item + '=' + str(self.__dict__[item]) + '\n'
 		return result
 
-	def write_content(self, file):
-		write = file.write
+	def write_content(self, fileobj):
+		write = fileobj.write
 		if hasattr(self, 'fill_pattern'):
 			pattern = self.fill_pattern
 			if pattern is EmptyPattern:
@@ -647,7 +647,7 @@ class Style:
 				if not pattern.color == sk1const.black_color:
 					write('fp(' + pattern.color.__str__() + ')\n')
 			else:
-				pattern.write_content(file)
+				pattern.write_content(fileobj)
 				write('fp()\n')
 		if not self.fill_transform:
 			write('ft(%d)\n' % self.fill_transform)
@@ -659,7 +659,7 @@ class Style:
 				if not pattern.color == sk1const.black_color:
 					write('lp(' + pattern.color.__str__() + ')\n')
 			else:
-				pattern.write_content(file)
+				pattern.write_content(fileobj)
 				write('lp()\n')
 		if self.line_width :
 			write('lw(%g)\n' % self.line_width)
@@ -954,8 +954,8 @@ class SK1BitmapData(SK1ModelObject):
 		if id: self.id = id
 		SK1ModelObject.__init__(self)
 
-	def read_data(self, file):
-		decoder = Base64Decode(SubFileDecode(file, '-'))
+	def read_data(self, fileobj):
+		decoder = Base64Decode(SubFileDecode(fileobj, '-'))
 		self.raw_image = Image.open(decoder)
 		self.raw_image.load()
 
@@ -963,15 +963,15 @@ class SK1BitmapData(SK1ModelObject):
 		self.string = 'bm(%d)\n' % (self.id)
 		self.end_string = '-\n'
 
-	def write_content(self, file):
-		file.write(self.string)
-		vfile = Base64Encode(file)
+	def write_content(self, fileobj):
+		fileobj.write(self.string)
+		vfile = Base64Encode(fileobj)
 		if self.raw_image.mode == "CMYK":
 			self.raw_image.save(vfile, 'JPEG', quality=100)
 		else:
 			self.raw_image.save(vfile, 'PNG')
 		vfile.close()
-		file.write(self.end_string)
+		fileobj.write(self.end_string)
 
 
 class SK1Image(SK1ModelObject):
@@ -997,14 +997,14 @@ class SK1Image(SK1ModelObject):
 			self.id = id(self.image)
 		self.string = 'im' + (self.trafo.coeff(), self.id).__str__() + '\n'
 
-	def write_content(self, file):
+	def write_content(self, fileobj):
 		if self.image:
-			file.write('bm(%d)\n' % (self.id))
-			vfile = Base64Encode(file)
+			fileobj.write('bm(%d)\n' % (self.id))
+			vfile = Base64Encode(fileobj)
 			if self.raw_image.mode == "CMYK":
 				self.raw_image.save(vfile, 'JPEG', quality=100)
 			else:
 				self.raw_image.save(vfile, 'PNG')
 			vfile.close()
-			file.write('-\n')
-			file.write(self.string)
+			fileobj.write('-\n')
+			fileobj.write(self.string)
