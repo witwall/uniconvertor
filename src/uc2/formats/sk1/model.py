@@ -113,7 +113,7 @@ class SK1Document(SK1ModelObject):
 	"""
 
 	string = '##sK1 1 2\ndocument()\n'
-	doc_origin = 1
+	doc_origin = sk1const.DOC_ORIGIN_LL
 	doc_units = uc2const.UNIT_MM
 	cid = DOCUMENT
 	layout = None
