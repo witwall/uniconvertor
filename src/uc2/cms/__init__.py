@@ -95,6 +95,13 @@ def gdk_hexcolor_to_rgb(hexcolor):
 	b = int(hexcolor[9:], 0x10) / 65535.0
 	return [r, g, b]
 
+def rgb_to_gdk_hexcolor(color):
+	"""
+	Converts hex color string as a list of float values.
+	For example: #ffff0000ffff => [1.0, 0.0, 1.0]
+	"""
+	r, g, b = color
+	return '#%02x%02x%02x' % (r * 65535.0, g * 65535.0, b * 65535.0)
 
 def cmyk_to_rgb(color):
 	"""
