@@ -59,8 +59,6 @@ class UCConfig(XmlConfigParser):
 	uc_version = '2.0'
 	system_encoding = 'utf-8'# default encoding (GUI uses utf-8 only)
 
-
-
 	#============== COLOR PROFILES ================
 	cms_use = True
 	cms_display_profiles = {}
@@ -80,8 +78,10 @@ class UCConfig(XmlConfigParser):
 	cms_bpc_flag = False
 	cms_bpt_flag = False
 
+	def __init__(self):pass
+
 	def get_defaults(self):
-		return self.__dict__
+		return UCConfig.__dict__.copy()
 
 
 
