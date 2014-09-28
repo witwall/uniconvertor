@@ -78,7 +78,7 @@ class UCApplication:
 	appdata = None
 	default_cms = None
 
-	def __init__(self, path):
+	def __init__(self, path=''):
 		self.path = path
 		self.config = UCConfig()
 		self.appdata = UCData()
