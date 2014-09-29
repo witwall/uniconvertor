@@ -101,7 +101,7 @@ def rgb_to_gdk_hexcolor(color):
 	For example: #ffff0000ffff => [1.0, 0.0, 1.0]
 	"""
 	r, g, b = color
-	return '#%02x%02x%02x' % (r * 65535.0, g * 65535.0, b * 65535.0)
+	return '#%04x%04x%04x' % (r * 65535.0, g * 65535.0, b * 65535.0)
 
 def cmyk_to_rgb(color):
 	"""
