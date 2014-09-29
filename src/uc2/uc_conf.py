@@ -73,7 +73,7 @@ class UCConfig(XmlConfigParser):
 	cms_flags = uc2const.cmsFLAGS_NOTPRECALC
 	cms_proofing = False
 	cms_gamutcheck = False
-	cms_alarmcodes = (255, 0, 255)
+	cms_alarmcodes = (1.0, 0.0, 1.0)
 	cms_proof_for_spot = False
 	cms_bpc_flag = False
 	cms_bpt_flag = False
